@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -131,6 +130,10 @@ const AdminArea = () => {
     });
   };
   
+  const handleUploadForCardsTab = () => {
+    handleUploadPlanilha(selectedCardType);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#52aa85]/5 to-[#52aa85]/10 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
@@ -168,7 +171,7 @@ const AdminArea = () => {
                   onConfirmPayment={handleConfirmarPagamento}
                   onDelete={handleExcluirCartao}
                   onDownload={handleDownloadPlanilha}
-                  onUpload={handleUploadPlanilha}
+                  onUpload={handleUploadForCardsTab}
                 />
               </TabsContent>
               

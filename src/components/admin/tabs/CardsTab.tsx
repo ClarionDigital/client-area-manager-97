@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -15,7 +14,7 @@ interface CardsTabProps {
   onConfirmPayment: (id: number) => void;
   onDelete: (id: number) => void;
   onDownload: () => void;
-  onUpload: () => void;
+  onUpload: () => void; // Changed: this now expects a function with no arguments
 }
 
 const CardsTab: React.FC<CardsTabProps> = ({
@@ -52,7 +51,7 @@ const CardsTab: React.FC<CardsTabProps> = ({
         onViewChange={() => setModoVisualizacao(modoVisualizacao === "lista" ? "grade" : "lista")}
         modoVisualizacao={modoVisualizacao}
         onDownload={onDownload}
-        onUpload={onUpload}
+        onUpload={onUpload} // Now this expects a function with no parameters
       />
       
       <SearchFilters 

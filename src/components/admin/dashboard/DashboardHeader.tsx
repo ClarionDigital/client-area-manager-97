@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { FileText, Upload, Eye, Download } from "lucide-react";
+import { FileText, Eye, Download } from "lucide-react";
 import UploadSpreadsheet from "@/components/admin/UploadSpreadsheet";
 
 interface DashboardHeaderProps {
@@ -10,7 +10,7 @@ interface DashboardHeaderProps {
   onViewChange: () => void;
   modoVisualizacao: "lista" | "grade";
   onDownload: () => void;
-  onUpload: () => void;
+  onUpload: () => void; // This expects a function with no parameters
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
@@ -33,7 +33,14 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           Relatório
         </Button>
         
-        <UploadSpreadsheet onUpload={onUpload} />
+        {/* Create a wrapper function to call the original onUpload with the selected card type */}
+        <UploadSpreadsheet 
+          onUpload={(cardType: string) => {
+            // After the spreadsheet component gets the card type,
+            // we call the original onUpload function
+            onUpload();
+          }} 
+        />
         
         <Button 
           variant="outline" 
@@ -51,3 +58,4 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 };
 
 export default DashboardHeader;
+
