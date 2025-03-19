@@ -10,16 +10,31 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Download, FileText, Search, Trash2, Eye, Upload, DollarSign } from "lucide-react";
+import { ArrowLeft, Download, FileText, Search, Trash2, Eye, Upload, DollarSign, CheckCircle, Phone, Clock, ImagePlus, Filter, RefreshCw, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 // Dados simulados para demonstração
 const segundasVias = [
-  { id: 1, nome: "Carlos Silva", matricula: "3001245", data: "12/05/2023", status: "Pago", valor: "R$ 35,00" },
-  { id: 2, nome: "Maria Santos", matricula: "3018756", data: "15/05/2023", status: "Pago", valor: "R$ 45,00" },
-  { id: 3, nome: "José Oliveira", matricula: "7042389", data: "18/05/2023", status: "Pendente", valor: "R$ 35,00" },
-  { id: 4, nome: "Ana Rodrigues", matricula: "3021567", data: "20/05/2023", status: "Pago", valor: "R$ 35,00" },
-  { id: 5, nome: "Paulo Costa", matricula: "7031298", data: "22/05/2023", status: "Cancelado", valor: "R$ 45,00" },
+  { id: 1, nome: "Carlos Silva", matricula: "3001245", data: "12/05/2023", status: "Pago", valor: "R$ 35,00", tipo: "Light" },
+  { id: 2, nome: "Maria Santos", matricula: "3018756", data: "15/05/2023", status: "Pago", valor: "R$ 45,00", tipo: "Light" },
+  { id: 3, nome: "José Oliveira", matricula: "7042389", data: "18/05/2023", status: "Pendente", valor: "R$ 35,00", tipo: "Conecta" },
+  { id: 4, nome: "Ana Rodrigues", matricula: "3021567", data: "20/05/2023", status: "Pago", valor: "R$ 35,00", tipo: "Light" },
+  { id: 5, nome: "Paulo Costa", matricula: "7031298", data: "22/05/2023", status: "Cancelado", valor: "R$ 45,00", tipo: "Conecta" },
+  { id: 6, nome: "Fernanda Lima", matricula: "3025467", data: "25/05/2023", status: "Pago", valor: "R$ 35,00", tipo: "Light" },
+  { id: 7, nome: "Ricardo Souza", matricula: "7056234", data: "26/05/2023", status: "Pendente", valor: "R$ 45,00", tipo: "Conecta" },
+  { id: 8, nome: "Juliana Alves", matricula: "3037654", data: "27/05/2023", status: "Pago", valor: "R$ 35,00", tipo: "Light" },
+  { id: 9, nome: "Eduardo Mendes", matricula: "7069872", data: "28/05/2023", status: "Cancelado", valor: "R$ 35,00", tipo: "Conecta" },
+  { id: 10, nome: "Patrícia Rocha", matricula: "3045678", data: "29/05/2023", status: "Pago", valor: "R$ 45,00", tipo: "Light" },
+];
+
+const transacoes = [
+  { id: 3582, cliente: "Maria Santos", valor: "R$ 45,00", data: "22/05/2023", status: "Confirmado", metodo: "Cartão" },
+  { id: 3581, cliente: "João Silva", valor: "R$ 35,00", data: "21/05/2023", status: "Confirmado", metodo: "Pix" },
+  { id: 3580, cliente: "Ana Oliveira", valor: "R$ 35,00", data: "20/05/2023", status: "Pendente", metodo: "Pix" },
+  { id: 3579, cliente: "Carlos Eduardo", valor: "R$ 45,00", data: "19/05/2023", status: "Cancelado", metodo: "Cartão" },
+  { id: 3578, cliente: "Patrícia Rocha", valor: "R$ 45,00", data: "18/05/2023", status: "Confirmado", metodo: "Pix" },
+  { id: 3577, cliente: "Ricardo Souza", valor: "R$ 35,00", data: "17/05/2023", status: "Pendente", metodo: "Cartão" },
+  { id: 3576, cliente: "Juliana Alves", valor: "R$ 45,00", data: "16/05/2023", status: "Confirmado", metodo: "Pix" },
 ];
 
 const AdminArea = () => {
@@ -27,8 +42,12 @@ const AdminArea = () => {
   const { toast } = useToast();
   const [busca, setBusca] = useState("");
   const [filtroStatus, setFiltroStatus] = useState("");
+  const [filtroTipo, setFiltroTipo] = useState("");
   const [visualizarId, setVisualizarId] = useState<number | null>(null);
   const [cartoesGerados, setCartoesGerados] = useState(segundasVias);
+  const [dataInicio, setDataInicio] = useState("");
+  const [dataFim, setDataFim] = useState("");
+  const [modoVisualizacao, setModoVisualizacao] = useState<"lista" | "grade">("lista");
   
   // Função para filtrar os dados
   const filtrarCartoes = () => {
@@ -36,7 +55,8 @@ const AdminArea = () => {
       (busca === "" || 
         cartao.nome.toLowerCase().includes(busca.toLowerCase()) || 
         cartao.matricula.includes(busca)) &&
-      (filtroStatus === "" || cartao.status === filtroStatus)
+      (filtroStatus === "" || cartao.status === filtroStatus) &&
+      (filtroTipo === "" || cartao.tipo === filtroTipo)
     );
   };
   
@@ -56,6 +76,16 @@ const AdminArea = () => {
       description: "Os dados da planilha serão processados em breve",
     });
   };
+
+  const handleConfirmarPagamento = (id: number) => {
+    setCartoesGerados(cartoesGerados.map(cartao => 
+      cartao.id === id ? { ...cartao, status: "Pago" } : cartao
+    ));
+    toast({
+      title: "Pagamento confirmado",
+      description: "Status do pagamento atualizado para 'Pago'",
+    });
+  };
   
   const cartaoSelecionado = visualizarId ? cartoesGerados.find(cartao => cartao.id === visualizarId) : null;
   
@@ -66,20 +96,20 @@ const AdminArea = () => {
       </Button>
       
       <div className="max-w-6xl mx-auto">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Área Light ADM</CardTitle>
-            <CardDescription>
-              Gerencie cartões, segundas vias e controle financeiro
+        <Card className="border-purple-200 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-t-lg">
+            <CardTitle className="text-2xl font-bold">Área Light ADM</CardTitle>
+            <CardDescription className="text-purple-100">
+              Gerenciamento de cartões, segundas vias e controle financeiro
             </CardDescription>
           </CardHeader>
           
-          <CardContent>
-            <Tabs defaultValue="cartoes">
+          <CardContent className="p-6">
+            <Tabs defaultValue="cartoes" className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-8">
-                <TabsTrigger value="cartoes">Cartões Gerados</TabsTrigger>
-                <TabsTrigger value="busca">Busca Avançada</TabsTrigger>
-                <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
+                <TabsTrigger value="cartoes" className="text-sm md:text-base">Cartões Gerados</TabsTrigger>
+                <TabsTrigger value="busca" className="text-sm md:text-base">Busca Avançada</TabsTrigger>
+                <TabsTrigger value="financeiro" className="text-sm md:text-base">Financeiro</TabsTrigger>
               </TabsList>
               
               <TabsContent value="cartoes" className="space-y-6">
@@ -90,14 +120,14 @@ const AdminArea = () => {
                       Lista de todos os cartões gerados pelo sistema
                     </p>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap gap-2">
                     <Button variant="outline" onClick={() => window.print()}>
                       <FileText className="mr-2 h-4 w-4" />
                       Relatório
                     </Button>
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button>
+                        <Button className="bg-purple-600 hover:bg-purple-700">
                           <Upload className="mr-2 h-4 w-4" />
                           Importar Planilha
                         </Button>
@@ -126,10 +156,20 @@ const AdminArea = () => {
                         </div>
                         <DialogFooter>
                           <Button variant="outline">Cancelar</Button>
-                          <Button onClick={handleUploadPlanilha}>Enviar</Button>
+                          <Button onClick={handleUploadPlanilha} className="bg-purple-600 hover:bg-purple-700">Enviar</Button>
                         </DialogFooter>
                       </DialogContent>
                     </Dialog>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setModoVisualizacao(modoVisualizacao === "lista" ? "grade" : "lista")}
+                    >
+                      {modoVisualizacao === "lista" ? (
+                        <><Eye className="mr-2 h-4 w-4" />Visualização em Grade</>
+                      ) : (
+                        <><FileText className="mr-2 h-4 w-4" />Visualização em Lista</>
+                      )}
+                    </Button>
                   </div>
                 </div>
                 
@@ -143,130 +183,280 @@ const AdminArea = () => {
                       onChange={(e) => setBusca(e.target.value)}
                     />
                   </div>
-                  <Select value={filtroStatus} onValueChange={setFiltroStatus}>
-                    <SelectTrigger className="w-full md:w-[180px]">
-                      <SelectValue placeholder="Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Todos</SelectItem>
-                      <SelectItem value="Pago">Pago</SelectItem>
-                      <SelectItem value="Pendente">Pendente</SelectItem>
-                      <SelectItem value="Cancelado">Cancelado</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="flex gap-2">
+                    <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+                      <SelectTrigger className="w-full md:w-[140px]">
+                        <SelectValue placeholder="Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Todos</SelectItem>
+                        <SelectItem value="Pago">Pago</SelectItem>
+                        <SelectItem value="Pendente">Pendente</SelectItem>
+                        <SelectItem value="Cancelado">Cancelado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={filtroTipo} onValueChange={setFiltroTipo}>
+                      <SelectTrigger className="w-full md:w-[140px]">
+                        <SelectValue placeholder="Tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="">Todos</SelectItem>
+                        <SelectItem value="Light">Light</SelectItem>
+                        <SelectItem value="Conecta">Conecta</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Nome</TableHead>
-                        <TableHead>Matrícula</TableHead>
-                        <TableHead>Data</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Valor</TableHead>
-                        <TableHead className="text-right">Ações</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {cartoesFiltrados.length > 0 ? (
-                        cartoesFiltrados.map((cartao) => (
-                          <TableRow key={cartao.id}>
-                            <TableCell className="font-medium">{cartao.nome}</TableCell>
-                            <TableCell>{cartao.matricula}</TableCell>
-                            <TableCell>{cartao.data}</TableCell>
-                            <TableCell>
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                cartao.status === 'Pago' 
-                                  ? 'bg-green-100 text-green-800' 
-                                  : cartao.status === 'Pendente'
-                                    ? 'bg-yellow-100 text-yellow-800'
-                                    : 'bg-red-100 text-red-800'
-                              }`}>
-                                {cartao.status}
-                              </span>
-                            </TableCell>
-                            <TableCell>{cartao.valor}</TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end gap-2">
-                                <Dialog>
-                                  <DialogTrigger asChild>
-                                    <Button variant="outline" size="sm" onClick={() => setVisualizarId(cartao.id)}>
-                                      <Eye className="h-4 w-4" />
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent>
-                                    <DialogHeader>
-                                      <DialogTitle>Visualizar Cartão</DialogTitle>
-                                      <DialogDescription>
-                                        Detalhes do cartão gerado
-                                      </DialogDescription>
-                                    </DialogHeader>
-                                    {cartaoSelecionado && (
-                                      <div className="py-4">
-                                        <div className="bg-white border rounded-lg p-4 max-w-xs mx-auto">
-                                          <div className="bg-blue-700 text-white text-center py-2 rounded-t-md">
-                                            {cartaoSelecionado.matricula.startsWith('3') ? 'LIGHT' : 'CONECTA'}
-                                          </div>
-                                          <div className="flex p-4">
-                                            <div className="bg-gray-200 w-24 h-32 mr-4 flex items-center justify-center text-gray-400">
-                                              FOTO
+                {modoVisualizacao === "lista" ? (
+                  <div className="rounded-md border bg-white shadow-sm">
+                    <Table>
+                      <TableHeader className="bg-purple-50">
+                        <TableRow>
+                          <TableHead>Nome</TableHead>
+                          <TableHead>Matrícula</TableHead>
+                          <TableHead>Data</TableHead>
+                          <TableHead>Tipo</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Valor</TableHead>
+                          <TableHead className="text-right">Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {cartoesFiltrados.length > 0 ? (
+                          cartoesFiltrados.map((cartao) => (
+                            <TableRow key={cartao.id} className="hover:bg-purple-50">
+                              <TableCell className="font-medium">{cartao.nome}</TableCell>
+                              <TableCell>
+                                <span className={`${cartao.matricula.startsWith('3') ? 'text-blue-600' : 'text-green-600'} font-medium`}>
+                                  {cartao.matricula}
+                                </span>
+                              </TableCell>
+                              <TableCell>{cartao.data}</TableCell>
+                              <TableCell>
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  cartao.tipo === 'Light' 
+                                    ? 'bg-blue-100 text-blue-800' 
+                                    : 'bg-green-100 text-green-800'
+                                }`}>
+                                  {cartao.tipo}
+                                </span>
+                              </TableCell>
+                              <TableCell>
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                  cartao.status === 'Pago' 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : cartao.status === 'Pendente'
+                                      ? 'bg-yellow-100 text-yellow-800'
+                                      : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {cartao.status}
+                                </span>
+                              </TableCell>
+                              <TableCell>{cartao.valor}</TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex justify-end gap-2">
+                                  <Dialog>
+                                    <DialogTrigger asChild>
+                                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0" onClick={() => setVisualizarId(cartao.id)}>
+                                        <Eye className="h-4 w-4" />
+                                      </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                      <DialogHeader>
+                                        <DialogTitle>Visualizar Cartão</DialogTitle>
+                                        <DialogDescription>
+                                          Detalhes do cartão gerado
+                                        </DialogDescription>
+                                      </DialogHeader>
+                                      {cartaoSelecionado && (
+                                        <div className="py-4">
+                                          <div className="bg-white border rounded-lg p-4 max-w-xs mx-auto shadow-md">
+                                            <div className={`${cartaoSelecionado.tipo === 'Light' ? 'bg-blue-700' : 'bg-green-700'} text-white text-center py-2 rounded-t-md font-bold`}>
+                                              {cartaoSelecionado.tipo}
                                             </div>
-                                            <div className="space-y-2">
-                                              <p className="font-bold">{cartaoSelecionado.nome}</p>
-                                              <p className="text-sm text-gray-600">Matrícula: {cartaoSelecionado.matricula}</p>
-                                              <p className="text-sm text-gray-600">Cargo: Analista</p>
-                                              <p className="text-sm text-gray-600">Validade: 12/2024</p>
+                                            <div className="flex p-4">
+                                              <div className="bg-gray-200 w-24 h-32 mr-4 flex items-center justify-center text-gray-400 rounded-md">
+                                                <ImagePlus className="h-8 w-8" />
+                                              </div>
+                                              <div className="space-y-2">
+                                                <p className="font-bold">{cartaoSelecionado.nome}</p>
+                                                <p className="text-sm text-gray-600">Matrícula: {cartaoSelecionado.matricula}</p>
+                                                <p className="text-sm text-gray-600">Cargo: Analista</p>
+                                                <p className="text-sm text-gray-600">Validade: 12/2024</p>
+                                                <p className="text-sm">
+                                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                                    cartaoSelecionado.status === 'Pago' 
+                                                      ? 'bg-green-100 text-green-800' 
+                                                      : cartaoSelecionado.status === 'Pendente'
+                                                        ? 'bg-yellow-100 text-yellow-800'
+                                                        : 'bg-red-100 text-red-800'
+                                                  }`}>
+                                                    {cartaoSelecionado.status}
+                                                  </span>
+                                                </p>
+                                              </div>
                                             </div>
                                           </div>
+                                          
+                                          {cartaoSelecionado.status === "Pendente" && (
+                                            <div className="mt-4 flex justify-center">
+                                              <Button 
+                                                onClick={() => {
+                                                  handleConfirmarPagamento(cartaoSelecionado.id);
+                                                  setVisualizarId(null);
+                                                }}
+                                                className="bg-green-600 hover:bg-green-700"
+                                              >
+                                                <CheckCircle className="mr-2 h-4 w-4" />
+                                                Confirmar Pagamento
+                                              </Button>
+                                            </div>
+                                          )}
                                         </div>
-                                      </div>
-                                    )}
-                                    <DialogFooter>
-                                      <Button onClick={() => setVisualizarId(null)}>Fechar</Button>
-                                    </DialogFooter>
-                                  </DialogContent>
-                                </Dialog>
-                                
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button variant="outline" size="sm" className="text-red-500">
-                                      <Trash2 className="h-4 w-4" />
+                                      )}
+                                      <DialogFooter>
+                                        <Button onClick={() => setVisualizarId(null)}>Fechar</Button>
+                                      </DialogFooter>
+                                    </DialogContent>
+                                  </Dialog>
+                                  
+                                  {cartao.status === "Pendente" && (
+                                    <Button 
+                                      variant="ghost" 
+                                      size="sm" 
+                                      className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
+                                      onClick={() => handleConfirmarPagamento(cartao.id)}
+                                    >
+                                      <CheckCircle className="h-4 w-4" />
                                     </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Excluir cartão?</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Esta ação não pode ser desfeita. Este cartão será permanentemente excluído 
-                                        do sistema e não poderá ser recuperado.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                      <AlertDialogAction 
-                                        onClick={() => handleExcluirCartao(cartao.id)} 
-                                        className="bg-red-500 hover:bg-red-600"
+                                  )}
+                                  
+                                  <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                      <Button 
+                                        variant="ghost" 
+                                        size="sm" 
+                                        className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
                                       >
-                                        Excluir
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              </div>
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                      <AlertDialogHeader>
+                                        <AlertDialogTitle>Excluir cartão?</AlertDialogTitle>
+                                        <AlertDialogDescription>
+                                          Esta ação não pode ser desfeita. Este cartão será permanentemente excluído 
+                                          do sistema e não poderá ser recuperado.
+                                        </AlertDialogDescription>
+                                      </AlertDialogHeader>
+                                      <AlertDialogFooter>
+                                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                        <AlertDialogAction 
+                                          onClick={() => handleExcluirCartao(cartao.id)} 
+                                          className="bg-red-500 hover:bg-red-600"
+                                        >
+                                          Excluir
+                                        </AlertDialogAction>
+                                      </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                  </AlertDialog>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={7} className="text-center py-6 text-gray-500">
+                              Nenhum cartão encontrado
                             </TableCell>
                           </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={6} className="text-center py-6 text-gray-500">
-                            Nenhum cartão encontrado
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {cartoesFiltrados.length > 0 ? (
+                      cartoesFiltrados.map((cartao) => (
+                        <Card key={cartao.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
+                          <div className={`${cartao.tipo === 'Light' ? 'bg-blue-700' : 'bg-green-700'} text-white text-center py-2 font-bold`}>
+                            {cartao.tipo}
+                          </div>
+                          <CardContent className="p-4">
+                            <div className="flex items-start space-x-4">
+                              <div className="bg-gray-200 w-16 h-20 flex items-center justify-center text-gray-400 rounded-md mt-2">
+                                <ImagePlus className="h-6 w-6" />
+                              </div>
+                              <div className="space-y-1 flex-1">
+                                <p className="font-bold truncate">{cartao.nome}</p>
+                                <p className="text-sm text-gray-600">Mat: {cartao.matricula}</p>
+                                <p className="text-sm text-gray-600">Data: {cartao.data}</p>
+                                <div className="flex justify-between items-center mt-2">
+                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    cartao.status === 'Pago' 
+                                      ? 'bg-green-100 text-green-800' 
+                                      : cartao.status === 'Pendente'
+                                        ? 'bg-yellow-100 text-yellow-800'
+                                        : 'bg-red-100 text-red-800'
+                                  }`}>
+                                    {cartao.status}
+                                  </span>
+                                  <span className="font-medium text-sm">{cartao.valor}</span>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="flex justify-end gap-2 mt-3">
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <Button variant="outline" size="sm" onClick={() => setVisualizarId(cartao.id)}>
+                                    <Eye className="h-3 w-3 mr-1" />
+                                    Ver
+                                  </Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                  {/* Conteúdo do diálogo - igual ao já definido acima */}
+                                </DialogContent>
+                              </Dialog>
+                              
+                              {cartao.status === "Pendente" && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  className="text-green-600 border-green-200 hover:bg-green-50"
+                                  onClick={() => handleConfirmarPagamento(cartao.id)}
+                                >
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Pago
+                                </Button>
+                              )}
+                              
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    className="text-red-600 border-red-200 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="h-3 w-3 mr-1" />
+                                    Excluir
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  {/* Conteúdo do alerta - igual ao já definido acima */}
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))
+                    ) : (
+                      <div className="col-span-full text-center py-6 text-gray-500 bg-white rounded-md border">
+                        Nenhum cartão encontrado
+                      </div>
+                    )}
+                  </div>
+                )}
                 
                 <div className="flex justify-end">
                   <Button variant="outline">
@@ -276,7 +466,7 @@ const AdminArea = () => {
                 </div>
               </TabsContent>
               
-              <TabsContent value="busca" className="space-y-6">
+              <TabsContent value="busca" className="space-y-6 bg-white p-6 rounded-md shadow-sm border">
                 <h3 className="text-lg font-medium mb-4">Busca Avançada</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -294,8 +484,18 @@ const AdminArea = () => {
                     <div className="space-y-2">
                       <Label htmlFor="busca-data">Data de Emissão</Label>
                       <div className="grid grid-cols-2 gap-2">
-                        <Input id="busca-data-inicio" type="date" />
-                        <Input id="busca-data-fim" type="date" />
+                        <Input 
+                          id="data-inicio" 
+                          type="date" 
+                          value={dataInicio}
+                          onChange={(e) => setDataInicio(e.target.value)}
+                        />
+                        <Input 
+                          id="data-fim" 
+                          type="date"
+                          value={dataFim}
+                          onChange={(e) => setDataFim(e.target.value)}
+                        />
                       </div>
                     </div>
                   </div>
@@ -350,9 +550,12 @@ const AdminArea = () => {
                 </div>
                 
                 <div className="flex justify-end gap-2 pt-4">
-                  <Button variant="outline">Limpar</Button>
-                  <Button>
-                    <Search className="mr-2 h-4 w-4" />
+                  <Button variant="outline" className="gap-2">
+                    <RefreshCw className="h-4 w-4" />
+                    Limpar
+                  </Button>
+                  <Button className="gap-2 bg-purple-600 hover:bg-purple-700">
+                    <Search className="h-4 w-4" />
                     Buscar
                   </Button>
                 </div>
@@ -362,22 +565,23 @@ const AdminArea = () => {
                 <h3 className="text-lg font-medium mb-4">Financeiro</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                  <Card>
+                  <Card className="border-green-200 hover:border-green-300 transition-colors">
                     <CardHeader className="pb-2">
                       <CardDescription>Total Recebido</CardDescription>
-                      <CardTitle className="text-2xl">R$ 3.785,00</CardTitle>
+                      <CardTitle className="text-2xl text-green-600">R$ 3.785,00</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 flex items-center">
+                        <Clock className="h-3 w-3 mr-1" />
                         Últimos 30 dias
                       </div>
                     </CardContent>
                   </Card>
                   
-                  <Card>
+                  <Card className="border-yellow-200 hover:border-yellow-300 transition-colors">
                     <CardHeader className="pb-2">
                       <CardDescription>Pendente</CardDescription>
-                      <CardTitle className="text-2xl">R$ 420,00</CardTitle>
+                      <CardTitle className="text-2xl text-yellow-600">R$ 420,00</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-xs text-gray-500">
@@ -386,10 +590,10 @@ const AdminArea = () => {
                     </CardContent>
                   </Card>
                   
-                  <Card>
+                  <Card className="border-blue-200 hover:border-blue-300 transition-colors">
                     <CardHeader className="pb-2">
                       <CardDescription>Cartões Emitidos</CardDescription>
-                      <CardTitle className="text-2xl">128</CardTitle>
+                      <CardTitle className="text-2xl text-blue-600">128</CardTitle>
                     </CardHeader>
                     <CardContent>
                       <div className="text-xs text-gray-500">
@@ -399,18 +603,18 @@ const AdminArea = () => {
                   </Card>
                 </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-4 bg-white p-6 rounded-md shadow-sm border">
                   <div className="flex justify-between items-center">
                     <h4 className="text-base font-medium">Últimas transações</h4>
-                    <Button variant="outline" size="sm">
-                      <DollarSign className="mr-2 h-4 w-4" />
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <DollarSign className="h-4 w-4" />
                       Relatório Financeiro
                     </Button>
                   </div>
                   
-                  <div className="rounded-md border">
+                  <div className="rounded-md border overflow-hidden">
                     <Table>
-                      <TableHeader>
+                      <TableHeader className="bg-gray-50">
                         <TableRow>
                           <TableHead>ID</TableHead>
                           <TableHead>Cliente</TableHead>
@@ -418,61 +622,108 @@ const AdminArea = () => {
                           <TableHead>Data</TableHead>
                           <TableHead>Status</TableHead>
                           <TableHead>Método</TableHead>
+                          <TableHead className="text-right">Ações</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        <TableRow>
-                          <TableCell className="font-medium">#3582</TableCell>
-                          <TableCell>Maria Santos</TableCell>
-                          <TableCell>R$ 45,00</TableCell>
-                          <TableCell>22/05/2023</TableCell>
-                          <TableCell>
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              Confirmado
-                            </span>
-                          </TableCell>
-                          <TableCell>Cartão</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">#3581</TableCell>
-                          <TableCell>João Silva</TableCell>
-                          <TableCell>R$ 35,00</TableCell>
-                          <TableCell>21/05/2023</TableCell>
-                          <TableCell>
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              Confirmado
-                            </span>
-                          </TableCell>
-                          <TableCell>Pix</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">#3580</TableCell>
-                          <TableCell>Ana Oliveira</TableCell>
-                          <TableCell>R$ 35,00</TableCell>
-                          <TableCell>20/05/2023</TableCell>
-                          <TableCell>
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                              Pendente
-                            </span>
-                          </TableCell>
-                          <TableCell>Pix</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="font-medium">#3579</TableCell>
-                          <TableCell>Carlos Eduardo</TableCell>
-                          <TableCell>R$ 45,00</TableCell>
-                          <TableCell>19/05/2023</TableCell>
-                          <TableCell>
-                            <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                              Cancelado
-                            </span>
-                          </TableCell>
-                          <TableCell>Cartão</TableCell>
-                        </TableRow>
+                        {transacoes.map((transacao) => (
+                          <TableRow key={transacao.id} className="hover:bg-gray-50">
+                            <TableCell className="font-medium">#{transacao.id}</TableCell>
+                            <TableCell>{transacao.cliente}</TableCell>
+                            <TableCell>{transacao.valor}</TableCell>
+                            <TableCell>{transacao.data}</TableCell>
+                            <TableCell>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                transacao.status === 'Confirmado' 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : transacao.status === 'Pendente'
+                                    ? 'bg-yellow-100 text-yellow-800'
+                                    : 'bg-red-100 text-red-800'
+                              }`}>
+                                {transacao.status}
+                              </span>
+                            </TableCell>
+                            <TableCell>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                transacao.metodo === 'Pix' 
+                                  ? 'bg-purple-100 text-purple-800' 
+                                  : 'bg-blue-100 text-blue-800'
+                              }`}>
+                                {transacao.metodo}
+                              </span>
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
                       </TableBody>
                     </Table>
                   </div>
+                  
+                  <div className="mt-4">
+                    <Button variant="outline" className="gap-2 w-full md:w-auto">
+                      <Filter className="h-4 w-4" />
+                      Filtrar Transações
+                    </Button>
+                  </div>
                 </div>
+                
+                <Card className="border-purple-200">
+                  <CardHeader>
+                    <CardTitle className="text-lg">Adicionar Nova Transação</CardTitle>
+                    <CardDescription>
+                      Registre manualmente uma nova transação no sistema
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="transacao-cliente">Cliente</Label>
+                        <div className="flex gap-2">
+                          <Input id="transacao-cliente" placeholder="Nome do cliente" />
+                          <Button variant="ghost" size="icon" className="h-10 w-10">
+                            <UserPlus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="transacao-matricula">Matrícula</Label>
+                        <Input id="transacao-matricula" placeholder="Digite a matrícula" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="transacao-valor">Valor</Label>
+                        <Input id="transacao-valor" placeholder="R$ 0,00" />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="transacao-metodo">Método de Pagamento</Label>
+                        <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecione um método" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pix">Pix</SelectItem>
+                            <SelectItem value="cartao">Cartão</SelectItem>
+                            <SelectItem value="boleto">Boleto</SelectItem>
+                            <SelectItem value="transferencia">Transferência</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-end mt-6">
+                      <Button className="bg-purple-600 hover:bg-purple-700 gap-2">
+                        <CheckCircle className="h-4 w-4" />
+                        Registrar Transação
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               </TabsContent>
             </Tabs>
           </CardContent>
