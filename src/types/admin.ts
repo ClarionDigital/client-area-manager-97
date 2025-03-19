@@ -50,3 +50,20 @@ export interface CropDialogProps {
   employeeId?: string;
   employeeRole?: string;
 }
+
+export interface CardType {
+  value: string;
+  label: string;
+}
+
+export interface UploadedEmployee {
+  id: number;
+  nome: string;
+  matricula: string;
+  cargo: string;
+  setor: string;
+  validade: string;
+  tipo: string;
+  foto?: boolean;
+  fotoUrl?: string;
+}

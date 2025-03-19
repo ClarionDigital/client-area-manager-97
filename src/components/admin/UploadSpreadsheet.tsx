@@ -9,11 +9,32 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload, FileSpreadsheet, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { CardType } from "@/types/admin";
 
 interface UploadSpreadsheetProps {
-  onUpload: () => void;
+  onUpload: (cardType: string) => void;
   onDownloadTemplate?: () => void;
 }
+
+// Card type options
+const CARD_TYPES: CardType[] = [
+  { value: "Light", label: "Light Padrão" },
+  { value: "Conecta", label: "Conecta" }
+];
+
+// Helper function to determine card type from employee ID
+export const getCardTypeFromEmployeeId = (id: string): string => {
+  if (id.startsWith('3')) return 'Light';
+  if (id.startsWith('7')) return 'Conecta';
+  return 'Light'; // Default fallback
+};
 
 const UploadSpreadsheet: React.FC<UploadSpreadsheetProps> = ({ 
   onUpload,
@@ -21,6 +42,7 @@ const UploadSpreadsheet: React.FC<UploadSpreadsheetProps> = ({
 }) => {
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedCardType, setSelectedCardType] = useState<string>("Light");
   const [open, setOpen] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,13 +61,13 @@ const UploadSpreadsheet: React.FC<UploadSpreadsheetProps> = ({
       return;
     }
 
-    // In a real app, this would process the file
+    // Display success toast
     toast({
       title: "Planilha enviada",
-      description: "Os dados da planilha serão processados em breve",
+      description: `Os dados da planilha ${selectedCardType} serão processados em breve`,
     });
     
-    onUpload();
+    onUpload(selectedCardType);
     setOpen(false);
     setSelectedFile(null);
   };
@@ -65,7 +87,30 @@ const UploadSpreadsheet: React.FC<UploadSpreadsheetProps> = ({
             Faça upload de uma planilha com dados para adição de fotos personalizada.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4">
+        <div className="py-4 space-y-4">
+          {/* Card Type Selection */}
+          <div className="space-y-2">
+            <Label htmlFor="card-type">Tipo de Cartão</Label>
+            <Select 
+              value={selectedCardType} 
+              onValueChange={setSelectedCardType}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Selecione o tipo de cartão" />
+              </SelectTrigger>
+              <SelectContent>
+                {CARD_TYPES.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-gray-500">
+              Nota: Matrículas com início 3 são Light e início 7 são Conecta
+            </p>
+          </div>
+          
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
             {selectedFile ? (
               <div className="flex flex-col items-center">

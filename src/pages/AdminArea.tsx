@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +11,8 @@ import DataTab from "@/components/admin/tabs/DataTab";
 import PhotoCropTab from "@/components/admin/tabs/PhotoCropTab";
 
 // Import sample data
-import { CardData, TransactionData, CardDataWithPhoto } from "@/types/admin";
+import { CardData, TransactionData, CardDataWithPhoto, UploadedEmployee } from "@/types/admin";
+import { getCardTypeFromEmployeeId } from "@/components/admin/UploadSpreadsheet";
 
 // Sample data
 const segundasVias: CardData[] = [
@@ -37,10 +37,22 @@ const dadosCartoes: CardDataWithPhoto[] = [
   { id: 6, nome: "Fernanda Lima", primeiroNome: "Fernanda", matricula: "3025467", cargo: "Diretora", setor: "Comercial", validade: "12/2024", foto: true, tipo: "Light", data: "25/05/2023", status: "Ativo", valor: "--" },
 ];
 
+// Sample uploaded employees data
+const mockUploadedEmployees: UploadedEmployee[] = [
+  { id: 1, nome: "Carlos Silva", matricula: "3001245", cargo: "Analista", setor: "TI", validade: "12/2024", tipo: "Light", foto: false },
+  { id: 2, nome: "Maria Santos", matricula: "3018756", cargo: "Coordenadora", setor: "RH", validade: "12/2024", tipo: "Light", foto: false },
+  { id: 3, nome: "José Oliveira", matricula: "7042389", cargo: "Técnico", setor: "Operações", validade: "12/2024", tipo: "Conecta", foto: false },
+  { id: 4, nome: "Ana Rodrigues", matricula: "3021567", cargo: "Gerente", setor: "Financeiro", validade: "12/2024", tipo: "Light", foto: false },
+  { id: 5, nome: "Paulo Costa", matricula: "7031298", cargo: "Supervisor", setor: "Atendimento", validade: "12/2024", tipo: "Conecta", foto: false },
+];
+
 const AdminArea = () => {
   const { toast } = useToast();
   const [cartoesGerados, setCartoesGerados] = useState(segundasVias);
   const [activeTab, setActiveTab] = useState("cartoes");
+  const [uploadedEmployees, setUploadedEmployees] = useState<UploadedEmployee[]>([]);
+  const [showUploadedData, setShowUploadedData] = useState(false);
+  const [selectedCardType, setSelectedCardType] = useState<string>("Light");
   
   const handleExcluirCartao = (id: number) => {
     setCartoesGerados(cartoesGerados.filter(cartao => cartao.id !== id));
@@ -50,10 +62,21 @@ const AdminArea = () => {
     });
   };
   
-  const handleUploadPlanilha = () => {
+  const handleUploadPlanilha = (cardType: string) => {
+    setSelectedCardType(cardType);
+    
+    const filteredEmployees = mockUploadedEmployees.filter(employee => {
+      const employeeCardType = getCardTypeFromEmployeeId(employee.matricula);
+      return cardType === "Todos" || employeeCardType === cardType;
+    });
+    
+    setUploadedEmployees(filteredEmployees);
+    setShowUploadedData(true);
+    setActiveTab("todos-dados");
+    
     toast({
       title: "Planilha enviada",
-      description: "Os dados da planilha serão processados em breve",
+      description: `Os dados da planilha para cartões ${cardType} foram carregados`,
     });
   };
 
@@ -71,6 +94,15 @@ const AdminArea = () => {
     toast({
       title: "Download iniciado",
       description: "A planilha está sendo baixada",
+    });
+  };
+
+  const handleSubmitOrder = () => {
+    setShowUploadedData(false);
+    
+    toast({
+      title: "Pedido enviado com sucesso",
+      description: "Os cartões serão processados em breve",
     });
   };
   
@@ -122,7 +154,12 @@ const AdminArea = () => {
               </TabsContent>
               
               <TabsContent value="todos-dados" className="space-y-6">
-                <PhotoCropTab />
+                <PhotoCropTab 
+                  uploadedEmployees={uploadedEmployees}
+                  showUploadedData={showUploadedData}
+                  selectedCardType={selectedCardType}
+                  onSubmitOrder={handleSubmitOrder}
+                />
               </TabsContent>
             </Tabs>
           </CardContent>
