@@ -36,7 +36,7 @@ const ClienteArea = () => {
     toast({
       title: "Matrícula válida",
       description: "Sua matrícula foi validada com sucesso",
-      variant: "default",
+      className: "bg-[#8cdcd8]/20 border-[#8cdcd8]",
     });
     
     setLoggedIn(true);
@@ -127,7 +127,7 @@ const ClienteArea = () => {
       toast({
         title: "Atenção",
         description: "Por favor salve os dados do cartão antes de prosseguir",
-        variant: "destructive",
+        className: "bg-[#8cdcd8]/20 border-[#8cdcd8]",
       });
     }
   };
@@ -136,7 +136,7 @@ const ClienteArea = () => {
   if (!loggedIn) {
     return (
       <div className="min-h-screen bg-amber-50 flex flex-col justify-center items-center p-4">
-        <Card className="w-full max-w-md bg-white shadow-md rounded-lg overflow-hidden">
+        <Card className="w-full max-w-md bg-white shadow-lg rounded-xl overflow-hidden border-0">
           <div className="p-6 flex flex-col items-center">
             {/* Logo superior */}
             <img 
@@ -152,19 +152,19 @@ const ClienteArea = () => {
                 placeholder="Digite sua matrícula" 
                 value={matricula}
                 onChange={(e) => setMatricula(e.target.value)}
-                className="w-full h-12 text-base"
+                className="w-full h-12 text-base shadow-sm"
               />
             </div>
             
             <Button 
               onClick={handleConsultar} 
-              className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center gap-2 mb-6"
+              className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center gap-2 mb-6 shadow-md"
             >
               <Search className="h-5 w-5" />
               Consultar Matrícula
             </Button>
             
-            <div className="bg-gray-100 p-4 rounded-md text-gray-700 text-sm mb-8 w-full">
+            <div className="bg-gray-100 p-4 rounded-lg text-gray-700 text-sm mb-8 w-full shadow-inner">
               <p>
                 Sistema de solicitação de 2ª via do Kit de Identificação Pessoal Light. Preencha corretamente o número da sua matrícula, e o sistema gerará o seu último crachá com o mesmo modelo atualizado.
               </p>
@@ -185,7 +185,7 @@ const ClienteArea = () => {
   return (
     <div className="min-h-screen bg-amber-50 p-4 md:py-8">
       <div className="max-w-4xl mx-auto">
-        <Card className="bg-white shadow-md rounded-lg overflow-hidden mb-6">
+        <Card className="bg-white shadow-lg rounded-xl overflow-hidden mb-6 border-0">
           <div className="p-4 md:p-6 flex flex-col items-center">
             {/* Logo superior */}
             <img 
@@ -199,7 +199,7 @@ const ClienteArea = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
               {/* Coluna da esquerda - Pré-visualização do cartão */}
               <div className="flex flex-col items-center">
-                <div className="bg-blue-800 rounded-lg p-6 w-full h-72 relative flex flex-col justify-between">
+                <div className="bg-blue-800 rounded-lg p-6 w-full h-72 relative flex flex-col justify-between shadow-lg">
                   <div className="absolute right-2 top-2">
                     <img 
                       src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Light_Servi%C3%A7os_Eletricidade.svg/1200px-Light_Servi%C3%A7os_Eletricidade.svg.png" 
@@ -210,11 +210,11 @@ const ClienteArea = () => {
 
                   <div className="mt-16 flex items-center justify-center">
                     {fotoUrl ? (
-                      <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white">
+                      <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md">
                         <img src={fotoUrl} alt="Foto do funcionário" className="w-full h-full object-cover" />
                       </div>
                     ) : (
-                      <div className="w-24 h-24 rounded-full bg-gray-300 border-4 border-white flex items-center justify-center">
+                      <div className="w-24 h-24 rounded-full bg-gray-300 border-4 border-white flex items-center justify-center shadow-md">
                         <CreditCard className="w-12 h-12 text-gray-500" />
                       </div>
                     )}
@@ -232,35 +232,38 @@ const ClienteArea = () => {
               <div className="md:col-span-2">
                 <div className="w-full space-y-4">
                   <div className="space-y-2">
-                    <Label>Nome Abreviado</Label>
+                    <Label className="text-gray-700">Nome Abreviado</Label>
                     <Input 
                       placeholder="Digite seu nome abreviado" 
                       value={nomeAbreviado} 
                       onChange={(e) => setNomeAbreviado(e.target.value)}
+                      className="shadow-sm"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label>Nome Completo</Label>
+                    <Label className="text-gray-700">Nome Completo</Label>
                     <Input 
                       placeholder="Digite seu nome completo" 
                       value={nomeCompleto} 
                       onChange={(e) => setNomeCompleto(e.target.value)}
+                      className="shadow-sm"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label>Matrícula</Label>
-                    <Input value={matricula} readOnly />
+                    <Label className="text-gray-700">Matrícula</Label>
+                    <Input value={matricula} readOnly className="bg-gray-50 shadow-sm" />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label>Foto</Label>
-                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                    <Label className="text-gray-700">Foto</Label>
+                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition-colors hover:bg-gray-50">
                       <Label htmlFor="foto-upload" className="cursor-pointer">
                         <div className="flex flex-col items-center">
-                          <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                          <Upload className="h-8 w-8 text-[#8cdcd8] mb-2" />
                           <span className="text-sm text-gray-500">Clique para selecionar</span>
+                          {foto && <span className="text-xs text-green-600 mt-2">Foto selecionada: {foto.name}</span>}
                         </div>
                         <Input
                           id="foto-upload"
@@ -275,7 +278,7 @@ const ClienteArea = () => {
 
                   <Button 
                     onClick={handleSaveCard} 
-                    className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white"
+                    className="w-full h-12 bg-[#8cdcd8] hover:bg-[#7cc9c5] text-white shadow-md transition-all duration-200"
                   >
                     <Save className="mr-2 h-5 w-5" />
                     Salvar Cartão
@@ -286,63 +289,65 @@ const ClienteArea = () => {
           </div>
         </Card>
 
-        <Card className="bg-white shadow-md rounded-lg overflow-hidden" onClick={!cardSaved ? handleFormClick : undefined}>
+        <Card className="bg-white shadow-lg rounded-xl overflow-hidden border-0" onClick={!cardSaved ? handleFormClick : undefined}>
           <div className={`p-4 md:p-6 flex flex-col items-center ${!cardSaved ? 'opacity-70 pointer-events-none' : ''}`}>
             <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">Dados Pessoais</h2>
             
             <div className="w-full space-y-4 mb-6">
               <div className="space-y-2">
-                <Label>Nome Completo</Label>
-                <Input placeholder="Digite seu nome completo" defaultValue={nomeCompleto} />
+                <Label className="text-gray-700">Nome Completo</Label>
+                <Input placeholder="Digite seu nome completo" defaultValue={nomeCompleto} className="shadow-sm" />
               </div>
               
               <div className="space-y-2">
-                <Label>CPF</Label>
-                <Input placeholder="000.000.000-00" />
+                <Label className="text-gray-700">CPF</Label>
+                <Input placeholder="000.000.000-00" className="shadow-sm" />
               </div>
               
               <div className="space-y-2">
-                <Label>Email</Label>
-                <Input placeholder="seu@email.com" />
+                <Label className="text-gray-700">Email</Label>
+                <Input placeholder="seu@email.com" className="shadow-sm" />
               </div>
               
               <div className="space-y-2">
-                <Label>Telefone</Label>
-                <Input placeholder="(00) 00000-0000" />
+                <Label className="text-gray-700">Telefone</Label>
+                <Input placeholder="(00) 00000-0000" className="shadow-sm" />
               </div>
             </div>
             
             <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">Finalização</h2>
             
-            <div className="w-full space-y-4 mb-6">
-              <div className="flex items-center space-x-4">
-                <img 
-                  src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e3f6bd0fe.png" 
-                  alt="Crachá PVC" 
-                  className="w-16 h-16 object-contain rounded-md"
-                />
-                <div className="font-medium">Crachá PVC</div>
+            <div className="w-full space-y-6 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 flex flex-col items-center">
+                  <img 
+                    src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e3f6bd0fe.png" 
+                    alt="Crachá PVC" 
+                    className="w-24 h-24 object-contain rounded-md mb-3"
+                  />
+                  <div className="font-medium text-center">Crachá PVC</div>
+                </div>
+                
+                <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 flex flex-col items-center">
+                  <img 
+                    src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e2f02ac11.png" 
+                    alt="Cordão" 
+                    className="w-24 h-24 object-contain rounded-md mb-3"
+                  />
+                  <div className="font-medium text-center">CORDÃO</div>
+                </div>
+                
+                <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 flex flex-col items-center">
+                  <img 
+                    src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e3f6bd0fe.png" 
+                    alt="Porta Crachá" 
+                    className="w-24 h-24 object-contain rounded-md mb-3"
+                  />
+                  <div className="font-medium text-center">PORTA CRACHÁ</div>
+                </div>
               </div>
               
-              <div className="flex items-center space-x-4">
-                <img 
-                  src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e2f02ac11.png" 
-                  alt="Cordão" 
-                  className="w-16 h-16 object-contain rounded-md"
-                />
-                <div className="font-medium">CORDÃO</div>
-              </div>
-              
-              <div className="flex items-center space-x-4">
-                <img 
-                  src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e3f6bd0fe.png" 
-                  alt="Porta Crachá" 
-                  className="w-16 h-16 object-contain rounded-md"
-                />
-                <div className="font-medium">PORTA CRACHÁ</div>
-              </div>
-              
-              <div className="bg-blue-50 border border-blue-100 rounded-md p-4">
+              <div className="bg-blue-50 border border-blue-100 rounded-lg p-5 shadow-inner">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-lg text-blue-800">Total:</span>
                   <span className="font-bold text-lg text-blue-800">R$ {valorTotal.toFixed(2)}</span>
@@ -356,7 +361,7 @@ const ClienteArea = () => {
                         variant="outline" 
                         size="icon" 
                         onClick={decreaseQuantity}
-                        className="h-8 w-8"
+                        className="h-8 w-8 shadow-sm"
                       >
                         <Minus className="h-4 w-4" />
                       </Button>
@@ -365,7 +370,7 @@ const ClienteArea = () => {
                         variant="outline" 
                         size="icon" 
                         onClick={increaseQuantity}
-                        className="h-8 w-8"
+                        className="h-8 w-8 shadow-sm"
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
@@ -374,13 +379,13 @@ const ClienteArea = () => {
                 </div>
               </div>
               
-              <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
-                <strong>Informações de entrega:</strong><br />
-                A entrega será realizada em até 10 dias úteis após a confirmação do pagamento. Para mais informações, entre em contato pelo e-mail ou telefone.
+              <div className="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg shadow-inner">
+                <p className="font-semibold mb-2">Informações de entrega:</p>
+                <p>Após a confirmação do pedido, os materiais serão entregues na sede da Light. Você será notificado sobre o status da entrega via e-mail e WhatsApp.</p>
               </div>
               
               <Button 
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white h-12" 
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white h-12 shadow-md transition-all duration-200" 
                 onClick={handleFinalizarCompra}
               >
                 <ShoppingCart className="mr-2 h-5 w-5" />
