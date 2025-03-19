@@ -3,9 +3,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CropDialogProps } from '@/types/admin';
-import { X, ChevronLeft, ChevronRight, ChevronUp, ChevronDown, Plus, Minus } from 'lucide-react';
+import { X } from 'lucide-react';
 
-// New dimensions in cm
+// Dimensions in cm
 const CROP_WIDTH = 5.9; // cm
 const CROP_HEIGHT = 3.59; // cm
 
@@ -13,77 +13,146 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
   open,
   onOpenChange,
   onCropComplete,
-  imageUrl,
-  cardType,
-  employeeName,
-  employeeId,
-  employeeRole
+  imageUrl
 }) => {
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [cropPosition, setCropPosition] = useState({ x: 0, y: 0 });
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [scale, setScale] = useState(1);
+  const [imageQuality, setImageQuality] = useState<'good' | 'poor' | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const cropAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) {
       // Reset when dialog closes
-      setZoomLevel(0.6); // Start with 60% zoom as shown in the example
-      setCropPosition({ x: 0, y: 0 });
-    } else {
-      setZoomLevel(0.6); // Set initial zoom to 60%
+      setPosition({ x: 0, y: 0 });
+      setScale(1);
+      setImageLoaded(false);
+      setImageQuality(null);
     }
   }, [open]);
 
-  const handleMove = (dx: number, dy: number) => {
-    setCropPosition(prev => ({
-      x: prev.x + dx,
-      y: prev.y + dy
-    }));
+  // Handle image load
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+    
+    if (imageRef.current) {
+      // Analyze image quality
+      const img = imageRef.current;
+      const minDimension = Math.min(img.naturalWidth, img.naturalHeight);
+      // If image is smaller than 500px in either dimension, consider it poor quality
+      setImageQuality(minDimension < 500 ? 'poor' : 'good');
+      
+      // Center the image initially
+      if (cropAreaRef.current && img) {
+        const cropArea = cropAreaRef.current.getBoundingClientRect();
+        const cropWidth = cropArea.width;
+        const cropHeight = cropArea.height;
+        
+        // Calculate initial scale to fit image inside crop area while maintaining aspect ratio
+        const widthRatio = cropWidth / img.naturalWidth;
+        const heightRatio = cropHeight / img.naturalHeight;
+        const initialScale = Math.min(widthRatio, heightRatio) * 0.95; // 95% to leave some margin
+        
+        setScale(initialScale);
+        
+        // Center the image
+        const scaledImgWidth = img.naturalWidth * initialScale;
+        const scaledImgHeight = img.naturalHeight * initialScale;
+        const centerX = (cropWidth - scaledImgWidth) / 2;
+        const centerY = (cropHeight - scaledImgHeight) / 2;
+        
+        setPosition({ x: centerX, y: centerY });
+      }
+    }
   };
 
-  const handleZoom = (increment: number) => {
-    setZoomLevel(prev => Math.max(0.2, Math.min(2, prev + increment)));
+  // Mouse and touch event handlers for dragging
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y });
+  };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      setIsDragging(true);
+      setDragStart({ x: touch.clientX - position.x, y: touch.clientY - position.y });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isDragging) {
+      setPosition({
+        x: e.clientX - dragStart.x,
+        y: e.clientY - dragStart.y
+      });
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging && e.touches.length === 1) {
+      const touch = e.touches[0];
+      setPosition({
+        x: touch.clientX - dragStart.x,
+        y: touch.clientY - dragStart.y
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
   };
 
   const handleApply = () => {
-    if (!imageRef.current || !canvasRef.current) return;
+    if (!imageRef.current || !canvasRef.current || !cropAreaRef.current) return;
     
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
+    const cropArea = cropAreaRef.current.getBoundingClientRect();
     
     if (ctx && imageRef.current) {
-      // Set canvas dimensions for ID photo
-      canvas.width = 300;
-      canvas.height = 300 * (CROP_HEIGHT / CROP_WIDTH); // Maintain aspect ratio
+      // Set canvas dimensions based on crop area
+      canvas.width = 600; // Fixed output width
+      canvas.height = 600 * (CROP_HEIGHT / CROP_WIDTH); // Maintain aspect ratio
+      
+      // Calculate the visible portion of the image within the crop area
+      const img = imageRef.current;
+      const cropRect = cropAreaRef.current.getBoundingClientRect();
+      const imgRect = img.getBoundingClientRect();
+      
+      // Calculate the part of the image that is inside the crop area
+      const sourceX = (cropRect.left - imgRect.left) / scale;
+      const sourceY = (cropRect.top - imgRect.top) / scale;
+      const sourceWidth = cropRect.width / scale;
+      const sourceHeight = cropRect.height / scale;
       
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
-      // Calculate scaled dimensions
-      const image = imageRef.current;
-      const aspectRatio = image.naturalWidth / image.naturalHeight;
-      const scaledWidth = image.height * aspectRatio * zoomLevel;
-      const scaledHeight = image.height * zoomLevel;
-      
-      // Draw the image with crop and zoom applied
+      // Draw only the portion of the image that is inside the crop area
       ctx.drawImage(
-        image,
-        cropPosition.x, cropPosition.y,
-        scaledWidth / zoomLevel, scaledHeight / zoomLevel,
-        0, 0,
+        img,
+        Math.max(0, sourceX), Math.max(0, sourceY), // Make sure we don't go outside the image
+        sourceWidth, sourceHeight,
+        0, 0, 
         canvas.width, canvas.height
       );
       
-      // Convert to data URL and set as cropped image
+      // Convert to data URL and complete the crop
       const croppedUrl = canvas.toDataURL('image/jpeg', 0.95);
       onCropComplete(croppedUrl);
       onOpenChange(false);
     }
   };
-
-  // Helper function to format zoom level as percentage
-  const getZoomPercentage = () => `${Math.round(zoomLevel * 100)}%`;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -95,137 +164,77 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
           </Button>
         </div>
         
-        <div className="relative bg-neutral-100 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImNoZWNrZXJib2FyZCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiNmMGYwZjAiLz48cmVjdCB4PSIxMCIgeT0iMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjZTBlMGUwIi8+PHJlY3QgeD0iMCIgeT0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2UwZTBlMCIvPjxyZWN0IHg9IjEwIiB5PSIxMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjZjBmMGYwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2NoZWNrZXJib2FyZCkiLz48L3N2Zz4=')]">
-          <div 
-            ref={containerRef}
-            className="relative w-full overflow-hidden"
-            style={{ minHeight: '500px' }}
-          >
-            <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-              {imageUrl && (
-                <img
-                  ref={imageRef}
-                  src={imageUrl}
-                  alt="Imagem para recorte"
-                  style={{ 
-                    transform: `translate(-${cropPosition.x}px, -${cropPosition.y}px) scale(${zoomLevel})`,
-                    transformOrigin: 'center',
-                    maxWidth: 'none'
-                  }}
-                  className="pointer-events-none"
-                />
-              )}
-            </div>
-            
-            {/* ID Card overlay */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="relative">
-                {/* Background overlay with semi-transparency */}
-                <div className="absolute inset-0 bg-black/30"></div>
-                
-                {/* Crop frame */}
-                <div 
-                  className="relative border-2 border-white overflow-hidden bg-transparent"
-                  style={{ 
-                    width: '400px', 
-                    height: `${400 * (CROP_HEIGHT / CROP_WIDTH)}px`,
-                    boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)'
-                  }}
-                >
-                  {/* ID Card preview */}
-                  <div className="absolute bottom-0 left-0 right-0">
-                    <div className={`flex flex-col ${cardType === 'Light' ? 'bg-brand-primary' : 'bg-blue-600'} text-white mx-auto`} style={{ width: '200px' }}>
-                      <div className="flex p-2 bg-white text-black">
-                        <div className="w-16 h-20 bg-transparent border border-gray-300 overflow-hidden rounded-sm mr-2"></div>
-                        <div className="flex-1 text-xs">
-                          <div className="font-bold truncate">{employeeName || "Nome do Funcionário"}</div>
-                          <div>{employeeRole || "Cargo"}</div>
-                          <div>Mat: {employeeId || "0000000"}</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Dashed border frame */}
-                  <div className="absolute inset-0 border border-dashed border-white/80">
-                    <div className="flex justify-between">
-                      <div className="w-8 h-8 border-t border-l border-white/80"></div>
-                      <div className="w-8 h-8 border-t border-r border-white/80"></div>
-                    </div>
-                    <div className="flex justify-between h-full items-end">
-                      <div className="w-8 h-8 border-b border-l border-white/80"></div>
-                      <div className="w-8 h-8 border-b border-r border-white/80"></div>
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Dimension label */}
-                <div className="absolute -bottom-8 left-0 right-0 text-center bg-white/80 backdrop-blur-sm py-1 px-2 rounded text-sm">
-                  {CROP_WIDTH}cm × {CROP_HEIGHT}cm
-                </div>
+        <div 
+          className="relative bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImNoZWNrZXJib2FyZCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiNmMGYwZjAiLz48cmVjdCB4PSIxMCIgeT0iMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjZTBlMGUwIi8+PHJlY3QgeD0iMCIgeT0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2UwZTBlMCIvPjxyZWN0IHg9IjEwIiB5PSIxMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjZjBmMGYwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2NoZWNrZXJib2FyZCkiLz48L3N2Zz4=')]"
+          style={{ height: '500px' }}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Image to crop with drag functionality */}
+          {imageUrl && (
+            <img
+              ref={imageRef}
+              src={imageUrl}
+              alt="Imagem para recorte"
+              className="absolute"
+              style={{ 
+                transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
+                transformOrigin: '0 0',
+                cursor: isDragging ? 'grabbing' : 'grab'
+              }}
+              onLoad={handleImageLoad}
+              onMouseDown={handleMouseDown}
+              onTouchStart={handleTouchStart}
+              draggable={false}
+            />
+          )}
+          
+          {/* Crop area overlay */}
+          <div className="absolute inset-0 bg-black/50 pointer-events-none">
+            {/* Transparent crop area */}
+            <div 
+              ref={cropAreaRef}
+              className="absolute border-2 border-blue-500 bg-transparent"
+              style={{ 
+                left: '50%',
+                top: '50%',
+                width: '400px', 
+                height: `${400 * (CROP_HEIGHT / CROP_WIDTH)}px`,
+                transform: 'translate(-50%, -50%)',
+                boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)'
+              }}
+            >
+              {/* Corner markers */}
+              <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-blue-500"></div>
+              <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-blue-500"></div>
+              <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-blue-500"></div>
+              <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-blue-500"></div>
+              
+              {/* Dimension indicator */}
+              <div className="absolute -bottom-8 left-0 right-0 text-center bg-white/80 backdrop-blur-sm py-1 px-2 rounded text-sm">
+                {CROP_WIDTH}cm × {CROP_HEIGHT}cm
               </div>
             </div>
           </div>
           
-          {/* Controls - styled to match the reference image */}
-          <div className="absolute bottom-20 left-0 right-0 flex justify-center items-center space-x-8 z-10">
-            {/* Zoom controls */}
-            <div className="bg-white rounded-full px-4 py-1 shadow-md flex items-center gap-1">
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                className="rounded-full h-8 w-8 p-0 text-gray-700"
-                onClick={() => handleZoom(-0.05)}
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
-              <div className="w-24 text-center text-sm font-medium">Zoom: {getZoomPercentage()}</div>
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                className="rounded-full h-8 w-8 p-0 text-gray-700"
-                onClick={() => handleZoom(0.05)}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
+          {/* Image quality indicator */}
+          {imageQuality && imageLoaded && (
+            <div className={`absolute top-4 right-4 px-3 py-1 rounded ${
+              imageQuality === 'good' ? 'bg-green-500' : 'bg-yellow-500'
+            } text-white text-sm font-medium`}>
+              {imageQuality === 'good' ? 'Boa Qualidade' : 'Qualidade Baixa'}
             </div>
-            
-            {/* Direction controls */}
-            <div className="bg-white rounded-full py-1 px-3 shadow-md flex items-center gap-2">
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                className="rounded-full h-8 w-8 p-0 text-gray-700"
-                onClick={() => handleMove(-10, 0)}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                className="rounded-full h-8 w-8 p-0 text-gray-700"
-                onClick={() => handleMove(0, -10)}
-              >
-                <ChevronUp className="h-4 w-4" />
-              </Button>
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                className="rounded-full h-8 w-8 p-0 text-gray-700"
-                onClick={() => handleMove(0, 10)}
-              >
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-              <Button 
-                size="sm" 
-                variant="ghost" 
-                className="rounded-full h-8 w-8 p-0 text-gray-700"
-                onClick={() => handleMove(10, 0)}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+          )}
+          
+          {/* Instructions */}
+          {imageLoaded && (
+            <div className="absolute bottom-4 left-4 right-4 text-center bg-white/80 backdrop-blur-sm py-2 px-3 rounded text-sm">
+              Arraste a imagem para posicionar | Ajuste a posição do rosto dentro da área demarcada
             </div>
-          </div>
+          )}
         </div>
         
         <canvas ref={canvasRef} className="hidden"></canvas>
@@ -241,6 +250,7 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
           <Button 
             onClick={handleApply} 
             className="bg-green-600 hover:bg-green-700 rounded-md"
+            disabled={!imageLoaded}
           >
             Aplicar
           </Button>

@@ -46,6 +46,9 @@ const PhotoCropTab: React.FC = () => {
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
       setCroppedImageUrl(null);
+      
+      // Automatically open the cropper when a file is selected
+      setCropperOpen(true);
     }
   };
 
@@ -360,7 +363,7 @@ const PhotoCropTab: React.FC = () => {
             <div className="border rounded-lg p-4">
               <h4 className="font-medium text-sm mb-2">2. Recorte a Imagem</h4>
               <p className="text-sm text-gray-600">
-                Ajuste o recorte para enquadrar o rosto da pessoa nas dimensões 5.5cm × 5.2cm.
+                Arraste a foto para posicioná-la dentro da área de recorte de {CROP_WIDTH}cm × {CROP_HEIGHT}cm.
               </p>
             </div>
             <div className="border rounded-lg p-4">
@@ -379,10 +382,6 @@ const PhotoCropTab: React.FC = () => {
         onOpenChange={setCropperOpen}
         onCropComplete={handleCropComplete}
         imageUrl={previewUrl}
-        cardType={selectedCard?.tipo as 'Light' | 'Conecta' || 'Light'}
-        employeeName={selectedCard?.nome || ''}
-        employeeId={selectedCard?.matricula || ''}
-        employeeRole={selectedCard?.cargo || ''}
       />
     </div>
   );
