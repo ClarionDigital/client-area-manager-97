@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -248,13 +249,13 @@ const PhotoCropTab: React.FC = () => {
               ) : (
                 <div className="space-y-4">
                   <div 
-                    className="relative border rounded-lg overflow-hidden mx-auto"
+                    className="relative border rounded-lg overflow-hidden mx-auto flex items-center justify-center bg-gray-100"
                     style={{ width: '100%', height: '300px' }}
                   >
                     <img
                       src={previewUrl}
                       alt="Preview"
-                      className="w-full h-full object-contain"
+                      className="max-h-full max-w-full object-contain"
                     />
                   </div>
                   
@@ -291,7 +292,7 @@ const PhotoCropTab: React.FC = () => {
                     <img
                       src={croppedImageUrl}
                       alt="Cropped"
-                      className="h-full object-contain"
+                      className="max-h-full max-w-full object-contain"
                     />
                   </div>
                   <div className="flex justify-center gap-2 flex-wrap">
