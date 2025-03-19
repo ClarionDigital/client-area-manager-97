@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   Table, TableBody, TableCell, TableHead, 
   TableHeader, TableRow 
@@ -8,6 +8,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Eye, CheckCircle, Trash2 } from "lucide-react";
 import { CardData } from '@/types/admin';
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from "@/components/ui/pagination";
 
 interface CardListProps {
   cards: CardData[];
@@ -16,12 +24,27 @@ interface CardListProps {
   onDelete: (id: number) => void;
 }
 
+const ITEMS_PER_PAGE = 5;
+
 const CardList: React.FC<CardListProps> = ({ 
   cards, 
   onView, 
   onConfirmPayment, 
   onDelete 
 }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  
+  // Calculate pagination values
+  const totalPages = Math.ceil(cards.length / ITEMS_PER_PAGE);
+  const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentItems = cards.slice(indexOfFirstItem, indexOfLastItem);
+  
+  // Change page
+  const goToPage = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <Card className="border-brand-primary/20 shadow-sm">
       <CardHeader className="pb-2">
@@ -43,8 +66,8 @@ const CardList: React.FC<CardListProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {cards.length > 0 ? (
-                cards.map((card) => (
+              {currentItems.length > 0 ? (
+                currentItems.map((card) => (
                   <TableRow key={card.id} className="hover:bg-brand-primary/5">
                     <TableCell className="font-medium">{card.nome}</TableCell>
                     <TableCell>
@@ -117,6 +140,37 @@ const CardList: React.FC<CardListProps> = ({
             </TableBody>
           </Table>
         </div>
+        
+        {totalPages > 1 && (
+          <Pagination className="mt-4">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious 
+                  onClick={() => goToPage(Math.max(1, currentPage - 1))}
+                  className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+              
+              {Array.from({ length: totalPages }).map((_, index) => (
+                <PaginationItem key={index}>
+                  <PaginationLink 
+                    isActive={currentPage === index + 1}
+                    onClick={() => goToPage(index + 1)}
+                  >
+                    {index + 1}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              
+              <PaginationItem>
+                <PaginationNext 
+                  onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
+                  className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
       </CardContent>
     </Card>
   );

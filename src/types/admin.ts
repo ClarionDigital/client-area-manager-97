@@ -19,6 +19,7 @@ export interface TransactionData {
 }
 
 export interface CardDataWithPhoto extends CardData {
+  primeiroNome?: string;
   cargo: string;
   setor: string;
   validade: string;

@@ -1,15 +1,14 @@
+
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Crop } from "lucide-react";
 
 // Import components
 import Header from "@/components/Header";
 import Logo from "@/components/Logo";
 import CardsTab from "@/components/admin/tabs/CardsTab";
 import DataTab from "@/components/admin/tabs/DataTab";
-import FinancialTab from "@/components/admin/tabs/FinancialTab";
 import PhotoCropTab from "@/components/admin/tabs/PhotoCropTab";
 
 // Import sample data
@@ -30,29 +29,18 @@ const segundasVias: CardData[] = [
 ];
 
 const dadosCartoes: CardDataWithPhoto[] = [
-  { id: 1, nome: "Carlos Silva", matricula: "3001245", cargo: "Analista", setor: "TI", validade: "12/2024", foto: true, tipo: "Light", data: "12/05/2023", status: "Ativo", valor: "--" },
-  { id: 2, nome: "Maria Santos", matricula: "3018756", cargo: "Coordenadora", setor: "RH", validade: "12/2024", foto: true, tipo: "Light", data: "15/05/2023", status: "Ativo", valor: "--" },
-  { id: 3, nome: "José Oliveira", matricula: "7042389", cargo: "Técnico", setor: "Operações", validade: "12/2024", foto: false, tipo: "Conecta", data: "18/05/2023", status: "Pendente", valor: "--" },
-  { id: 4, nome: "Ana Rodrigues", matricula: "3021567", cargo: "Gerente", setor: "Financeiro", validade: "12/2024", foto: true, tipo: "Light", data: "20/05/2023", status: "Ativo", valor: "--" },
-  { id: 5, nome: "Paulo Costa", matricula: "7031298", cargo: "Supervisor", setor: "Atendimento", validade: "12/2024", foto: false, tipo: "Conecta", data: "22/05/2023", status: "Inativo", valor: "--" },
-  { id: 6, nome: "Fernanda Lima", matricula: "3025467", cargo: "Diretora", setor: "Comercial", validade: "12/2024", foto: true, tipo: "Light", data: "25/05/2023", status: "Ativo", valor: "--" },
-];
-
-const transacoes: TransactionData[] = [
-  { id: 3582, cliente: "Maria Santos", valor: "--", data: "22/05/2023", status: "Confirmado", metodo: "Cartão" },
-  { id: 3581, cliente: "João Silva", valor: "--", data: "21/05/2023", status: "Confirmado", metodo: "Pix" },
-  { id: 3580, cliente: "Ana Oliveira", valor: "--", data: "20/05/2023", status: "Pendente", metodo: "Pix" },
-  { id: 3579, cliente: "Carlos Eduardo", valor: "--", data: "19/05/2023", status: "Cancelado", metodo: "Cartão" },
-  { id: 3578, cliente: "Patrícia Rocha", valor: "--", data: "18/05/2023", status: "Confirmado", metodo: "Pix" },
-  { id: 3577, cliente: "Ricardo Souza", valor: "--", data: "17/05/2023", status: "Pendente", metodo: "Cartão" },
-  { id: 3576, cliente: "Juliana Alves", valor: "--", data: "16/05/2023", status: "Confirmado", metodo: "Pix" },
+  { id: 1, nome: "Carlos Silva", primeiroNome: "Carlos", matricula: "3001245", cargo: "Analista", setor: "TI", validade: "12/2024", foto: true, tipo: "Light", data: "12/05/2023", status: "Ativo", valor: "--" },
+  { id: 2, nome: "Maria Santos", primeiroNome: "Maria", matricula: "3018756", cargo: "Coordenadora", setor: "RH", validade: "12/2024", foto: true, tipo: "Light", data: "15/05/2023", status: "Ativo", valor: "--" },
+  { id: 3, nome: "José Oliveira", primeiroNome: "José", matricula: "7042389", cargo: "Técnico", setor: "Operações", validade: "12/2024", foto: false, tipo: "Conecta", data: "18/05/2023", status: "Pendente", valor: "--" },
+  { id: 4, nome: "Ana Rodrigues", primeiroNome: "Ana", matricula: "3021567", cargo: "Gerente", setor: "Financeiro", validade: "12/2024", foto: true, tipo: "Light", data: "20/05/2023", status: "Ativo", valor: "--" },
+  { id: 5, nome: "Paulo Costa", primeiroNome: "Paulo", matricula: "7031298", cargo: "Supervisor", setor: "Atendimento", validade: "12/2024", foto: false, tipo: "Conecta", data: "22/05/2023", status: "Inativo", valor: "--" },
+  { id: 6, nome: "Fernanda Lima", primeiroNome: "Fernanda", matricula: "3025467", cargo: "Diretora", setor: "Comercial", validade: "12/2024", foto: true, tipo: "Light", data: "25/05/2023", status: "Ativo", valor: "--" },
 ];
 
 const AdminArea = () => {
   const { toast } = useToast();
   const [cartoesGerados, setCartoesGerados] = useState(segundasVias);
   const [activeTab, setActiveTab] = useState("cartoes");
-  const [walletBalance, setWalletBalance] = useState(500);
   
   const handleExcluirCartao = (id: number) => {
     setCartoesGerados(cartoesGerados.filter(cartao => cartao.id !== id));
@@ -94,37 +82,26 @@ const AdminArea = () => {
             <Logo size="md" />
             <Header 
               title="ÁREA LIGHT ADM" 
-              subtitle="Gerenciamento de cartões, segundas vias e controle financeiro"
+              subtitle="Gerenciamento de cartões, segundas vias e controle de dados"
               showBackButton={false}
             />
           </div>
-          <button 
-            onClick={() => setActiveTab("financeiro")} 
-            className="flex items-center gap-2 bg-[#52aa85] text-white px-4 py-2 rounded-lg hover:bg-[#3a7960] transition-colors"
-          >
-            <DollarSign size={20} />
-            <div>
-              <div className="text-sm font-medium">Carteira</div>
-              <div className="text-lg font-bold">R$ {walletBalance.toFixed(2)}</div>
-            </div>
-          </button>
         </div>
         
         <Card className="border-[#52aa85]/20 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-[#52aa85] to-[#004c48] text-white rounded-t-lg">
             <CardTitle className="text-2xl font-bold">Painel de Controle</CardTitle>
             <CardDescription className="text-white/80">
-              Gerencie segundas vias, cartões e controle financeiro
+              Gerencie segundas vias e cartões
             </CardDescription>
           </CardHeader>
           
           <CardContent className="p-6">
             <Tabs defaultValue="cartoes" value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-8">
+              <TabsList className="grid w-full grid-cols-3 mb-8">
                 <TabsTrigger value="cartoes" className="text-sm md:text-base">Cartões Gerados</TabsTrigger>
                 <TabsTrigger value="dados" className="text-sm md:text-base">Dados e Cartões</TabsTrigger>
                 <TabsTrigger value="foto" className="text-sm md:text-base">Recorte de Foto</TabsTrigger>
-                <TabsTrigger value="financeiro" className="text-sm md:text-base">Financeiro</TabsTrigger>
               </TabsList>
               
               <TabsContent value="cartoes" className="space-y-6">
@@ -146,10 +123,6 @@ const AdminArea = () => {
               
               <TabsContent value="foto" className="space-y-6">
                 <PhotoCropTab />
-              </TabsContent>
-              
-              <TabsContent value="financeiro" className="space-y-6">
-                <FinancialTab transactions={transacoes} />
               </TabsContent>
             </Tabs>
           </CardContent>
