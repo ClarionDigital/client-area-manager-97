@@ -1,11 +1,10 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Upload, CreditCard, Check, AlertCircle } from "lucide-react";
+import { ArrowLeft, Upload, CreditCard, Check, AlertCircle, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,7 +16,7 @@ const ClienteArea = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [foto, setFoto] = useState<File | null>(null);
   
-  const handleLogin = () => {
+  const handleConsultar = () => {
     if (matricula.trim() === "") {
       toast({
         title: "Erro",
@@ -41,7 +40,7 @@ const ClienteArea = () => {
     
     setLoggedIn(true);
     toast({
-      title: "Login realizado",
+      title: "Consulta realizada",
       description: `Bem-vindo ao sistema. Identificamos sua matrícula como ${tipoMatricula}`,
     });
   };
@@ -83,35 +82,48 @@ const ClienteArea = () => {
   // Renderiza o formulário de login se não estiver logado
   if (!loggedIn) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-100 flex flex-col justify-center items-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">Área do Cliente Light</CardTitle>
-            <CardDescription className="text-center">
-              Entre com sua matrícula para acessar o sistema
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="matricula">Matrícula</Label>
-                <Input 
-                  id="matricula" 
-                  placeholder="Digite sua matrícula" 
-                  value={matricula}
-                  onChange={(e) => setMatricula(e.target.value)}
-                />
-              </div>
+      <div className="min-h-screen bg-amber-50 flex flex-col justify-center items-center p-4">
+        <Card className="w-full max-w-md bg-white shadow-md rounded-lg overflow-hidden">
+          <div className="p-6 flex flex-col items-center">
+            {/* Logo superior */}
+            <img 
+              src="https://areadocliente.alternativacard.com/up/uploads/alt-67d9cda455e18.png" 
+              alt="CrachaShop" 
+              className="h-16 mb-8"
+            />
+            
+            <h2 className="text-xl font-semibold text-gray-800 mb-4 text-left w-full">Matrícula Light</h2>
+            
+            <div className="w-full mb-4">
+              <Input 
+                placeholder="Digite sua matrícula" 
+                value={matricula}
+                onChange={(e) => setMatricula(e.target.value)}
+                className="w-full h-12 text-base"
+              />
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col gap-4">
-            <Button onClick={handleLogin} className="w-full">
-              Entrar
+            
+            <Button 
+              onClick={handleConsultar} 
+              className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center gap-2 mb-6"
+            >
+              <Search className="h-5 w-5" />
+              Consultar Matrícula
             </Button>
-            <Button variant="outline" onClick={() => navigate("/")} className="w-full">
-              Voltar
-            </Button>
-          </CardFooter>
+            
+            <div className="bg-gray-100 p-4 rounded-md text-gray-700 text-sm mb-8 w-full">
+              <p>
+                Sistema de solicitação de 2ª via do Kit de Identificação Pessoal Light. Preencha corretamente o número da sua matrícula, e o sistema gerará o seu último crachá com o mesmo modelo atualizado.
+              </p>
+            </div>
+            
+            {/* Logo inferior */}
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Light_Servi%C3%A7os_Eletricidade.svg/1200px-Light_Servi%C3%A7os_Eletricidade.svg.png" 
+              alt="Light" 
+              className="h-12"
+            />
+          </div>
         </Card>
       </div>
     );
