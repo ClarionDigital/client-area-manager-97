@@ -232,32 +232,36 @@ const ClienteArea = () => {
               <div className="md:col-span-2">
                 <div className="w-full space-y-4">
                   <div className="space-y-2">
-                    <Label className="text-gray-700">Nome Abreviado</Label>
+                    <Label className="text-gray-700 font-medium">Nome Abreviado</Label>
                     <Input 
                       placeholder="Digite seu nome abreviado" 
                       value={nomeAbreviado} 
                       onChange={(e) => setNomeAbreviado(e.target.value)}
-                      className="shadow-sm"
+                      className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-gray-700">Nome Completo</Label>
+                    <Label className="text-gray-700 font-medium">Nome Completo</Label>
                     <Input 
                       placeholder="Digite seu nome completo" 
                       value={nomeCompleto} 
                       onChange={(e) => setNomeCompleto(e.target.value)}
-                      className="shadow-sm"
+                      className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all"
                     />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-gray-700">Matrícula</Label>
-                    <Input value={matricula} readOnly className="bg-gray-50 shadow-sm" />
+                    <Label className="text-gray-700 font-medium">Matrícula</Label>
+                    <Input 
+                      value={matricula} 
+                      readOnly 
+                      className="bg-gray-50 shadow-sm"
+                    />
                   </div>
                   
                   <div className="space-y-2">
-                    <Label className="text-gray-700">Foto</Label>
+                    <Label className="text-gray-700 font-medium">Foto</Label>
                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition-colors hover:bg-gray-50">
                       <Label htmlFor="foto-upload" className="cursor-pointer">
                         <div className="flex flex-col items-center">
@@ -295,23 +299,48 @@ const ClienteArea = () => {
             
             <div className="w-full space-y-4 mb-6">
               <div className="space-y-2">
-                <Label className="text-gray-700">Nome Completo</Label>
-                <Input placeholder="Digite seu nome completo" defaultValue={nomeCompleto} className="shadow-sm" />
+                <Label className="text-gray-700 font-medium">Nome Completo</Label>
+                <Input 
+                  placeholder="Digite seu nome completo" 
+                  defaultValue={nomeCompleto} 
+                  className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all"
+                />
               </div>
               
-              <div className="space-y-2">
-                <Label className="text-gray-700">CPF</Label>
-                <Input placeholder="000.000.000-00" className="shadow-sm" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-gray-700 font-medium">CPF</Label>
+                  <Input 
+                    placeholder="000.000.000-00" 
+                    className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all" 
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label className="text-gray-700 font-medium">Data de Nascimento</Label>
+                  <Input 
+                    placeholder="DD/MM/AAAA" 
+                    className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all" 
+                  />
+                </div>
               </div>
               
-              <div className="space-y-2">
-                <Label className="text-gray-700">Email</Label>
-                <Input placeholder="seu@email.com" className="shadow-sm" />
-              </div>
-              
-              <div className="space-y-2">
-                <Label className="text-gray-700">Telefone</Label>
-                <Input placeholder="(00) 00000-0000" className="shadow-sm" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-gray-700 font-medium">Email</Label>
+                  <Input 
+                    placeholder="seu@email.com" 
+                    className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all" 
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label className="text-gray-700 font-medium">Telefone</Label>
+                  <Input 
+                    placeholder="(00) 00000-0000"  
+                    className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all" 
+                  />
+                </div>
               </div>
             </div>
             
@@ -319,7 +348,7 @@ const ClienteArea = () => {
             
             <div className="w-full space-y-6 mb-6">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 flex flex-col items-center">
+                <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition-all">
                   <img 
                     src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e3f6bd0fe.png" 
                     alt="Crachá PVC" 
@@ -328,7 +357,7 @@ const ClienteArea = () => {
                   <div className="font-medium text-center">Crachá PVC</div>
                 </div>
                 
-                <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 flex flex-col items-center">
+                <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition-all">
                   <img 
                     src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e2f02ac11.png" 
                     alt="Cordão" 
@@ -337,7 +366,7 @@ const ClienteArea = () => {
                   <div className="font-medium text-center">CORDÃO</div>
                 </div>
                 
-                <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 flex flex-col items-center">
+                <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition-all">
                   <img 
                     src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e3f6bd0fe.png" 
                     alt="Porta Crachá" 
@@ -347,7 +376,7 @@ const ClienteArea = () => {
                 </div>
               </div>
               
-              <div className="bg-blue-50 border border-blue-100 rounded-lg p-5 shadow-inner">
+              <div className="bg-gradient-to-r from-blue-50 to-[#8cdcd8]/10 border border-blue-100 rounded-lg p-5 shadow-inner">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-lg text-blue-800">Total:</span>
                   <span className="font-bold text-lg text-blue-800">R$ {valorTotal.toFixed(2)}</span>
@@ -361,7 +390,7 @@ const ClienteArea = () => {
                         variant="outline" 
                         size="icon" 
                         onClick={decreaseQuantity}
-                        className="h-8 w-8 shadow-sm"
+                        className="h-8 w-8 shadow-sm hover:bg-[#8cdcd8]/10 hover:border-[#8cdcd8] transition-colors"
                       >
                         <Minus className="h-4 w-4" />
                       </Button>
@@ -370,7 +399,7 @@ const ClienteArea = () => {
                         variant="outline" 
                         size="icon" 
                         onClick={increaseQuantity}
-                        className="h-8 w-8 shadow-sm"
+                        className="h-8 w-8 shadow-sm hover:bg-[#8cdcd8]/10 hover:border-[#8cdcd8] transition-colors"
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
@@ -379,10 +408,18 @@ const ClienteArea = () => {
                 </div>
               </div>
               
-              <div className="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg shadow-inner">
+              <div className="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg shadow-inner border border-gray-100">
                 <p className="font-semibold mb-2">Informações de entrega:</p>
                 <p>Após a confirmação do pedido, os materiais serão entregues na sede da Light. Você será notificado sobre o status da entrega via e-mail e WhatsApp.</p>
               </div>
+              
+              <Alert variant="success" className="bg-[#8cdcd8]/10 border-[#8cdcd8] shadow-md">
+                <Check className="h-4 w-4 text-[#8cdcd8]" />
+                <AlertTitle>Importante</AlertTitle>
+                <AlertDescription>
+                  Ao finalizar o pedido, você receberá um comprovante por e-mail. Mantenha seus dados atualizados.
+                </AlertDescription>
+              </Alert>
               
               <Button 
                 className="w-full bg-orange-500 hover:bg-orange-600 text-white h-12 shadow-md transition-all duration-200" 
