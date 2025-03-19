@@ -16,8 +16,8 @@ const FinancialTab: React.FC<FinancialTabProps> = ({ transactions }) => {
       <h3 className="text-lg font-medium mb-4">Financeiro</h3>
       
       <FinancialStats
-        totalReceived="R$ 3.785,00"
-        pendingAmount="R$ 420,00"
+        totalReceived="--"
+        pendingAmount="--"
         pendingTransactions={12}
         cardsIssued={128}
       />

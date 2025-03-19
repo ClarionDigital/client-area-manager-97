@@ -15,11 +15,14 @@ const Logo: React.FC<LogoProps> = ({ className = "", size = "md" }) => {
 
   return (
     <div className={`flex items-center ${className}`}>
-      <img 
-        src="https://areadocliente.alternativacard.com/up/uploads/alt-67dac2db10c51.png" 
-        alt="Alternativa Card Logo" 
-        className={`${sizes[size]}`}
-      />
+      <div className="relative">
+        <img 
+          src="https://areadocliente.alternativacard.com/up/uploads/alt-67dac2db10c51.png" 
+          alt="Alternativa Card Logo" 
+          className={`${sizes[size]} object-contain filter drop-shadow-sm`}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#52aa85]/10 to-transparent rounded-lg opacity-0 hover:opacity-30 transition-opacity duration-300"></div>
+      </div>
     </div>
   );
 };

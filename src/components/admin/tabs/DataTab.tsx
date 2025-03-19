@@ -1,10 +1,11 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Upload, FileSpreadsheet } from "lucide-react";
+import { Upload, FileSpreadsheet, Camera } from "lucide-react";
 import { CardDataWithPhoto } from "@/types/admin";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 interface DataTabProps {
   cards: CardDataWithPhoto[];
@@ -12,6 +13,30 @@ interface DataTabProps {
 }
 
 const DataTab: React.FC<DataTabProps> = ({ cards, onDownloadSpreadsheet }) => {
+  const [selectedCard, setSelectedCard] = useState<CardDataWithPhoto | null>(null);
+  const [photoUploadOpen, setPhotoUploadOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  const handlePhotoSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+  };
+
+  const handleUploadClick = (card: CardDataWithPhoto) => {
+    setSelectedCard(card);
+    setPhotoUploadOpen(true);
+  };
+
+  const handleSavePhoto = () => {
+    // Here you would typically upload the photo to a server
+    // and update the card's photo status
+    setPhotoUploadOpen(false);
+    setPreviewUrl(null);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-4">
@@ -42,6 +67,7 @@ const DataTab: React.FC<DataTabProps> = ({ cards, onDownloadSpreadsheet }) => {
                   <TableHead>Tipo</TableHead>
                   <TableHead>Foto</TableHead>
                   <TableHead>Validade</TableHead>
+                  <TableHead>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -66,6 +92,16 @@ const DataTab: React.FC<DataTabProps> = ({ cards, onDownloadSpreadsheet }) => {
                         : <span className="text-red-600">Não</span>}
                     </TableCell>
                     <TableCell>{cartao.validade}</TableCell>
+                    <TableCell>
+                      <Button 
+                        size="sm" 
+                        variant={cartao.foto ? "outline" : "default"}
+                        className={cartao.foto ? "text-amber-600 border-amber-600 hover:bg-amber-50" : "bg-brand-primary hover:bg-brand-primaryDark"}
+                        onClick={() => handleUploadClick(cartao)}
+                      >
+                        {cartao.foto ? "Atualizar Foto" : "Adicionar Foto"}
+                      </Button>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -89,7 +125,11 @@ const DataTab: React.FC<DataTabProps> = ({ cards, onDownloadSpreadsheet }) => {
                   <p className="font-medium">{cartao.nome}</p>
                   <p className="text-xs text-gray-600">Mat: {cartao.matricula}</p>
                   <p className="text-xs text-gray-600">{cartao.cargo}</p>
-                  <Button size="sm" className="mt-2 bg-brand-primary hover:bg-brand-primaryDark text-xs">
+                  <Button 
+                    size="sm" 
+                    className="mt-2 bg-brand-primary hover:bg-brand-primaryDark text-xs"
+                    onClick={() => handleUploadClick(cartao)}
+                  >
                     Enviar Foto
                   </Button>
                 </div>
@@ -98,6 +138,46 @@ const DataTab: React.FC<DataTabProps> = ({ cards, onDownloadSpreadsheet }) => {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={photoUploadOpen} onOpenChange={setPhotoUploadOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Upload de Foto - {selectedCard?.nome}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {previewUrl ? (
+              <div className="mt-2 relative rounded-md overflow-hidden aspect-[3/4] max-w-[280px] mx-auto">
+                <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-4 py-8">
+                <Camera className="h-12 w-12 text-gray-400" />
+                <label className="cursor-pointer">
+                  <Button variant="outline">Selecionar Foto</Button>
+                  <input type="file" className="hidden" accept="image/*" onChange={handlePhotoSelect} />
+                </label>
+              </div>
+            )}
+            
+            <p className="text-sm text-gray-500 text-center">
+              Matrícula: {selectedCard?.matricula}<br />
+              Cargo: {selectedCard?.cargo}<br />
+              Setor: {selectedCard?.setor}
+            </p>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="secondary" onClick={() => {
+              setPhotoUploadOpen(false);
+              setPreviewUrl(null);
+            }}>
+              Cancelar
+            </Button>
+            <Button type="button" onClick={handleSavePhoto} disabled={!previewUrl}>
+              Salvar Foto
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
