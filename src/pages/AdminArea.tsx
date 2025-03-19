@@ -84,15 +84,15 @@ const AdminArea = () => {
   };
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-brand-primary/5 to-brand-primary/10 p-4 md:p-8">
+    <div className="min-h-screen bg-gradient-to-b from-[#52aa85]/5 to-[#52aa85]/10 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         <Header 
           title="ÁREA LIGHT ADM" 
           subtitle="Gerenciamento de cartões, segundas vias e controle financeiro"
         />
         
-        <Card className="border-brand-primary/20 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-brand-primary to-brand-darkest text-white rounded-t-lg">
+        <Card className="border-[#52aa85]/20 shadow-lg">
+          <CardHeader className="bg-gradient-to-r from-[#52aa85] to-[#004c48] text-white rounded-t-lg">
             <CardTitle className="text-2xl font-bold">Painel de Controle</CardTitle>
             <CardDescription className="text-white/80">
               Gerencie segundas vias, cartões e controle financeiro

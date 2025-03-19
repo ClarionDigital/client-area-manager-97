@@ -12,7 +12,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({ onClick }) => {
     <Button 
       variant="outline" 
       onClick={onClick}
-      className="border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white"
+      className="border-[#52aa85] text-[#52aa85] hover:bg-[#52aa85] hover:text-white"
     >
       <Download className="mr-2 h-4 w-4" />
       Exportar dados
