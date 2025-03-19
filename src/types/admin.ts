@@ -25,6 +25,7 @@ export interface CardDataWithPhoto extends CardData {
   validade: string;
   foto: boolean;
   editMode?: boolean;
+  fotoUrl?: string;
 }
 
 export interface SpreadsheetTemplate {

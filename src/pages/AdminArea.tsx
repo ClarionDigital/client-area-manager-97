@@ -101,7 +101,7 @@ const AdminArea = () => {
               <TabsList className="grid w-full grid-cols-3 mb-8">
                 <TabsTrigger value="cartoes" className="text-sm md:text-base">Cartões Gerados</TabsTrigger>
                 <TabsTrigger value="dados" className="text-sm md:text-base">Dados e Cartões</TabsTrigger>
-                <TabsTrigger value="foto" className="text-sm md:text-base">Recorte de Foto</TabsTrigger>
+                <TabsTrigger value="todos-dados" className="text-sm md:text-base">TODOS OS DADOS</TabsTrigger>
               </TabsList>
               
               <TabsContent value="cartoes" className="space-y-6">
@@ -121,7 +121,7 @@ const AdminArea = () => {
                 />
               </TabsContent>
               
-              <TabsContent value="foto" className="space-y-6">
+              <TabsContent value="todos-dados" className="space-y-6">
                 <PhotoCropTab />
               </TabsContent>
             </Tabs>
