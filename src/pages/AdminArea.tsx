@@ -14,7 +14,7 @@ import PhotoCropTab from "@/components/admin/tabs/PhotoCropTab";
 import NewEmployeeDialog from "@/components/admin/NewEmployeeDialog";
 
 // Import sample data
-import { CardData, TransactionData, CardDataWithPhoto, UploadedEmployee } from "@/types/admin";
+import { CardData, CardDataWithPhoto, UploadedEmployee } from "@/types/admin";
 import { getCardTypeFromEmployeeId } from "@/components/admin/UploadSpreadsheet";
 
 // Sample data
@@ -135,13 +135,7 @@ const AdminArea = () => {
     <div className="min-h-screen bg-gradient-to-b from-[#52aa85]/5 to-[#52aa85]/10 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-4">
-            <Logo size="md" />
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">ÁREA LIGHT ADM</h1>
-              <p className="text-sm text-gray-500">Gerenciamento de cartões, segundas vias e controle de dados</p>
-            </div>
-          </div>
+          <Logo size="md" />
           
           <Button 
             onClick={() => setNewEmployeeDialogOpen(true)}

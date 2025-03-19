@@ -4,9 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { NewEmployeeDialogProps, UploadedEmployee } from "@/types/admin";
-import { UserPlus } from 'lucide-react';
+import { NewEmployeeDialogProps } from "@/types/admin";
 import { getCardTypeFromEmployeeId } from './UploadSpreadsheet';
 
 const NewEmployeeDialog: React.FC<NewEmployeeDialogProps> = ({

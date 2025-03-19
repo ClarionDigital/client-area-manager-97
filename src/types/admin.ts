@@ -66,6 +66,7 @@ export interface UploadedEmployee {
   tipo: string;
   foto?: boolean;
   fotoUrl?: string;
+  primeiroNome?: string;
 }
 
 export interface PhotoCropTabProps {
