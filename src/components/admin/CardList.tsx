@@ -39,7 +39,6 @@ const CardList: React.FC<CardListProps> = ({
                 <TableHead>Data</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Valor</TableHead>
                 <TableHead className="text-right">Ações</TableHead>
               </TableRow>
             </TableHeader>
@@ -49,7 +48,7 @@ const CardList: React.FC<CardListProps> = ({
                   <TableRow key={card.id} className="hover:bg-brand-primary/5">
                     <TableCell className="font-medium">{card.nome}</TableCell>
                     <TableCell>
-                      <span className={`${card.matricula.startsWith('3') ? 'text-brand-primary' : 'text-brand-secondary'} font-medium`}>
+                      <span className={`${card.matricula.startsWith('3') ? 'text-brand-primary' : 'text-blue-600'} font-medium`}>
                         {card.matricula}
                       </span>
                     </TableCell>
@@ -58,7 +57,7 @@ const CardList: React.FC<CardListProps> = ({
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         card.tipo === 'Light' 
                           ? 'bg-brand-primary/20 text-brand-primaryDark' 
-                          : 'bg-brand-secondary/20 text-brand-accent'
+                          : 'bg-blue-100 text-blue-800'
                       }`}>
                         {card.tipo}
                       </span>
@@ -74,7 +73,6 @@ const CardList: React.FC<CardListProps> = ({
                         {card.status}
                       </span>
                     </TableCell>
-                    <TableCell>{card.valor}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button 
@@ -111,7 +109,7 @@ const CardList: React.FC<CardListProps> = ({
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-6 text-gray-500">
+                  <TableCell colSpan={6} className="text-center py-6 text-gray-500">
                     Nenhum cartão encontrado
                   </TableCell>
                 </TableRow>

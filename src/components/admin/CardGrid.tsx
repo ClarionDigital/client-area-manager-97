@@ -23,7 +23,7 @@ const CardGrid: React.FC<CardGridProps> = ({
       {cards.length > 0 ? (
         cards.map((card) => (
           <Card key={card.id} className="overflow-hidden border shadow-sm hover:shadow-md transition-shadow">
-            <div className={`${card.tipo === 'Light' ? 'bg-brand-primary' : 'bg-brand-accent'} text-white text-center py-2 font-bold`}>
+            <div className={`${card.tipo === 'Light' ? 'bg-brand-primary' : 'bg-blue-600'} text-white text-center py-2 font-bold`}>
               {card.tipo}
             </div>
             <CardContent className="p-4">
@@ -45,7 +45,6 @@ const CardGrid: React.FC<CardGridProps> = ({
                     }`}>
                       {card.status}
                     </span>
-                    <span className="font-medium text-sm">{card.valor}</span>
                   </div>
                 </div>
               </div>

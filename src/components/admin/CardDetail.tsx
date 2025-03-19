@@ -13,7 +13,7 @@ const CardDetail: React.FC<CardDetailProps> = ({ card, onConfirmPayment }) => {
   return (
     <div className="py-4">
       <div className="bg-white border rounded-lg p-4 max-w-xs mx-auto shadow-md">
-        <div className={`${card.tipo === 'Light' ? 'bg-brand-primary' : 'bg-brand-accent'} text-white text-center py-2 rounded-t-md font-bold`}>
+        <div className={`${card.tipo === 'Light' ? 'bg-brand-primary' : 'bg-blue-600'} text-white text-center py-2 rounded-t-md font-bold`}>
           {card.tipo}
         </div>
         <div className="flex p-4">

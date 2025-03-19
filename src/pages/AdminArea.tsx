@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -92,10 +91,11 @@ const AdminArea = () => {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-4">
-            <Logo size="md" className="hidden md:block" />
+            <Logo size="md" />
             <Header 
               title="ÁREA LIGHT ADM" 
               subtitle="Gerenciamento de cartões, segundas vias e controle financeiro"
+              showBackButton={false}
             />
           </div>
           <button 
@@ -112,15 +112,10 @@ const AdminArea = () => {
         
         <Card className="border-[#52aa85]/20 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-[#52aa85] to-[#004c48] text-white rounded-t-lg">
-            <div className="flex items-center gap-3">
-              <Logo size="sm" className="md:hidden" />
-              <div>
-                <CardTitle className="text-2xl font-bold">Painel de Controle</CardTitle>
-                <CardDescription className="text-white/80">
-                  Gerencie segundas vias, cartões e controle financeiro
-                </CardDescription>
-              </div>
-            </div>
+            <CardTitle className="text-2xl font-bold">Painel de Controle</CardTitle>
+            <CardDescription className="text-white/80">
+              Gerencie segundas vias, cartões e controle financeiro
+            </CardDescription>
           </CardHeader>
           
           <CardContent className="p-6">
