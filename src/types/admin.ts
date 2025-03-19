@@ -1,3 +1,4 @@
+
 export interface CardData {
   id: number;
   nome: string;
