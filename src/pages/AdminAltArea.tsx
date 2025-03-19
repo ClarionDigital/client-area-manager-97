@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -657,4 +658,704 @@ const AdminAltArea = () => {
                           <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M3 20.4V3.6C3 3.26863 3.26863 3 3.6 3H20.4C20.7314 3 21 3.26863 21 3.6V20.4C21 20.7314 20.7314 21 20.4 21H3.6C3.26863 21 3 20.7314 3 20.4Z" fill="#EAF3FF"/>
                             <path d="M9 8.5C8.17157 8.5 7.5 9.17157 7.5 10C7.5 10.8284 8.17157 11.5 9 11.5H15C15.8284 11.5 16.5 10.8284 16.5 10C16.5 9.17157 15.8284 8.5 15 8.5H9Z" fill="#70C4FF"/>
-                            <path d="M9 12.5C8.17157 12.5 7.5 13.1716 7.5 14C7.5 14.8284 8.17157 15
+                            <path d="M9 12.5C8.17157 12.5 7.5 13.1716 7.5 14C7.5 14.8284 8.17157 15.5 9 15.5H15C15.8284 15.5 16.5 14.8284 16.5 14C16.5 13.1716 15.8284 12.5 15 12.5H9Z" fill="#70C4FF"/>
+                          </svg>
+                          Integração MinIO
+                        </CardTitle>
+                        <CardDescription>
+                          Armazenamento de imagens e documentos
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="minio-api">API Key</Label>
+                            <Input id="minio-api" type="password" value="**********************" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="minio-url">Endpoint URL</Label>
+                            <Input id="minio-url" type="text" value="https://minio-server.exemplo.com" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="minio-bucket">Bucket</Label>
+                            <Select defaultValue="cards">
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione o bucket" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="cards">cards</SelectItem>
+                                <SelectItem value="photos">photos</SelectItem>
+                                <SelectItem value="backups">backups</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          <div className="bg-green-50 border border-green-200 p-3 rounded-md flex items-center">
+                            <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
+                            <span className="text-sm text-green-700">Integração ativa</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                  
+                  <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center">
+                          <Smartphone className="h-5 w-5 mr-2" />
+                          Integração WhatsApp
+                        </CardTitle>
+                        <CardDescription>
+                          Envio automatizado de mensagens e notificações
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="whatsapp-token">Token de Acesso</Label>
+                            <Input id="whatsapp-token" type="password" value="**********************" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="whatsapp-numero">Número de Telefone</Label>
+                            <Input id="whatsapp-numero" type="text" value="+55 11 99999-9999" />
+                          </div>
+                          <div className="flex justify-between">
+                            <Button variant="outline" size="sm">
+                              <RefreshCw className="h-4 w-4 mr-2" />
+                              Sincronizar
+                            </Button>
+                            <Button variant="outline" size="sm">
+                              <MessageSquare className="h-4 w-4 mr-2" />
+                              Testar
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center">
+                          <Globe className="h-5 w-5 mr-2" />
+                          Webhooks
+                        </CardTitle>
+                        <CardDescription>
+                          Configuração de endpoints para eventos
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="webhook-url">URL do Webhook</Label>
+                            <Input id="webhook-url" type="text" value="https://api.seuservidor.com/webhook" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Eventos</Label>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="flex items-center space-x-2">
+                                <input type="checkbox" id="evento-pagamento" checked className="rounded" />
+                                <Label htmlFor="evento-pagamento" className="text-sm">Pagamento</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <input type="checkbox" id="evento-cartao" checked className="rounded" />
+                                <Label htmlFor="evento-cartao" className="text-sm">Emissão de Cartão</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <input type="checkbox" id="evento-acesso" className="rounded" />
+                                <Label htmlFor="evento-acesso" className="text-sm">Controle de Acesso</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <input type="checkbox" id="evento-erro" className="rounded" />
+                                <Label htmlFor="evento-erro" className="text-sm">Erros</Label>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-md flex items-center">
+                            <div className="w-2 h-2 rounded-full bg-yellow-500 mr-2"></div>
+                            <span className="text-sm text-yellow-700">Teste pendente</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="acesso" className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Controle de Acesso</h3>
+                  <p className="text-sm text-gray-500 mb-6">
+                    Gerencie usuários, permissões e acessos ao sistema
+                  </p>
+                  
+                  <div className="flex justify-end mb-6">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button>
+                          <Plus className="h-4 w-4 mr-2" />
+                          Adicionar Acesso
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Criar Novo Acesso</DialogTitle>
+                          <DialogDescription>
+                            Adicione um novo usuário ao sistema
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-4 py-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="nome">Nome</Label>
+                              <Input id="nome" placeholder="João Silva" />
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="email">E-mail</Label>
+                              <Input id="email" type="email" placeholder="joao@exemplo.com" />
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="tipo-acesso">Tipo de Acesso</Label>
+                            <Select defaultValue="operacional">
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione o tipo" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="admin">Administrador</SelectItem>
+                                <SelectItem value="gerente">Gerente</SelectItem>
+                                <SelectItem value="operacional">Operacional</SelectItem>
+                                <SelectItem value="financeiro">Financeiro</SelectItem>
+                                <SelectItem value="consulta">Somente Consulta</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label>Módulos de Acesso</Label>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div className="flex items-center space-x-2">
+                                <input type="checkbox" id="modulo-estatisticas" checked className="rounded" />
+                                <Label htmlFor="modulo-estatisticas" className="text-sm">Estatísticas</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <input type="checkbox" id="modulo-cartoes" checked className="rounded" />
+                                <Label htmlFor="modulo-cartoes" className="text-sm">Cartões</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <input type="checkbox" id="modulo-integracao" className="rounded" />
+                                <Label htmlFor="modulo-integracao" className="text-sm">Integrações</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <input type="checkbox" id="modulo-financeiro" checked className="rounded" />
+                                <Label htmlFor="modulo-financeiro" className="text-sm">Financeiro</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <input type="checkbox" id="modulo-acesso" className="rounded" />
+                                <Label htmlFor="modulo-acesso" className="text-sm">Controle de Acesso</Label>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <input type="checkbox" id="modulo-sistema" className="rounded" />
+                                <Label htmlFor="modulo-sistema" className="text-sm">Sistema</Label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button variant="outline">Cancelar</Button>
+                          <Button onClick={handleCriarAcesso}>Criar Acesso</Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg">Usuários do Sistema</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="rounded-md border">
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>Nome</TableHead>
+                              <TableHead>E-mail</TableHead>
+                              <TableHead>Tipo</TableHead>
+                              <TableHead>Último Acesso</TableHead>
+                              <TableHead>Status</TableHead>
+                              <TableHead className="text-right">Ações</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            <TableRow>
+                              <TableCell className="font-medium">Carlos Administrador</TableCell>
+                              <TableCell>carlos@admin.com</TableCell>
+                              <TableCell>Administrador</TableCell>
+                              <TableCell>30/05/2023 09:45</TableCell>
+                              <TableCell>
+                                <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                  Ativo
+                                </span>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="sm">
+                                  <Settings className="h-4 w-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell className="font-medium">Maria Operadora</TableCell>
+                              <TableCell>maria@op.com</TableCell>
+                              <TableCell>Operacional</TableCell>
+                              <TableCell>29/05/2023 16:30</TableCell>
+                              <TableCell>
+                                <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                  Ativo
+                                </span>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="sm">
+                                  <Settings className="h-4 w-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell className="font-medium">José Financeiro</TableCell>
+                              <TableCell>jose@fin.com</TableCell>
+                              <TableCell>Financeiro</TableCell>
+                              <TableCell>28/05/2023 11:20</TableCell>
+                              <TableCell>
+                                <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                  Ativo
+                                </span>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="sm">
+                                  <Settings className="h-4 w-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell className="font-medium">Ana Consulta</TableCell>
+                              <TableCell>ana@cons.com</TableCell>
+                              <TableCell>Somente Consulta</TableCell>
+                              <TableCell>25/05/2023 14:15</TableCell>
+                              <TableCell>
+                                <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                  Inativo
+                                </span>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button variant="ghost" size="sm">
+                                  <Settings className="h-4 w-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
+                        </Table>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center">
+                          <Lock className="h-5 w-5 mr-2 text-indigo-600" />
+                          Regras de Acesso
+                        </CardTitle>
+                        <CardDescription>
+                          Configure as permissões para cada tipo de usuário
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="bg-gray-50 p-3 rounded-md">
+                            <div className="font-medium mb-2">Administrador</div>
+                            <div className="text-sm text-gray-600">Acesso total ao sistema</div>
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700">Todos os módulos</span>
+                            </div>
+                          </div>
+                          <div className="bg-gray-50 p-3 rounded-md">
+                            <div className="font-medium mb-2">Gerente</div>
+                            <div className="text-sm text-gray-600">Acesso a relatórios e aprovações</div>
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Estatísticas</span>
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Cartões</span>
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Financeiro</span>
+                            </div>
+                          </div>
+                          <div className="bg-gray-50 p-3 rounded-md">
+                            <div className="font-medium mb-2">Operacional</div>
+                            <div className="text-sm text-gray-600">Operações do dia-a-dia</div>
+                            <div className="flex flex-wrap gap-1 mt-2">
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Cartões</span>
+                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Estatísticas básicas</span>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center">
+                          <Activity className="h-5 w-5 mr-2 text-rose-600" />
+                          Atividade de Usuários
+                        </CardTitle>
+                        <CardDescription>
+                          Registros de ações dos usuários no sistema
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="max-h-64 overflow-auto p-0">
+                        <div className="text-sm">
+                          <div className="px-4 py-3 border-b">
+                            <div className="flex justify-between mb-1">
+                              <span className="font-medium">Carlos Administrador</span>
+                              <span className="text-xs text-gray-500">30/05/2023 09:45</span>
+                            </div>
+                            <p className="text-gray-600 text-xs">Login no sistema realizado com sucesso</p>
+                          </div>
+                          <div className="px-4 py-3 border-b">
+                            <div className="flex justify-between mb-1">
+                              <span className="font-medium">Maria Operadora</span>
+                              <span className="text-xs text-gray-500">29/05/2023 16:30</span>
+                            </div>
+                            <p className="text-gray-600 text-xs">Geração de cartão para matrícula #3021567</p>
+                          </div>
+                          <div className="px-4 py-3 border-b">
+                            <div className="flex justify-between mb-1">
+                              <span className="font-medium">José Financeiro</span>
+                              <span className="text-xs text-gray-500">29/05/2023 14:15</span>
+                            </div>
+                            <p className="text-gray-600 text-xs">Confirmação de pagamento ID #3582</p>
+                          </div>
+                          <div className="px-4 py-3 border-b">
+                            <div className="flex justify-between mb-1">
+                              <span className="font-medium">Carlos Administrador</span>
+                              <span className="text-xs text-gray-500">29/05/2023 11:20</span>
+                            </div>
+                            <p className="text-gray-600 text-xs">Alteração nas configurações do sistema</p>
+                          </div>
+                          <div className="px-4 py-3">
+                            <div className="flex justify-between mb-1">
+                              <span className="font-medium">José Financeiro</span>
+                              <span className="text-xs text-gray-500">28/05/2023 15:40</span>
+                            </div>
+                            <p className="text-gray-600 text-xs">Exportação de relatório financeiro</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="sistema" className="space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium mb-4">Sistema</h3>
+                  <p className="text-sm text-gray-500 mb-6">
+                    Monitoramento, manutenção e configurações avançadas do sistema
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg flex items-center">
+                          <Cpu className="h-5 w-5 mr-2 text-indigo-600" />
+                          Desempenho
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>CPU</span>
+                              <span className="font-medium">24%</span>
+                            </div>
+                            <Progress value={24} className="h-2 bg-indigo-100" />
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>Memória</span>
+                              <span className="font-medium">42%</span>
+                            </div>
+                            <Progress value={42} className="h-2 bg-indigo-100" />
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>Armazenamento</span>
+                              <span className="font-medium">68%</span>
+                            </div>
+                            <Progress value={68} className="h-2 bg-indigo-100" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg flex items-center">
+                          <Shield className="h-5 w-5 mr-2 text-emerald-600" />
+                          Segurança
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-1">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm">Firewall</span>
+                            <span className="text-xs font-medium bg-green-100 text-green-800 px-2 py-1 rounded-full">Ativo</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm">SSL/TLS</span>
+                            <span className="text-xs font-medium bg-green-100 text-green-800 px-2 py-1 rounded-full">Válido</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm">Backups</span>
+                            <span className="text-xs font-medium bg-green-100 text-green-800 px-2 py-1 rounded-full">Automáticos</span>
+                          </div>
+                          <div className="flex justify-between items-center pt-1">
+                            <span className="text-sm">Último incidente</span>
+                            <span className="text-xs text-gray-600">Nunca</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg flex items-center">
+                          <Activity className="h-5 w-5 mr-2 text-amber-600" />
+                          Status do Sistema
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-1">
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm">API Principal</span>
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 rounded-full bg-green-500 mr-1"></div>
+                              <span className="text-xs">Online</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm">Banco de Dados</span>
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 rounded-full bg-green-500 mr-1"></div>
+                              <span className="text-xs">Online</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm">Gateway Pagamento</span>
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 rounded-full bg-green-500 mr-1"></div>
+                              <span className="text-xs">Online</span>
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-sm">API WhatsApp</span>
+                            <div className="flex items-center">
+                              <div className="w-2 h-2 rounded-full bg-green-500 mr-1"></div>
+                              <span className="text-xs">Online</span>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center">
+                          <Database className="h-5 w-5 mr-2 text-blue-600" />
+                          Backup e Restauração
+                        </CardTitle>
+                        <CardDescription>
+                          Gerencie backups do sistema e banco de dados
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <div className="font-medium">Backup Automático</div>
+                              <div className="text-sm text-gray-600">Diário às 03:00</div>
+                            </div>
+                            <Switch defaultChecked />
+                          </div>
+                          
+                          <div className="bg-green-50 p-3 rounded-md">
+                            <div className="font-medium mb-1">Último backup realizado</div>
+                            <div className="text-sm text-gray-600">30/05/2023 03:00 - 156MB</div>
+                          </div>
+                          
+                          <div className="flex gap-3">
+                            <Button variant="outline" size="sm" className="flex-1" onClick={handleBackup}>
+                              <FileText className="h-4 w-4 mr-2" />
+                              Backup Manual
+                            </Button>
+                            <Button variant="outline" size="sm" className="flex-1">
+                              <FileSpreadsheet className="h-4 w-4 mr-2" />
+                              Histórico
+                            </Button>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center">
+                          <Layers className="h-5 w-5 mr-2 text-violet-600" />
+                          Recursos do Sistema
+                        </CardTitle>
+                        <CardDescription>
+                          Visualize e gerencie recursos disponíveis
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-gray-50 p-3 rounded-md">
+                              <div className="text-sm text-gray-600">Armazenamento</div>
+                              <div className="font-medium">1.2 TB / 2 TB</div>
+                              <Progress value={60} className="h-2 mt-2" />
+                            </div>
+                            <div className="bg-gray-50 p-3 rounded-md">
+                              <div className="text-sm text-gray-600">Banco de Dados</div>
+                              <div className="font-medium">450 MB / 1 GB</div>
+                              <Progress value={45} className="h-2 mt-2" />
+                            </div>
+                          </div>
+                          
+                          <div className="bg-gray-50 p-3 rounded-md">
+                            <div className="text-sm text-gray-600">Plano Atual</div>
+                            <div className="font-medium">Empresarial</div>
+                            <div className="text-xs text-gray-500 mt-1">10.000 cartões/mês, 5 TB armazenamento</div>
+                          </div>
+                          
+                          <Button variant="outline" size="sm" className="w-full">
+                            <Settings className="h-4 w-4 mr-2" />
+                            Configurar Limites
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                  
+                  <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg flex items-center">
+                          <Image className="h-5 w-5 mr-2 text-pink-600" />
+                          Arquivos e Mídia
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="bg-gray-50 p-3 rounded-md flex flex-col gap-2">
+                            <div className="flex justify-between">
+                              <span className="text-sm">Imagens</span>
+                              <span className="text-sm font-medium">3,452</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-sm">Documentos</span>
+                              <span className="text-sm font-medium">1,286</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-sm">Backups</span>
+                              <span className="text-sm font-medium">78</span>
+                            </div>
+                          </div>
+                          
+                          <Button variant="outline" size="sm" className="w-full">
+                            <Book className="h-4 w-4 mr-2" />
+                            Gerenciar Arquivos
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg flex items-center">
+                          <Minimize2 className="h-5 w-5 mr-2 text-emerald-600" />
+                          Modo Manutenção
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <div className="font-medium">Status</div>
+                              <div className="text-sm text-gray-600">
+                                {modoManutencao ? "Sistema em manutenção" : "Sistema operacional"}
+                              </div>
+                            </div>
+                            <Switch
+                              checked={modoManutencao}
+                              onCheckedChange={handleModoManutencao}
+                            />
+                          </div>
+                          
+                          <div className={`p-3 rounded-md ${
+                            modoManutencao ? "bg-yellow-50 border border-yellow-200" : "bg-green-50 border border-green-200"
+                          }`}>
+                            <div className="text-sm">
+                              {modoManutencao 
+                                ? "Apenas administradores podem acessar o sistema" 
+                                : "Todos os usuários podem acessar o sistema"
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg flex items-center">
+                          <BarChart2 className="h-5 w-5 mr-2 text-amber-600" />
+                          Desempenho API
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>Tempo médio</span>
+                              <span className="font-medium">235ms</span>
+                            </div>
+                            <Progress value={23} className="h-2 bg-amber-100" />
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>Taxa de erro</span>
+                              <span className="font-medium">0.3%</span>
+                            </div>
+                            <Progress value={0.3} className="h-2 bg-amber-100" />
+                          </div>
+                          <div>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span>Requisições/min</span>
+                              <span className="font-medium">452</span>
+                            </div>
+                            <Progress value={45} className="h-2 bg-amber-100" />
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default AdminAltArea;
