@@ -84,6 +84,7 @@ const ClienteArea = () => {
     toast({
       title: "Sucesso",
       description: "Dados do cartão salvos com sucesso",
+      className: "bg-[#8cdcd8]/20 border-[#8cdcd8]",
     });
     setCardSaved(true);
   };
@@ -114,6 +115,7 @@ const ClienteArea = () => {
     toast({
       title: "Compra finalizada!",
       description: "Você receberá um e-mail e WhatsApp com a confirmação",
+      className: "bg-[#8cdcd8]/20 border-[#8cdcd8]",
     });
     setTimeout(() => {
       navigate("/");
@@ -181,15 +183,15 @@ const ClienteArea = () => {
   }
   
   return (
-    <div className="min-h-screen bg-amber-50 p-4">
+    <div className="min-h-screen bg-amber-50 p-4 md:py-8">
       <div className="max-w-4xl mx-auto">
         <Card className="bg-white shadow-md rounded-lg overflow-hidden mb-6">
-          <div className="p-6 flex flex-col items-center">
+          <div className="p-4 md:p-6 flex flex-col items-center">
             {/* Logo superior */}
             <img 
               src="https://areadocliente.alternativacard.com/up/uploads/alt-67d9cda455e18.png" 
               alt="CrachaShop" 
-              className="h-16 mb-8"
+              className="h-12 md:h-16 mb-6 md:mb-8"
             />
             
             <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">Dados do Cartão</h2>
@@ -285,7 +287,7 @@ const ClienteArea = () => {
         </Card>
 
         <Card className="bg-white shadow-md rounded-lg overflow-hidden" onClick={!cardSaved ? handleFormClick : undefined}>
-          <div className={`p-6 flex flex-col items-center ${!cardSaved ? 'opacity-70 pointer-events-none' : ''}`}>
+          <div className={`p-4 md:p-6 flex flex-col items-center ${!cardSaved ? 'opacity-70 pointer-events-none' : ''}`}>
             <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">Dados Pessoais</h2>
             
             <div className="w-full space-y-4 mb-6">
@@ -310,15 +312,34 @@ const ClienteArea = () => {
               </div>
             </div>
             
-            <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">Produtos</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">Finalização</h2>
             
             <div className="w-full space-y-4 mb-6">
-              <div>
-                <div className="font-medium mb-2">Cordão Light Verde</div>
+              <div className="flex items-center space-x-4">
+                <img 
+                  src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e3f6bd0fe.png" 
+                  alt="Crachá PVC" 
+                  className="w-16 h-16 object-contain rounded-md"
+                />
+                <div className="font-medium">Crachá PVC</div>
               </div>
               
-              <div>
-                <div className="font-medium mb-2">Porta Crachá Padrão Cristal</div>
+              <div className="flex items-center space-x-4">
+                <img 
+                  src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e2f02ac11.png" 
+                  alt="Cordão" 
+                  className="w-16 h-16 object-contain rounded-md"
+                />
+                <div className="font-medium">CORDÃO</div>
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                <img 
+                  src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e3f6bd0fe.png" 
+                  alt="Porta Crachá" 
+                  className="w-16 h-16 object-contain rounded-md"
+                />
+                <div className="font-medium">PORTA CRACHÁ</div>
               </div>
               
               <div className="bg-blue-50 border border-blue-100 rounded-md p-4">
