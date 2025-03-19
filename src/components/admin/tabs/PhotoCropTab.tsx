@@ -3,10 +3,20 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Camera, Download, Upload, Crop, Image, Check, ArrowLeft, ArrowRight, SendHorizontal } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Camera, Download, Upload, Crop, Image, Check, ArrowLeft, ArrowRight, SendHorizontal, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CardDataWithPhoto, PhotoCropTabProps, UploadedEmployee } from '@/types/admin';
 import PhotoCropper, { CROP_WIDTH, CROP_HEIGHT } from "../PhotoCropper";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious 
+} from "@/components/ui/pagination";
 
 const PhotoCropTab: React.FC<PhotoCropTabProps> = ({
   uploadedEmployees = [],
@@ -33,10 +43,20 @@ const PhotoCropTab: React.FC<PhotoCropTabProps> = ({
       ]
   );
 
+  // State for list-specific items
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6;
-  const totalPages = Math.ceil(allCards.length / itemsPerPage);
-  const currentCards = allCards.slice(
+  const [activeTab, setActiveTab] = useState("todos");
+  const itemsPerPage = 5;
+  
+  // Filter cards based on active tab
+  const filteredCards = activeTab === "todos"
+    ? allCards
+    : activeTab === "comFoto"
+      ? allCards.filter(card => card.foto)
+      : allCards.filter(card => !card.foto);
+  
+  const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
+  const currentCards = filteredCards.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -134,6 +154,12 @@ const PhotoCropTab: React.FC<PhotoCropTabProps> = ({
     });
   };
 
+  // Handle tab change and reset pagination
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-4">
@@ -159,6 +185,7 @@ const PhotoCropTab: React.FC<PhotoCropTabProps> = ({
         </div>
       </div>
 
+      {/* Card Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {currentCards.map((card) => (
           <Card key={card.id} className="overflow-hidden">
@@ -206,41 +233,289 @@ const PhotoCropTab: React.FC<PhotoCropTabProps> = ({
         ))}
       </div>
 
-      {totalPages > 1 && (
-        <div className="flex justify-center mt-6">
-          <nav className="flex items-center gap-1">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-            >
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            
-            {Array.from({ length: totalPages }, (_, i) => (
-              <Button
-                key={i}
-                variant={currentPage === i + 1 ? "default" : "outline"}
-                size="sm"
-                className={currentPage === i + 1 ? "bg-brand-primary" : ""}
-                onClick={() => setCurrentPage(i + 1)}
-              >
-                {i + 1}
-              </Button>
-            ))}
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-              disabled={currentPage === totalPages}
-            >
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </nav>
-        </div>
-      )}
+      {/* Tabs for list view */}
+      <Tabs defaultValue="todos" value={activeTab} onValueChange={handleTabChange} className="mt-8">
+        <TabsList className="mb-4">
+          <TabsTrigger value="todos">Todos os Cartões</TabsTrigger>
+          <TabsTrigger value="comFoto">Com Foto</TabsTrigger>
+          <TabsTrigger value="semFoto">Sem Foto</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="todos" className="mt-0">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Lista de Todos os Cartões</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader className="bg-brand-primary/10">
+                    <TableRow>
+                      <TableHead>Nome Completo</TableHead>
+                      <TableHead>Matrícula</TableHead>
+                      <TableHead>Cargo</TableHead>
+                      <TableHead>Setor</TableHead>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead>Foto</TableHead>
+                      <TableHead>Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {currentCards.length > 0 ? (
+                      currentCards.map((card) => (
+                        <TableRow key={card.id}>
+                          <TableCell className="font-medium">{card.nome}</TableCell>
+                          <TableCell>{card.matricula}</TableCell>
+                          <TableCell>{card.cargo}</TableCell>
+                          <TableCell>{card.setor}</TableCell>
+                          <TableCell>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              card.tipo === 'Light' 
+                                ? 'bg-brand-primary/20 text-brand-primaryDark' 
+                                : 'bg-blue-100 text-blue-800'
+                            }`}>
+                              {card.tipo}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            {card.foto 
+                              ? <span className="text-green-600 flex items-center"><Check className="h-4 w-4 mr-1" /> Sim</span> 
+                              : <span className="text-red-600 flex items-center">Não</span>}
+                          </TableCell>
+                          <TableCell>
+                            <Button 
+                              size="sm" 
+                              className={card.foto 
+                                ? "bg-amber-500 hover:bg-amber-600" 
+                                : "bg-brand-primary hover:bg-brand-primaryDark"
+                              }
+                              onClick={() => handleAddPhotoToCard(card)}
+                            >
+                              {card.foto ? "Atualizar Foto" : "Adicionar Foto"}
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={7} className="text-center py-4 text-gray-500">
+                          Nenhum cartão encontrado
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+              
+              {totalPages > 1 && (
+                <Pagination className="mt-4">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                    
+                    {Array.from({ length: totalPages }).map((_, index) => (
+                      <PaginationItem key={index}>
+                        <PaginationLink 
+                          isActive={currentPage === index + 1}
+                          onClick={() => setCurrentPage(index + 1)}
+                        >
+                          {index + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="comFoto" className="mt-0">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Cartões com Foto</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader className="bg-brand-primary/10">
+                    <TableRow>
+                      <TableHead>Nome Completo</TableHead>
+                      <TableHead>Matrícula</TableHead>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead>Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {currentCards.length > 0 ? (
+                      currentCards.map((card) => (
+                        <TableRow key={card.id}>
+                          <TableCell className="font-medium">{card.nome}</TableCell>
+                          <TableCell>{card.matricula}</TableCell>
+                          <TableCell>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              card.tipo === 'Light' 
+                                ? 'bg-brand-primary/20 text-brand-primaryDark' 
+                                : 'bg-blue-100 text-blue-800'
+                            }`}>
+                              {card.tipo}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              className="text-amber-600 border-amber-600 hover:bg-amber-50"
+                              onClick={() => handleAddPhotoToCard(card)}
+                            >
+                              Atualizar Foto
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-4 text-gray-500">
+                          Nenhum cartão com foto encontrado
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+              
+              {totalPages > 1 && (
+                <Pagination className="mt-4">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                    
+                    {Array.from({ length: totalPages }).map((_, index) => (
+                      <PaginationItem key={index}>
+                        <PaginationLink 
+                          isActive={currentPage === index + 1}
+                          onClick={() => setCurrentPage(index + 1)}
+                        >
+                          {index + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="semFoto" className="mt-0">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg">Cartões sem Foto</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-md border">
+                <Table>
+                  <TableHeader className="bg-brand-primary/10">
+                    <TableRow>
+                      <TableHead>Nome Completo</TableHead>
+                      <TableHead>Matrícula</TableHead>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead>Ações</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {currentCards.length > 0 ? (
+                      currentCards.map((card) => (
+                        <TableRow key={card.id}>
+                          <TableCell className="font-medium">{card.nome}</TableCell>
+                          <TableCell>{card.matricula}</TableCell>
+                          <TableCell>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              card.tipo === 'Light' 
+                                ? 'bg-brand-primary/20 text-brand-primaryDark' 
+                                : 'bg-blue-100 text-blue-800'
+                            }`}>
+                              {card.tipo}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            <Button 
+                              size="sm" 
+                              className="bg-brand-primary hover:bg-brand-primaryDark"
+                              onClick={() => handleAddPhotoToCard(card)}
+                            >
+                              Adicionar Foto
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-4 text-gray-500">
+                          Todos os cartões já possuem foto
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+              
+              {totalPages > 1 && (
+                <Pagination className="mt-4">
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                    
+                    {Array.from({ length: totalPages }).map((_, index) => (
+                      <PaginationItem key={index}>
+                        <PaginationLink 
+                          isActive={currentPage === index + 1}
+                          onClick={() => setCurrentPage(index + 1)}
+                        >
+                          {index + 1}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       <h3 className="text-lg font-medium mt-8 mb-4">Recorte de Foto</h3>
       
@@ -366,34 +641,6 @@ const PhotoCropTab: React.FC<PhotoCropTabProps> = ({
           </CardContent>
         </Card>
       </div>
-      
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg">Instruções para Recorte</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="border rounded-lg p-4">
-              <h4 className="font-medium text-sm mb-2">1. Selecione a Foto</h4>
-              <p className="text-sm text-gray-600">
-                Faça o upload de uma foto nítida com fundo claro e uniforme.
-              </p>
-            </div>
-            <div className="border rounded-lg p-4">
-              <h4 className="font-medium text-sm mb-2">2. Recorte a Imagem</h4>
-              <p className="text-sm text-gray-600">
-                Arraste a foto para posicioná-la dentro da área de recorte de {CROP_WIDTH}cm × {CROP_HEIGHT}cm.
-              </p>
-            </div>
-            <div className="border rounded-lg p-4">
-              <h4 className="font-medium text-sm mb-2">3. Salve a Foto</h4>
-              <p className="text-sm text-gray-600">
-                Baixe a foto recortada ou use-a diretamente para a impressão do cartão.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
       
       <PhotoCropper
         open={cropperOpen}

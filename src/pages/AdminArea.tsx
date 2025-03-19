@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +14,7 @@ import PhotoCropTab from "@/components/admin/tabs/PhotoCropTab";
 import NewEmployeeDialog from "@/components/admin/NewEmployeeDialog";
 
 // Import sample data
-import { CardData, CardDataWithPhoto, UploadedEmployee } from "@/types/admin";
+import { CardData, CardDataWithPhoto, UploadedEmployee } from '@/types/admin';
 import { getCardTypeFromEmployeeId } from "@/components/admin/UploadSpreadsheet";
 
 // Sample data
