@@ -26,8 +26,8 @@ const CardsTab: React.FC<CardsTabProps> = ({
   onUpload
 }) => {
   const [busca, setBusca] = useState("");
-  const [filtroStatus, setFiltroStatus] = useState("");
-  const [filtroTipo, setFiltroTipo] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("todos");
+  const [filtroTipo, setFiltroTipo] = useState("todos");
   const [visualizarId, setVisualizarId] = useState<number | null>(null);
   const [modoVisualizacao, setModoVisualizacao] = useState<"lista" | "grade">("lista");
 
@@ -36,8 +36,8 @@ const CardsTab: React.FC<CardsTabProps> = ({
       (busca === "" || 
         cartao.nome.toLowerCase().includes(busca.toLowerCase()) || 
         cartao.matricula.includes(busca)) &&
-      (filtroStatus === "" || cartao.status === filtroStatus) &&
-      (filtroTipo === "" || cartao.tipo === filtroTipo)
+      (filtroStatus === "todos" || cartao.status === filtroStatus) &&
+      (filtroTipo === "todos" || cartao.tipo === filtroTipo)
     );
   };
   

@@ -38,7 +38,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
             <SelectValue placeholder="Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos</SelectItem>
+            <SelectItem value="todos">Todos</SelectItem>
             <SelectItem value="Pago">Pago</SelectItem>
             <SelectItem value="Pendente">Pendente</SelectItem>
             <SelectItem value="Cancelado">Cancelado</SelectItem>
@@ -49,7 +49,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
             <SelectValue placeholder="Tipo" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Todos</SelectItem>
+            <SelectItem value="todos">Todos</SelectItem>
             <SelectItem value="Light">Light</SelectItem>
             <SelectItem value="Conecta">Conecta</SelectItem>
           </SelectContent>
