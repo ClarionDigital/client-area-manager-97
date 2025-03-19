@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Camera, Download, Upload, Crop, Image, Check, ArrowLeft, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CardDataWithPhoto } from '@/types/admin';
-import PhotoCropper from "../PhotoCropper";
+import PhotoCropper, { CROP_WIDTH, CROP_HEIGHT } from "../PhotoCropper";
 
 const PhotoCropTab: React.FC = () => {
   const { toast } = useToast();
@@ -376,7 +377,7 @@ const PhotoCropTab: React.FC = () => {
         </CardContent>
       </Card>
       
-      {/* Photo Cropper Dialog */}
+      {/* Photo Cropper Dialog - Now with proper props */}
       <PhotoCropper
         open={cropperOpen}
         onOpenChange={setCropperOpen}

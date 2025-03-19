@@ -5,15 +5,19 @@ import { Button } from "@/components/ui/button";
 import { CropDialogProps } from '@/types/admin';
 import { X } from 'lucide-react';
 
-// Dimensions in cm
-const CROP_WIDTH = 5.9; // cm
-const CROP_HEIGHT = 3.59; // cm
+// Dimensions in cm - exported for use in other components
+export const CROP_WIDTH = 5.9; // cm
+export const CROP_HEIGHT = 3.59; // cm
 
 const PhotoCropper: React.FC<CropDialogProps> = ({
   open,
   onOpenChange,
   onCropComplete,
-  imageUrl
+  imageUrl,
+  cardType,
+  employeeName,
+  employeeId,
+  employeeRole
 }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);

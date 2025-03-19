@@ -45,8 +45,8 @@ export interface CropDialogProps {
   onOpenChange: (open: boolean) => void;
   onCropComplete: (croppedImageUrl: string) => void;
   imageUrl: string | null;
-  cardType: 'Light' | 'Conecta';
-  employeeName: string;
-  employeeId: string;
-  employeeRole: string;
+  cardType?: 'Light' | 'Conecta';
+  employeeName?: string;
+  employeeId?: string;
+  employeeRole?: string;
 }
