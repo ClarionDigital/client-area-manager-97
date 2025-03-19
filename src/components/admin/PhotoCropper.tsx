@@ -1,9 +1,9 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CropDialogProps } from '@/types/admin';
-import { X } from 'lucide-react';
+import { X, ZoomIn, ZoomOut, Move } from 'lucide-react';
 import { Slider } from "@/components/ui/slider";
 
 // Dimensions in cm - exported for use in other components
@@ -125,6 +125,14 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
     setScale(value[0]);
   };
 
+  const zoomIn = () => {
+    setScale(Math.min(scale + 0.1, 3));
+  };
+
+  const zoomOut = () => {
+    setScale(Math.max(scale - 0.1, 0.5));
+  };
+
   const handleApply = () => {
     if (!imageRef.current || !canvasRef.current || !cropAreaRef.current) return;
     
@@ -169,13 +177,17 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl p-0 gap-0 overflow-hidden">
-        <div className="p-4 flex justify-between items-center border-b">
-          <h2 className="text-xl font-bold">Ajustar Foto</h2>
-          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)}>
+      <DialogContent className="max-w-3xl p-0 gap-0 overflow-hidden border-0 shadow-xl rounded-lg">
+        <div className="p-4 flex justify-between items-center border-b bg-gradient-to-r from-zinc-50 to-slate-100">
+          <DialogTitle className="text-xl font-bold text-gray-800">Ajustar Foto</DialogTitle>
+          <Button variant="ghost" size="icon" onClick={() => onOpenChange(false)} className="rounded-full h-8 w-8">
             <X className="h-4 w-4" />
           </Button>
         </div>
+        
+        <DialogDescription className="sr-only">
+          Ajuste a posição da foto dentro da área de recorte
+        </DialogDescription>
         
         <div 
           ref={containerRef}
@@ -187,6 +199,26 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
+          {/* Control buttons overlay */}
+          <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
+            <Button 
+              onClick={zoomIn} 
+              variant="secondary" 
+              size="icon" 
+              className="rounded-full h-9 w-9 backdrop-blur-sm bg-white/80 shadow-md"
+            >
+              <ZoomIn className="h-4 w-4" />
+            </Button>
+            <Button 
+              onClick={zoomOut} 
+              variant="secondary" 
+              size="icon" 
+              className="rounded-full h-9 w-9 backdrop-blur-sm bg-white/80 shadow-md"
+            >
+              <ZoomOut className="h-4 w-4" />
+            </Button>
+          </div>
+          
           {/* Image to crop with drag functionality */}
           {imageUrl && (
             <img
@@ -208,7 +240,7 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
           )}
           
           {/* Crop area overlay */}
-          <div className="absolute inset-0 bg-black/50 pointer-events-none">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] pointer-events-none">
             {/* Transparent crop area */}
             <div 
               ref={cropAreaRef}
@@ -231,7 +263,7 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
               <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-blue-500"></div>
               
               {/* Dimension indicator */}
-              <div className="absolute -bottom-8 left-0 right-0 text-center bg-white/80 backdrop-blur-sm py-1 px-2 rounded text-sm">
+              <div className="absolute -bottom-8 left-0 right-0 text-center bg-white/90 backdrop-blur-sm py-1.5 px-3 rounded-full text-sm font-medium mx-auto w-max">
                 {CROP_WIDTH}cm × {CROP_HEIGHT}cm
               </div>
             </div>
@@ -239,26 +271,27 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
           
           {/* Image quality indicator */}
           {imageQuality && imageLoaded && (
-            <div className={`absolute top-4 right-4 px-3 py-1 rounded ${
+            <div className={`absolute top-4 right-4 px-3 py-1.5 rounded-full ${
               imageQuality === 'good' ? 'bg-green-500' : 'bg-yellow-500'
-            } text-white text-sm font-medium`}>
+            } text-white text-sm font-medium shadow-md backdrop-blur-sm`}>
               {imageQuality === 'good' ? 'Boa Qualidade' : 'Qualidade Baixa'}
             </div>
           )}
           
           {/* Instructions */}
           {imageLoaded && (
-            <div className="absolute bottom-4 left-4 right-4 text-center bg-white/80 backdrop-blur-sm py-2 px-3 rounded text-sm">
-              Arraste a imagem para posicionar | Ajuste a posição do rosto dentro da área demarcada
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center bg-white/90 backdrop-blur-sm py-2 px-4 rounded-full text-sm shadow-md max-w-xs w-full flex items-center justify-center gap-2">
+              <Move className="h-4 w-4 text-gray-700" />
+              <span>Arraste a imagem para posicionar</span>
             </div>
           )}
         </div>
         
         {/* Zoom controls */}
         {imageLoaded && (
-          <div className="p-4 border-t">
-            <div className="flex items-center space-x-4">
-              <span className="text-sm font-medium">Zoom:</span>
+          <div className="p-4 border-t border-gray-100 bg-gray-50">
+            <div className="flex items-center space-x-4 max-w-md mx-auto">
+              <ZoomOut className="h-4 w-4 text-gray-500" />
               <Slider
                 defaultValue={[1]}
                 min={0.5}
@@ -266,15 +299,16 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
                 step={0.01}
                 value={[scale]}
                 onValueChange={handleScaleChange}
-                className="w-full max-w-xs"
+                className="w-full"
               />
+              <ZoomIn className="h-4 w-4 text-gray-500" />
             </div>
           </div>
         )}
         
         <canvas ref={canvasRef} className="hidden"></canvas>
         
-        <DialogFooter className="p-4 bg-gray-50">
+        <DialogFooter className="p-4 border-t border-gray-100 bg-white flex gap-2 justify-end">
           <Button 
             variant="outline" 
             onClick={() => onOpenChange(false)}
