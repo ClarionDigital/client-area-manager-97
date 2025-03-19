@@ -24,4 +24,16 @@ export interface CardDataWithPhoto extends CardData {
   setor: string;
   validade: string;
   foto: boolean;
+  editMode?: boolean;
+}
+
+export interface SpreadsheetTemplate {
+  id: number;
+  primeiroNome: string;
+  nome: string;
+  matricula: string;
+  cargo: string;
+  setor: string;
+  validade: string;
+  tipo: string;
 }
