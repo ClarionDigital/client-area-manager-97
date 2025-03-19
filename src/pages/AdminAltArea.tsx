@@ -1,15 +1,17 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, BarChart, Download, Users, CreditCard, AlertTriangle, MessageSquare, Plus, Settings } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
+import { Separator } from "@/components/ui/separator";
+import { ArrowLeft, BarChart, Download, Users, CreditCard, AlertTriangle, MessageSquare, Plus, Settings, ChevronRight, Bell, BarChart2, Minimize2, Calendar, Cpu, Globe, Shield, Mail, Smartphone, FileText, RefreshCw, Activity, Lock, FileSpreadsheet, Layers, Image, Book, Database } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 // Dados simulados
@@ -28,10 +30,29 @@ const segundasVias = [
   { id: 5, nome: "Paulo Costa", matricula: "7031298", data: "22/05/2023", status: "Cancelado", tipo: "Conecta", quantidade: 1 },
 ];
 
+// Histórico de eventos do sistema
+const eventosHistorico = [
+  { id: 1, tipo: "Novo cartão", data: "30/05/2023 14:32", usuario: "admin", mensagem: "Cartão gerado para Maria Santos" },
+  { id: 2, tipo: "Pagamento", data: "30/05/2023 10:15", usuario: "financeiro", mensagem: "Pagamento confirmado: ID #3582" },
+  { id: 3, tipo: "API", data: "29/05/2023 18:45", usuario: "sistema", mensagem: "Integração MinIO sincronizada" },
+  { id: 4, tipo: "Whatsapp", data: "29/05/2023 16:20", usuario: "sistema", mensagem: "25 mensagens enviadas" },
+  { id: 5, tipo: "Login", data: "29/05/2023 09:10", usuario: "gerente", mensagem: "Login realizado com sucesso" },
+];
+
+// Taxas de conversão
+const conversoes = {
+  visitantes: 1250,
+  inicios: 420,
+  finalizados: 245,
+  taxa: 58.3
+};
+
 const AdminAltArea = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [periodoEstatisticas, setPeriodoEstatisticas] = useState("semana");
+  const [modoManutencao, setModoManutencao] = useState(false);
+  const [menuNotificacoes, setMenuNotificacoes] = useState(false);
   
   const handleEnviarMensagem = () => {
     toast({
@@ -46,12 +67,115 @@ const AdminAltArea = () => {
       description: "O usuário receberá as credenciais por e-mail"
     });
   };
+
+  const handleModoManutencao = () => {
+    setModoManutencao(!modoManutencao);
+    toast({
+      title: modoManutencao ? "Modo manutenção desativado" : "Modo manutenção ativado",
+      description: modoManutencao ? "O sistema está acessível para todos os usuários" : "O sistema está em manutenção e inacessível para usuários comuns"
+    });
+  };
+
+  const handleBackup = () => {
+    toast({
+      title: "Backup iniciado",
+      description: "O backup do banco de dados foi iniciado e será concluído em breve"
+    });
+  };
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-emerald-100 p-4 md:p-8">
-      <Button variant="outline" onClick={() => navigate("/")} className="mb-6">
-        <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao início
-      </Button>
+      <div className="flex justify-between items-center mb-6">
+        <Button variant="outline" onClick={() => navigate("/")} className="gap-2">
+          <ArrowLeft className="h-4 w-4" /> Voltar ao início
+        </Button>
+        
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <Button variant="outline" size="icon" onClick={() => setMenuNotificacoes(!menuNotificacoes)}>
+              <Bell className="h-4 w-4" />
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                3
+              </span>
+            </Button>
+            {menuNotificacoes && (
+              <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg p-2 z-50">
+                <h4 className="text-sm font-medium p-2">Notificações</h4>
+                <div className="space-y-2 max-h-64 overflow-auto">
+                  <div className="bg-yellow-50 p-2 rounded-md">
+                    <p className="text-xs font-medium">Pagamento pendente</p>
+                    <p className="text-xs text-gray-600">3 cartões aguardando pagamento</p>
+                  </div>
+                  <div className="bg-blue-50 p-2 rounded-md">
+                    <p className="text-xs font-medium">Sincronização API</p>
+                    <p className="text-xs text-gray-600">API WhatsApp sincronizada com sucesso</p>
+                  </div>
+                  <div className="bg-green-50 p-2 rounded-md">
+                    <p className="text-xs font-medium">Backup concluído</p>
+                    <p className="text-xs text-gray-600">Backup diário finalizado às 03:00</p>
+                  </div>
+                </div>
+                <div className="pt-2 mt-2 border-t">
+                  <Button variant="ghost" size="sm" className="w-full text-xs">Ver todas</Button>
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline">
+                <Settings className="h-4 w-4 mr-2" /> Configurações
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>Configurações do Sistema</DialogTitle>
+                <DialogDescription>
+                  Ajuste as configurações gerais do sistema
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-medium">Modo Manutenção</h4>
+                    <p className="text-xs text-gray-600">Bloqueia o acesso de usuários comuns</p>
+                  </div>
+                  <Switch checked={modoManutencao} onCheckedChange={handleModoManutencao} />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-medium">Notificações por E-mail</h4>
+                    <p className="text-xs text-gray-600">Envia resumos diários por e-mail</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-medium">Backup Automático</h4>
+                    <p className="text-xs text-gray-600">Realiza backup do banco de dados</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-sm font-medium">Modo Escuro</h4>
+                    <p className="text-xs text-gray-600">Alterna para o tema escuro</p>
+                  </div>
+                  <Switch />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline">Cancelar</Button>
+                <Button>Salvar Alterações</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
       
       <div className="max-w-6xl mx-auto">
         <Card>
@@ -64,11 +188,12 @@ const AdminAltArea = () => {
           
           <CardContent>
             <Tabs defaultValue="estatisticas">
-              <TabsList className="grid w-full grid-cols-1 md:grid-cols-4 mb-8">
+              <TabsList className="grid w-full grid-cols-1 md:grid-cols-5 mb-8">
                 <TabsTrigger value="estatisticas">Estatísticas</TabsTrigger>
                 <TabsTrigger value="cartoes">Dados e Cartões</TabsTrigger>
                 <TabsTrigger value="integracao">Integrações</TabsTrigger>
                 <TabsTrigger value="acesso">Controle de Acesso</TabsTrigger>
+                <TabsTrigger value="sistema">Sistema</TabsTrigger>
               </TabsList>
               
               <TabsContent value="estatisticas" className="space-y-6">
@@ -192,6 +317,120 @@ const AdminAltArea = () => {
                         ))}
                       </div>
                     </CardContent>
+                  </Card>
+                </div>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg flex items-center">
+                        <Activity className="h-5 w-5 mr-2 text-emerald-600" />
+                        Taxa de Conversão
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-center py-4">
+                        <div className="text-3xl font-bold text-emerald-600 mb-1">{conversoes.taxa}%</div>
+                        <p className="text-sm text-gray-500">Taxa de finalização</p>
+                      </div>
+                      <div className="space-y-4">
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Visitantes</span>
+                            <span className="font-medium">{conversoes.visitantes}</span>
+                          </div>
+                          <Progress value={100} className="h-2 bg-gray-100" />
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Iniciaram cadastro</span>
+                            <span className="font-medium">{conversoes.inicios}</span>
+                          </div>
+                          <Progress value={(conversoes.inicios/conversoes.visitantes)*100} className="h-2 bg-gray-100" />
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Finalizaram</span>
+                            <span className="font-medium">{conversoes.finalizados}</span>
+                          </div>
+                          <Progress value={(conversoes.finalizados/conversoes.visitantes)*100} className="h-2 bg-gray-100" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg flex items-center">
+                        <Bell className="h-5 w-5 mr-2 text-blue-600" />
+                        Comunicações Recentes
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <div className="text-sm">
+                        <div className="flex justify-between items-center px-6 py-3 border-b">
+                          <div className="flex items-center space-x-3">
+                            <Mail className="h-4 w-4 text-gray-500" />
+                            <span>E-mails enviados</span>
+                          </div>
+                          <span className="font-medium">152</span>
+                        </div>
+                        <div className="flex justify-between items-center px-6 py-3 border-b">
+                          <div className="flex items-center space-x-3">
+                            <Smartphone className="h-4 w-4 text-gray-500" />
+                            <span>Mensagens WhatsApp</span>
+                          </div>
+                          <span className="font-medium">86</span>
+                        </div>
+                        <div className="flex justify-between items-center px-6 py-3 border-b">
+                          <div className="flex items-center space-x-3">
+                            <FileText className="h-4 w-4 text-gray-500" />
+                            <span>Notificações sistema</span>
+                          </div>
+                          <span className="font-medium">43</span>
+                        </div>
+                        <div className="flex justify-between items-center px-6 py-3">
+                          <div className="flex items-center space-x-3">
+                            <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                            <span>Falhas de entrega</span>
+                          </div>
+                          <span className="font-medium">7</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter className="border-t pt-4">
+                      <Button variant="ghost" size="sm" className="w-full text-xs">
+                        Ver relatório detalhado
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                  
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg flex items-center">
+                        <Calendar className="h-5 w-5 mr-2 text-purple-600" />
+                        Atividade Recente
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="max-h-64 overflow-auto p-0">
+                      <div className="text-sm">
+                        {eventosHistorico.map((evento) => (
+                          <div key={evento.id} className="px-6 py-3 border-b last:border-0">
+                            <div className="flex justify-between mb-1">
+                              <span className="font-medium">{evento.tipo}</span>
+                              <span className="text-xs text-gray-500">{evento.data}</span>
+                            </div>
+                            <p className="text-gray-600 text-xs">{evento.mensagem}</p>
+                            <p className="text-gray-400 text-xs mt-1">por {evento.usuario}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                    <CardFooter className="border-t pt-4">
+                      <Button variant="ghost" size="sm" className="w-full text-xs">
+                        Ver histórico completo
+                      </Button>
+                    </CardFooter>
                   </Card>
                 </div>
               </TabsContent>
@@ -418,355 +657,4 @@ const AdminAltArea = () => {
                           <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M3 20.4V3.6C3 3.26863 3.26863 3 3.6 3H20.4C20.7314 3 21 3.26863 21 3.6V20.4C21 20.7314 20.7314 21 20.4 21H3.6C3.26863 21 3 20.7314 3 20.4Z" fill="#EAF3FF"/>
                             <path d="M9 8.5C8.17157 8.5 7.5 9.17157 7.5 10C7.5 10.8284 8.17157 11.5 9 11.5H15C15.8284 11.5 16.5 10.8284 16.5 10C16.5 9.17157 15.8284 8.5 15 8.5H9Z" fill="#70C4FF"/>
-                            <path d="M9 12.5C8.17157 12.5 7.5 13.1716 7.5 14C7.5 14.8284 8.17157 15.5 9 15.5H15C15.8284 15.5 16.5 14.8284 16.5 14C16.5 13.1716 15.8284 12.5 15 12.5H9Z" fill="#3F83F8"/>
-                          </svg>
-                          Integração MinIO
-                        </CardTitle>
-                        <CardDescription>
-                          Armazenamento de arquivos e imagens
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="minio-endpoint">Endpoint</Label>
-                            <Input id="minio-endpoint" value="https://minio.example.com" />
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div className="space-y-2">
-                              <Label htmlFor="minio-access">Access Key</Label>
-                              <Input id="minio-access" type="password" value="************" />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="minio-secret">Secret Key</Label>
-                              <Input id="minio-secret" type="password" value="************" />
-                            </div>
-                          </div>
-                          <div className="bg-green-50 border border-green-200 p-3 rounded-md flex items-center">
-                            <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
-                            <span className="text-sm text-green-700">Integração ativa</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center">
-                          <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M21 7.5V18C21 19.1046 20.1046 20 19 20H5C3.89543 20 3 19.1046 3 18V6C3 4.89543 3.89543 4 5 4H18.5" stroke="#25D366" strokeWidth="2" strokeLinecap="round"/>
-                            <path d="M15 12C15 13.6569 13.6569 15 12 15C10.3431 15 9 13.6569 9 12C9 10.3431 10.3431 9 12 9C13.6569 9 15 10.3431 15 12Z" stroke="#25D366" strokeWidth="2"/>
-                            <path d="M15.5 7.5H18.5V4.5" stroke="#25D366" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                          API WhatsApp
-                        </CardTitle>
-                        <CardDescription>
-                          Envio de mensagens e notificações
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="wp-token">Token</Label>
-                            <Input id="wp-token" type="password" value="**********************" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="wp-numero">Número do WhatsApp</Label>
-                            <Input id="wp-numero" value="+5521999998888" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="wp-template">Template Padrão</Label>
-                            <textarea 
-                              id="wp-template"
-                              rows={2}
-                              className="w-full p-2 border rounded-md"
-                              defaultValue="Olá {{1}}, seu crachá está pronto! Acesse: {{2}}"
-                            ></textarea>
-                          </div>
-                          <div className="bg-green-50 border border-green-200 p-3 rounded-md flex items-center">
-                            <div className="w-2 h-2 rounded-full bg-green-500 mr-2"></div>
-                            <span className="text-sm text-green-700">Integração ativa</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center">
-                          <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M21 5H3V19H21V5Z" fill="#F3F4F6"/>
-                            <path d="M21 5H3V8H21V5Z" fill="#4B5563"/>
-                            <circle cx="7" cy="6.5" r="1" fill="white"/>
-                            <circle cx="10" cy="6.5" r="1" fill="white"/>
-                            <circle cx="13" cy="6.5" r="1" fill="white"/>
-                            <path d="M6 12H8V14H6V12Z" fill="#4B5563"/>
-                            <path d="M11 12H13V14H11V12Z" fill="#4B5563"/>
-                            <path d="M16 12H18V14H16V12Z" fill="#4B5563"/>
-                            <path d="M6 16H8V18H6V16Z" fill="#4B5563"/>
-                            <path d="M11 16H13V18H11V16Z" fill="#4B5563"/>
-                            <path d="M16 16H18V18H16V16Z" fill="#4B5563"/>
-                          </svg>
-                          WebHooks
-                        </CardTitle>
-                        <CardDescription>
-                          Configuração de callbacks e notificações
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="webhook-url">URL do WebHook</Label>
-                            <Input id="webhook-url" value="https://api.example.com/hooks/cartoes" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Eventos</Label>
-                            <div className="grid grid-cols-2 gap-2">
-                              <div className="flex items-center space-x-2">
-                                <input type="checkbox" id="evento-novo" className="rounded" checked />
-                                <Label htmlFor="evento-novo">Novo Cartão</Label>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <input type="checkbox" id="evento-pagamento" className="rounded" checked />
-                                <Label htmlFor="evento-pagamento">Pagamento</Label>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <input type="checkbox" id="evento-cancelamento" className="rounded" />
-                                <Label htmlFor="evento-cancelamento">Cancelamento</Label>
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <input type="checkbox" id="evento-validade" className="rounded" />
-                                <Label htmlFor="evento-validade">Expiração</Label>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="bg-amber-50 border border-amber-200 p-3 rounded-md flex items-center">
-                            <AlertTriangle className="h-4 w-4 text-amber-500 mr-2" />
-                            <span className="text-sm text-amber-700">Última sincronização: há 3 dias</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="acesso" className="space-y-6">
-                <div className="flex justify-between items-center mb-6">
-                  <div>
-                    <h3 className="text-lg font-medium">Controle de Acesso</h3>
-                    <p className="text-sm text-gray-500">
-                      Gerencie usuários e permissões do sistema
-                    </p>
-                  </div>
-                  
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button>
-                        <Plus className="mr-2 h-4 w-4" />
-                        Novo Usuário
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Criar Novo Usuário</DialogTitle>
-                        <DialogDescription>
-                          Adicione um novo usuário ao sistema com o nível de acesso desejado.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4 py-4">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="usuario-nome">Nome</Label>
-                            <Input id="usuario-nome" placeholder="Nome completo" />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="usuario-email">E-mail</Label>
-                            <Input id="usuario-email" type="email" placeholder="email@exemplo.com" />
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="usuario-nivel">Nível de Acesso</Label>
-                          <Select defaultValue="operacional">
-                            <SelectTrigger>
-                              <SelectValue placeholder="Selecione o nível" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="admin">Administrador</SelectItem>
-                              <SelectItem value="gerente">Gerente</SelectItem>
-                              <SelectItem value="operacional">Operacional</SelectItem>
-                              <SelectItem value="somente-leitura">Somente Leitura</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label>Permissões</Label>
-                          <div className="grid grid-cols-2 gap-y-2">
-                            <div className="flex items-center space-x-2">
-                              <input type="checkbox" id="perm-visualizar" className="rounded" checked />
-                              <Label htmlFor="perm-visualizar">Visualizar dados</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <input type="checkbox" id="perm-editar" className="rounded" checked />
-                              <Label htmlFor="perm-editar">Editar dados</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <input type="checkbox" id="perm-financeiro" className="rounded" />
-                              <Label htmlFor="perm-financeiro">Financeiro</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <input type="checkbox" id="perm-config" className="rounded" />
-                              <Label htmlFor="perm-config">Configurações</Label>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <Button variant="outline">Cancelar</Button>
-                        <Button onClick={handleCriarAcesso}>Criar Usuário</Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-                
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">Usuários do Sistema</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="rounded-md border">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Nome</TableHead>
-                            <TableHead>E-mail</TableHead>
-                            <TableHead>Nível</TableHead>
-                            <TableHead>Último Acesso</TableHead>
-                            <TableHead className="text-right">Ações</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          <TableRow>
-                            <TableCell className="font-medium">Administrador</TableCell>
-                            <TableCell>admin@exemplo.com</TableCell>
-                            <TableCell>
-                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                Administrador
-                              </span>
-                            </TableCell>
-                            <TableCell>Hoje, 10:45</TableCell>
-                            <TableCell className="text-right">
-                              <Button variant="ghost" size="sm">
-                                <Settings className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell className="font-medium">Gerente Financeiro</TableCell>
-                            <TableCell>financeiro@exemplo.com</TableCell>
-                            <TableCell>
-                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                Gerente
-                              </span>
-                            </TableCell>
-                            <TableCell>Ontem, 15:30</TableCell>
-                            <TableCell className="text-right">
-                              <Button variant="ghost" size="sm">
-                                <Settings className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell className="font-medium">Operador</TableCell>
-                            <TableCell>operador@exemplo.com</TableCell>
-                            <TableCell>
-                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                Operacional
-                              </span>
-                            </TableCell>
-                            <TableCell>23/05/2023</TableCell>
-                            <TableCell className="text-right">
-                              <Button variant="ghost" size="sm">
-                                <Settings className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell className="font-medium">Visualizador</TableCell>
-                            <TableCell>visualizador@exemplo.com</TableCell>
-                            <TableCell>
-                              <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                Somente Leitura
-                              </span>
-                            </TableCell>
-                            <TableCell>20/05/2023</TableCell>
-                            <TableCell className="text-right">
-                              <Button variant="ghost" size="sm">
-                                <Settings className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                    </div>
-                    
-                    <div className="mt-6">
-                      <Card>
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-lg">Validade dos Cartões</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <h4 className="font-medium">Período de validade padrão</h4>
-                                <p className="text-sm text-gray-500">
-                                  Prazo de expiração a partir da data de emissão
-                                </p>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <Input 
-                                  type="number" 
-                                  defaultValue="12"
-                                  className="w-20 text-center" 
-                                />
-                                <span>meses</span>
-                              </div>
-                            </div>
-                            
-                            <div className="bg-blue-50 border border-blue-200 p-3 rounded-md">
-                              <div className="flex items-start">
-                                <Users className="h-5 w-5 text-blue-500 mr-2 mt-0.5" />
-                                <div>
-                                  <h4 className="text-sm font-medium text-blue-700">Cartões a expirar</h4>
-                                  <p className="text-xs text-blue-600 mt-1">
-                                    25 cartões expiram nos próximos 30 dias
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                            
-                            <div className="flex justify-end">
-                              <Button variant="outline">
-                                <BarChart className="mr-2 h-4 w-4" />
-                                Relatório de Validades
-                              </Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-};
-
-export default AdminAltArea;
+                            <path d="M9 12.5C8.17157 12.5 7.5 13.1716 7.5 14C7.5 14.8284 8.17157 15

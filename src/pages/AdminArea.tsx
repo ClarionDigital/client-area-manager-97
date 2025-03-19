@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -10,10 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { ArrowLeft, Download, FileText, Search, Trash2, Eye, Upload, DollarSign, CheckCircle, Phone, Clock, ImagePlus, Filter, RefreshCw, UserPlus } from "lucide-react";
+import { ArrowLeft, Download, FileText, Search, Trash2, Eye, Upload, DollarSign, CheckCircle, Phone, Clock, ImagePlus, Filter, RefreshCw, UserPlus, FileSpreadsheet, Database } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-// Dados simulados para demonstração
 const segundasVias = [
   { id: 1, nome: "Carlos Silva", matricula: "3001245", data: "12/05/2023", status: "Pago", valor: "R$ 35,00", tipo: "Light" },
   { id: 2, nome: "Maria Santos", matricula: "3018756", data: "15/05/2023", status: "Pago", valor: "R$ 45,00", tipo: "Light" },
@@ -25,6 +23,15 @@ const segundasVias = [
   { id: 8, nome: "Juliana Alves", matricula: "3037654", data: "27/05/2023", status: "Pago", valor: "R$ 35,00", tipo: "Light" },
   { id: 9, nome: "Eduardo Mendes", matricula: "7069872", data: "28/05/2023", status: "Cancelado", valor: "R$ 35,00", tipo: "Conecta" },
   { id: 10, nome: "Patrícia Rocha", matricula: "3045678", data: "29/05/2023", status: "Pago", valor: "R$ 45,00", tipo: "Light" },
+];
+
+const dadosCartoes = [
+  { id: 1, nome: "Carlos Silva", matricula: "3001245", cargo: "Analista", setor: "TI", validade: "12/2024", foto: true, tipo: "Light" },
+  { id: 2, nome: "Maria Santos", matricula: "3018756", cargo: "Coordenadora", setor: "RH", validade: "12/2024", foto: true, tipo: "Light" },
+  { id: 3, nome: "José Oliveira", matricula: "7042389", cargo: "Técnico", setor: "Operações", validade: "12/2024", foto: false, tipo: "Conecta" },
+  { id: 4, nome: "Ana Rodrigues", matricula: "3021567", cargo: "Gerente", setor: "Financeiro", validade: "12/2024", foto: true, tipo: "Light" },
+  { id: 5, nome: "Paulo Costa", matricula: "7031298", cargo: "Supervisor", setor: "Atendimento", validade: "12/2024", foto: false, tipo: "Conecta" },
+  { id: 6, nome: "Fernanda Lima", matricula: "3025467", cargo: "Diretora", setor: "Comercial", validade: "12/2024", foto: true, tipo: "Light" },
 ];
 
 const transacoes = [
@@ -48,8 +55,8 @@ const AdminArea = () => {
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
   const [modoVisualizacao, setModoVisualizacao] = useState<"lista" | "grade">("lista");
+  const [activeTab, setActiveTab] = useState("cartoes");
   
-  // Função para filtrar os dados
   const filtrarCartoes = () => {
     return cartoesGerados.filter(cartao => 
       (busca === "" || 
@@ -87,6 +94,13 @@ const AdminArea = () => {
     });
   };
   
+  const handleDownloadPlanilha = () => {
+    toast({
+      title: "Download iniciado",
+      description: "A planilha está sendo baixada",
+    });
+  };
+  
   const cartaoSelecionado = visualizarId ? cartoesGerados.find(cartao => cartao.id === visualizarId) : null;
   
   return (
@@ -105,10 +119,10 @@ const AdminArea = () => {
           </CardHeader>
           
           <CardContent className="p-6">
-            <Tabs defaultValue="cartoes" className="w-full">
+            <Tabs defaultValue="cartoes" value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-3 mb-8">
                 <TabsTrigger value="cartoes" className="text-sm md:text-base">Cartões Gerados</TabsTrigger>
-                <TabsTrigger value="busca" className="text-sm md:text-base">Busca Avançada</TabsTrigger>
+                <TabsTrigger value="dados" className="text-sm md:text-base">Dados e Cartões</TabsTrigger>
                 <TabsTrigger value="financeiro" className="text-sm md:text-base">Financeiro</TabsTrigger>
               </TabsList>
               
@@ -466,8 +480,8 @@ const AdminArea = () => {
                 </div>
               </TabsContent>
               
-              <TabsContent value="busca" className="space-y-6 bg-white p-6 rounded-md shadow-sm border">
-                <h3 className="text-lg font-medium mb-4">Busca Avançada</h3>
+              <TabsContent value="dados" className="space-y-6 bg-white p-6 rounded-md shadow-sm border">
+                <h3 className="text-lg font-medium mb-4">Gerenciamento de Dados</h3>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
