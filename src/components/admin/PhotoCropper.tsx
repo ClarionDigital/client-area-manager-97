@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CropDialogProps } from '@/types/admin';
 import { X } from 'lucide-react';
+import { Slider } from "@/components/ui/slider";
 
 // Dimensions in cm - exported for use in other components
 export const CROP_WIDTH = 5.9; // cm
@@ -28,6 +29,7 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const cropAreaRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) {
@@ -51,21 +53,24 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
       setImageQuality(minDimension < 500 ? 'poor' : 'good');
       
       // Center the image initially
-      if (cropAreaRef.current && img) {
+      if (cropAreaRef.current && img && containerRef.current) {
         const cropArea = cropAreaRef.current.getBoundingClientRect();
         const cropWidth = cropArea.width;
         const cropHeight = cropArea.height;
         
-        // Calculate initial scale to fit image inside crop area while maintaining aspect ratio
+        // Calculate initial scale to fit the image to fill the crop area
         const widthRatio = cropWidth / img.naturalWidth;
         const heightRatio = cropHeight / img.naturalHeight;
-        const initialScale = Math.min(widthRatio, heightRatio) * 0.95; // 95% to leave some margin
+        
+        // Use the larger scale to ensure the crop area is filled
+        const initialScale = Math.max(widthRatio, heightRatio) * 1.2; // 120% to ensure crop area is filled
         
         setScale(initialScale);
         
         // Center the image
         const scaledImgWidth = img.naturalWidth * initialScale;
         const scaledImgHeight = img.naturalHeight * initialScale;
+        
         const centerX = (cropWidth - scaledImgWidth) / 2;
         const centerY = (cropHeight - scaledImgHeight) / 2;
         
@@ -114,6 +119,10 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
 
   const handleTouchEnd = () => {
     setIsDragging(false);
+  };
+
+  const handleScaleChange = (value: number[]) => {
+    setScale(value[0]);
   };
 
   const handleApply = () => {
@@ -169,8 +178,9 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
         </div>
         
         <div 
+          ref={containerRef}
           className="relative bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImNoZWNrZXJib2FyZCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgd2lkdGg9IjIwIiBoZWlnaHQ9IjIwIj48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIGZpbGw9IiNmMGYwZjAiLz48cmVjdCB4PSIxMCIgeT0iMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjZTBlMGUwIi8+PHJlY3QgeD0iMCIgeT0iMTAiIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0iI2UwZTBlMCIvPjxyZWN0IHg9IjEwIiB5PSIxMCIgd2lkdGg9IjEwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjZjBmMGYwIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2NoZWNrZXJib2FyZCkiLz48L3N2Zz4=')]"
-          style={{ height: '500px' }}
+          style={{ height: 'calc(100vh - 250px)', minHeight: '400px', maxHeight: '550px' }}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
@@ -187,7 +197,8 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
               style={{ 
                 transform: `translate(${position.x}px, ${position.y}px) scale(${scale})`,
                 transformOrigin: '0 0',
-                cursor: isDragging ? 'grabbing' : 'grab'
+                cursor: isDragging ? 'grabbing' : 'grab',
+                maxWidth: 'none'
               }}
               onLoad={handleImageLoad}
               onMouseDown={handleMouseDown}
@@ -205,8 +216,10 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
               style={{ 
                 left: '50%',
                 top: '50%',
-                width: '400px', 
-                height: `${400 * (CROP_HEIGHT / CROP_WIDTH)}px`,
+                width: '60%', 
+                height: `${60 * (CROP_HEIGHT / CROP_WIDTH)}%`,
+                maxWidth: '500px',
+                maxHeight: `${500 * (CROP_HEIGHT / CROP_WIDTH)}px`,
                 transform: 'translate(-50%, -50%)',
                 boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.5)'
               }}
@@ -240,6 +253,24 @@ const PhotoCropper: React.FC<CropDialogProps> = ({
             </div>
           )}
         </div>
+        
+        {/* Zoom controls */}
+        {imageLoaded && (
+          <div className="p-4 border-t">
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium">Zoom:</span>
+              <Slider
+                defaultValue={[1]}
+                min={0.5}
+                max={2.5}
+                step={0.01}
+                value={[scale]}
+                onValueChange={handleScaleChange}
+                className="w-full max-w-xs"
+              />
+            </div>
+          </div>
+        )}
         
         <canvas ref={canvasRef} className="hidden"></canvas>
         

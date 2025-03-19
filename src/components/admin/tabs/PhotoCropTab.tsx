@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,6 @@ const PhotoCropTab: React.FC = () => {
   const [cropperOpen, setCropperOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState<CardDataWithPhoto | null>(null);
 
-  // Sample data for all cards
   const [allCards, setAllCards] = useState<CardDataWithPhoto[]>([
     { id: 1, nome: "Carlos Silva", primeiroNome: "Carlos", matricula: "3001245", cargo: "Analista", setor: "TI", validade: "12/2024", foto: true, tipo: "Light", data: "12/05/2023", status: "Ativo", valor: "--", fotoUrl: "/lovable-uploads/e60ff178-4d52-40cc-bbc3-e91693eff9c1.png" },
     { id: 2, nome: "Maria Santos", primeiroNome: "Maria", matricula: "3018756", cargo: "Coordenadora", setor: "RH", validade: "12/2024", foto: true, tipo: "Light", data: "15/05/2023", status: "Ativo", valor: "--" },
@@ -30,7 +28,6 @@ const PhotoCropTab: React.FC = () => {
     { id: 10, nome: "Patrícia Rocha", primeiroNome: "Patrícia", matricula: "3045678", cargo: "Supervisora", setor: "Vendas", validade: "12/2024", foto: true, tipo: "Light", data: "29/05/2023", status: "Ativo", valor: "--" },
   ]);
 
-  // Pagination state for all cards
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
   const totalPages = Math.ceil(allCards.length / itemsPerPage);
@@ -48,7 +45,6 @@ const PhotoCropTab: React.FC = () => {
       setPreviewUrl(objectUrl);
       setCroppedImageUrl(null);
       
-      // Automatically open the cropper when a file is selected
       setCropperOpen(true);
     }
   };
@@ -62,7 +58,6 @@ const PhotoCropTab: React.FC = () => {
   const handleCropComplete = (croppedUrl: string) => {
     setCroppedImageUrl(croppedUrl);
     
-    // If a card was selected, update its photo
     if (selectedCard) {
       setAllCards(prevCards => 
         prevCards.map(card => 
@@ -85,7 +80,6 @@ const PhotoCropTab: React.FC = () => {
     setSelectedCard(card);
     
     if (croppedImageUrl) {
-      // If we already have a cropped image, just use it
       setAllCards(prevCards => 
         prevCards.map(c => 
           c.id === card.id 
@@ -99,7 +93,6 @@ const PhotoCropTab: React.FC = () => {
         description: `Foto adicionada ao cartão de ${card.nome} com sucesso.`
       });
     } else {
-      // Otherwise, open the file input
       document.getElementById('photo-upload')?.click();
     }
   };
@@ -189,7 +182,6 @@ const PhotoCropTab: React.FC = () => {
         ))}
       </div>
 
-      {/* Pagination */}
       <div className="flex justify-center mt-6">
         <nav className="flex items-center gap-1">
           <Button 
@@ -234,7 +226,7 @@ const PhotoCropTab: React.FC = () => {
           <CardContent>
             <div className="space-y-4">
               {!previewUrl ? (
-                <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 rounded-lg">
+                <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 rounded-lg h-[300px]">
                   <Image className="w-16 h-16 text-gray-400 mb-4" />
                   <Label htmlFor="photo-upload" className="cursor-pointer">
                     <div className="bg-brand-primary hover:bg-brand-primaryDark text-white px-4 py-2 rounded-md inline-flex items-center gap-2">
@@ -257,7 +249,7 @@ const PhotoCropTab: React.FC = () => {
                 <div className="space-y-4">
                   <div 
                     className="relative border rounded-lg overflow-hidden mx-auto"
-                    style={{ width: '300px', height: '300px' }}
+                    style={{ width: '100%', height: '300px' }}
                   >
                     <img
                       src={previewUrl}
@@ -294,15 +286,15 @@ const PhotoCropTab: React.FC = () => {
                 <div className="space-y-4">
                   <div 
                     className="border rounded-lg overflow-hidden mx-auto bg-gray-100 flex items-center justify-center"
-                    style={{ width: '300px', height: '300px' }}
+                    style={{ width: '100%', height: '300px' }}
                   >
                     <img
                       src={croppedImageUrl}
                       alt="Cropped"
-                      className="w-full h-full object-contain"
+                      className="h-full object-contain"
                     />
                   </div>
-                  <div className="flex justify-center gap-2">
+                  <div className="flex justify-center gap-2 flex-wrap">
                     <Button 
                       onClick={handleDownload} 
                       className="bg-brand-primary hover:bg-brand-primaryDark"
@@ -337,7 +329,7 @@ const PhotoCropTab: React.FC = () => {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-300 rounded-lg h-full">
+                <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-gray-300 rounded-lg h-[300px]">
                   <Camera className="w-16 h-16 text-gray-400 mb-4" />
                   <p className="text-sm text-gray-500 text-center">
                     A imagem recortada aparecerá aqui
@@ -377,7 +369,6 @@ const PhotoCropTab: React.FC = () => {
         </CardContent>
       </Card>
       
-      {/* Photo Cropper Dialog - Now with proper props */}
       <PhotoCropper
         open={cropperOpen}
         onOpenChange={setCropperOpen}
