@@ -1,10 +1,11 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Upload, CreditCard, Check, AlertCircle, Search } from "lucide-react";
+import { ArrowLeft, Upload, CreditCard, Check, AlertCircle, Search, Plus, Minus, ShoppingCart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,6 +16,7 @@ const ClienteArea = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [foto, setFoto] = useState<File | null>(null);
+  const [quantity, setQuantity] = useState(1);
   
   const handleConsultar = () => {
     if (matricula.trim() === "") {
@@ -26,23 +28,14 @@ const ClienteArea = () => {
       return;
     }
     
-    // Simulação de login
-    const tipoMatricula = matricula.startsWith("3") ? "Light" : matricula.startsWith("7") ? "Conecta" : "Desconhecido";
-    
-    if (tipoMatricula === "Desconhecido") {
-      toast({
-        title: "Matrícula inválida",
-        description: "Formato de matrícula não reconhecido",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Aceitar qualquer matrícula
+    toast({
+      title: "Matrícula válida",
+      description: "Sua matrícula foi validada com sucesso",
+      variant: "default",
+    });
     
     setLoggedIn(true);
-    toast({
-      title: "Consulta realizada",
-      description: `Bem-vindo ao sistema. Identificamos sua matrícula como ${tipoMatricula}`,
-    });
   };
   
   const dadosCracha = {
@@ -51,7 +44,7 @@ const ClienteArea = () => {
     cargo: "Analista de Sistemas",
     setor: "Tecnologia",
     validade: "31/12/2024",
-    tipo: matricula.startsWith("3") ? "Light" : "Conecta"
+    tipo: "Light"
   };
   
   const handleUploadFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,12 +61,24 @@ const ClienteArea = () => {
     setCurrentStep(currentStep - 1);
   };
   
+  const increaseQuantity = () => {
+    setQuantity(quantity + 1);
+  };
+  
+  const decreaseQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
+  
+  const valorUnitario = 66.40;
+  const valorTotal = valorUnitario * quantity;
+  
   const handleFinalizarCompra = () => {
     toast({
       title: "Compra finalizada!",
       description: "Você receberá um e-mail e WhatsApp com a confirmação",
     });
-    // Aqui seria integrado com a API de pagamento ASAAS
     setTimeout(() => {
       navigate("/");
     }, 3000);
@@ -135,226 +140,221 @@ const ClienteArea = () => {
         <ArrowLeft className="mr-2 h-4 w-4" /> Voltar ao início
       </Button>
       
-      <div className="max-w-4xl mx-auto">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl">Área do Cliente {dadosCracha.tipo}</CardTitle>
-            <CardDescription>
-              Solicite sua segunda via de crachá em poucos passos
-            </CardDescription>
-            
-            <div className="flex justify-between items-center mt-6 border-t border-b py-4">
-              <div className={`flex flex-col items-center ${currentStep >= 1 ? "text-blue-600" : "text-gray-400"}`}>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${currentStep >= 1 ? "bg-blue-100" : "bg-gray-100"}`}>
-                  {currentStep > 1 ? <Check className="h-5 w-5" /> : "1"}
+      <div className="max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Coluna da esquerda - Pré-visualização */}
+          <Card className="h-fit">
+            <CardHeader>
+              <CardTitle>Pré-Visualização</CardTitle>
+              <CardDescription>
+                Este é o pré-visualização do crachá. O produto final terá excelente qualidade.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex justify-center">
+              <div className="border-4 border-orange-500 bg-teal-500 p-1 w-64 h-80 flex flex-col items-center">
+                <div className="w-full h-full flex flex-col items-center justify-center bg-teal-500 text-white">
+                  <img 
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Light_Servi%C3%A7os_Eletricidade.svg/1200px-Light_Servi%C3%A7os_Eletricidade.svg.png" 
+                    alt="Light" 
+                    className="h-24 mb-6"
+                  />
+                  <span className="text-xl">Light</span>
                 </div>
-                <span className="text-xs">Dados</span>
               </div>
-              
-              <div className={`flex-1 h-0.5 ${currentStep >= 2 ? "bg-blue-600" : "bg-gray-200"}`}></div>
-              
-              <div className={`flex flex-col items-center ${currentStep >= 2 ? "text-blue-600" : "text-gray-400"}`}>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${currentStep >= 2 ? "bg-blue-100" : "bg-gray-100"}`}>
-                  {currentStep > 2 ? <Check className="h-5 w-5" /> : "2"}
-                </div>
-                <span className="text-xs">Foto</span>
-              </div>
-              
-              <div className={`flex-1 h-0.5 ${currentStep >= 3 ? "bg-blue-600" : "bg-gray-200"}`}></div>
-              
-              <div className={`flex flex-col items-center ${currentStep >= 3 ? "text-blue-600" : "text-gray-400"}`}>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${currentStep >= 3 ? "bg-blue-100" : "bg-gray-100"}`}>
-                  {currentStep > 3 ? <Check className="h-5 w-5" /> : "3"}
-                </div>
-                <span className="text-xs">Confirmação</span>
-              </div>
-              
-              <div className={`flex-1 h-0.5 ${currentStep >= 4 ? "bg-blue-600" : "bg-gray-200"}`}></div>
-              
-              <div className={`flex flex-col items-center ${currentStep >= 4 ? "text-blue-600" : "text-gray-400"}`}>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center mb-2 ${currentStep >= 4 ? "bg-blue-100" : "bg-gray-100"}`}>
-                  {currentStep > 4 ? <Check className="h-5 w-5" /> : "4"}
-                </div>
-                <span className="text-xs">Pagamento</span>
-              </div>
-            </div>
-          </CardHeader>
+            </CardContent>
+          </Card>
           
-          <CardContent>
-            {currentStep === 1 && (
-              <div className="space-y-6">
-                <h3 className="text-lg font-medium">Dados Pessoais</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="nome">Nome completo</Label>
-                    <Input id="nome" value={dadosCracha.nome} readOnly />
+          {/* Coluna da direita - Dados e finalização */}
+          <div className="space-y-6">
+            {/* Dados do cartão */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Dados do Cartão</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="border rounded-md p-3 text-center">
+                    <img 
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Light_Servi%C3%A7os_Eletricidade.svg/1200px-Light_Servi%C3%A7os_Eletricidade.svg.png" 
+                      alt="Light Padrão" 
+                      className="h-10 mx-auto mb-2"
+                    />
+                    <span className="text-sm">Light Padrão</span>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="matricula">Matrícula</Label>
-                    <Input id="matricula" value={dadosCracha.matricula} readOnly />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="cargo">Cargo</Label>
-                    <Input id="cargo" value={dadosCracha.cargo} readOnly />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="setor">Setor</Label>
-                    <Input id="setor" value={dadosCracha.setor} readOnly />
+                  <div className="border rounded-md p-3 text-center">
+                    <img 
+                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Light_Servi%C3%A7os_Eletricidade.svg/1200px-Light_Servi%C3%A7os_Eletricidade.svg.png" 
+                      alt="Light Conecta" 
+                      className="h-10 mx-auto mb-2"
+                    />
+                    <span className="text-sm">Light Conecta</span>
                   </div>
                 </div>
-                <div className="flex justify-end mt-6">
-                  <Button onClick={nextStep}>Prosseguir</Button>
+                
+                <div className="space-y-2">
+                  <Label>Nome Completo</Label>
+                  <Input value={dadosCracha.nome} readOnly />
                 </div>
-              </div>
-            )}
-            
-            {currentStep === 2 && (
-              <div className="space-y-6">
-                <h3 className="text-lg font-medium">Envio de Foto</h3>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                  {foto ? (
-                    <div className="flex flex-col items-center">
-                      <img 
-                        src={URL.createObjectURL(foto)} 
-                        alt="Preview" 
-                        className="max-h-48 mb-4 relative"
-                        style={{
-                          position: "relative"
-                        }}
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="text-4xl font-bold text-white opacity-30 rotate-45">AGUARDANDO PAGAMENTO</div>
+                
+                <div className="space-y-2">
+                  <Label>Matrícula</Label>
+                  <Input value={matricula} readOnly />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>Foto</Label>
+                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+                    <Label htmlFor="foto-upload" className="cursor-pointer">
+                      <div className="flex flex-col items-center">
+                        <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                        <span className="text-sm text-gray-500">Clique para selecionar</span>
                       </div>
-                      <Button variant="outline" onClick={() => setFoto(null)}>
-                        Remover Foto
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center">
-                      <Upload className="h-12 w-12 text-gray-400 mb-4" />
-                      <h4 className="text-lg font-medium mb-2">Arraste sua foto ou clique para fazer upload</h4>
-                      <p className="text-sm text-gray-500 mb-4">Formato 3x4, fundo branco</p>
                       <Input
-                        id="foto"
+                        id="foto-upload"
                         type="file"
                         accept="image/*"
                         onChange={handleUploadFoto}
                         className="hidden"
                       />
-                      <Label htmlFor="foto" className="cursor-pointer">
-                        <Button variant="outline">Selecionar Arquivo</Button>
-                      </Label>
-                    </div>
-                  )}
+                    </Label>
+                  </div>
                 </div>
                 
-                <div className="bg-amber-50 border border-amber-200 p-4 rounded-md flex items-start">
-                  <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5 mr-3 flex-shrink-0" />
-                  <p className="text-sm text-amber-700">
-                    A foto será aplicada ao crachá apenas após a confirmação do pagamento. 
-                    A imagem deve seguir o padrão 3x4 com fundo branco.
-                  </p>
-                </div>
-                
-                <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={prevStep}>Voltar</Button>
-                  <Button onClick={nextStep} disabled={!foto}>Prosseguir</Button>
-                </div>
-              </div>
-            )}
+                <Button variant="outline" className="w-full bg-teal-600 text-white hover:bg-teal-700">
+                  Salvar Cartão
+                </Button>
+              </CardContent>
+            </Card>
             
-            {currentStep === 3 && (
-              <div className="space-y-6">
-                <h3 className="text-lg font-medium">Confirmação de Produto</h3>
-                
-                <Tabs defaultValue="basic">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="basic">Crachá Básico</TabsTrigger>
-                    <TabsTrigger value="kit">Kit Completo</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="basic" className="p-4 border rounded-md mt-2">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-medium">Crachá Segunda Via</h4>
-                        <p className="text-sm text-gray-500">Cartão PVC + Cordão Simples</p>
-                      </div>
-                      <div className="text-right">
-                        <span className="font-bold text-lg">R$ 35,00</span>
-                      </div>
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="kit" className="p-4 border rounded-md mt-2">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-medium">Kit Completo (+1)</h4>
-                        <p className="text-sm text-gray-500">Cartão PVC + Cordão Retrátil + Capa Protetora</p>
-                        <p className="text-xs text-emerald-600 font-medium mt-1">Economize R$ 5,00</p>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-sm line-through text-gray-400">R$ 50,00</span>
-                        <span className="font-bold text-lg block">R$ 45,00</span>
-                      </div>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-                
-                <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={prevStep}>Voltar</Button>
-                  <Button onClick={nextStep}>Prosseguir para Pagamento</Button>
+            {/* Dados Pessoais */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Dados Pessoais</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>CPF</Label>
+                  <Input placeholder="000.000.000-00" />
                 </div>
-              </div>
-            )}
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input placeholder="seu@email.com" />
+                </div>
+                <div className="space-y-2 col-span-2">
+                  <Label>Telefone</Label>
+                  <Input placeholder="(00) 00000-0000" />
+                </div>
+              </CardContent>
+            </Card>
             
-            {currentStep === 4 && (
-              <div className="space-y-6">
-                <h3 className="text-lg font-medium">Finalização e Pagamento</h3>
-                
-                <div className="bg-gray-50 p-4 rounded-md">
-                  <h4 className="font-medium mb-4">Resumo do Pedido</h4>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Produto:</span>
-                      <span>Crachá Segunda Via</span>
+            {/* Finalização */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Finalização</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-medium mb-2">Selecione o Cordão:</h3>
+                    <div className="border border-teal-500 rounded-md p-3 flex items-center justify-between text-teal-700 bg-teal-50">
+                      <div className="flex items-center">
+                        <svg className="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2"/>
+                          <path d="M8 12L11 15L16 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span>Cordão Light Verde</span>
+                      </div>
+                      <span className="font-medium">R$ 15,00</span>
                     </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Nome:</span>
-                      <span>{dadosCracha.nome}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Matrícula:</span>
-                      <span>{dadosCracha.matricula}</span>
-                    </div>
-                    <div className="flex justify-between font-medium pt-2 border-t">
-                      <span>Total:</span>
-                      <span>R$ 35,00</span>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-medium mb-2">Selecione o Porta Crachá:</h3>
+                    <div className="border border-teal-500 rounded-md p-3 flex items-center justify-between text-teal-700 my-2 bg-teal-50">
+                      <div className="flex items-center">
+                        <svg className="w-6 h-6 mr-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2"/>
+                          <path d="M8 12L11 15L16 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                        <span>Porta Crachá Padrão Cristal</span>
+                      </div>
+                      <span className="font-medium">R$ 8,50</span>
                     </div>
                   </div>
                 </div>
                 
-                <div className="border rounded-md p-4">
-                  <h4 className="font-medium mb-4">Formas de Pagamento</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Button variant="outline" className="justify-start">
-                      <CreditCard className="mr-2 h-4 w-4" />
-                      Cartão de Crédito
-                    </Button>
-                    <Button variant="outline" className="justify-start">
-                      <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M21 5L2 12.5L9 13.5M21 5L18.5 20L9 13.5M21 5L9 13.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      Pix
-                    </Button>
+                <div className="bg-blue-50 border border-blue-100 rounded-md p-4">
+                  <h3 className="font-semibold text-lg mb-3">Resumo do Pedido:</h3>
+                  <ul className="space-y-2 mb-4">
+                    <li className="flex justify-between">
+                      <span>• Crachá - Kit Completo</span>
+                      <span>R$ 42,90</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>• Cordão Light Verde</span>
+                      <span>R$ 15,00</span>
+                    </li>
+                    <li className="flex justify-between">
+                      <span>• Porta Crachá</span>
+                      <span>R$ 8,50</span>
+                    </li>
+                  </ul>
+                  
+                  <div className="flex justify-between items-center border-t border-blue-200 pt-3 font-bold text-lg text-blue-800">
+                    <span>Total:</span>
+                    <span>R$ 66,40</span>
+                  </div>
+                  
+                  <div className="mt-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="font-medium">Quantidade:</span>
+                      <div className="flex items-center">
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={decreaseQuantity}
+                          className="h-8 w-8"
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="mx-4 font-medium">{quantity}</span>
+                        <Button 
+                          variant="outline" 
+                          size="icon" 
+                          onClick={increaseQuantity}
+                          className="h-8 w-8"
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="bg-amber-50 border border-amber-200 p-3 rounded-md text-sm text-amber-800 mb-4">
+                      <p>
+                        <strong>KIT COMPLETO</strong><br />
+                        CRACHÁ + CORDÃO + PORTA CRACHÁ R$: 66,40 PODENDO ADICIONAR MAIS QUANTIDADES DE COPIA
+                      </p>
+                    </div>
                   </div>
                 </div>
                 
-                <div className="flex justify-between mt-6">
-                  <Button variant="outline" onClick={prevStep}>Voltar</Button>
-                  <Button onClick={handleFinalizarCompra}>Finalizar Compra</Button>
+                <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
+                  <strong>Informações de entrega:</strong><br />
+                  A entrega será realizada em até 10 dias úteis após a confirmação do pagamento. Para mais informações, entre em contato pelo e-mail ou telefone.
                 </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                
+                <Button 
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white" 
+                  size="lg"
+                  onClick={handleFinalizarCompra}
+                >
+                  <ShoppingCart className="mr-2 h-5 w-5" />
+                  Finalizar Pedido
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
