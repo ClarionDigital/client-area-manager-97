@@ -7,14 +7,18 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Upload, FileSpreadsheet } from "lucide-react";
+import { Upload, FileSpreadsheet, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface UploadSpreadsheetProps {
   onUpload: () => void;
+  onDownloadTemplate?: () => void;
 }
 
-const UploadSpreadsheet: React.FC<UploadSpreadsheetProps> = ({ onUpload }) => {
+const UploadSpreadsheet: React.FC<UploadSpreadsheetProps> = ({ 
+  onUpload,
+  onDownloadTemplate 
+}) => {
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [open, setOpen] = useState(false);
@@ -100,6 +104,21 @@ const UploadSpreadsheet: React.FC<UploadSpreadsheetProps> = ({ onUpload }) => {
               </>
             )}
           </div>
+          
+          {/* Template download link */}
+          {onDownloadTemplate && (
+            <div className="mt-4 text-center">
+              <Button
+                variant="link"
+                size="sm"
+                className="text-brand-primary"
+                onClick={onDownloadTemplate}
+              >
+                <Download className="h-4 w-4 mr-1" />
+                Baixar Planilha Modelo
+              </Button>
+            </div>
+          )}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>

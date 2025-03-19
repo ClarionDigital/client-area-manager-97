@@ -37,4 +37,16 @@ export interface SpreadsheetTemplate {
   setor: string;
   validade: string;
   tipo: string;
+  foto?: string;
+}
+
+export interface CropDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onCropComplete: (croppedImageUrl: string) => void;
+  imageUrl: string | null;
+  cardType: 'Light' | 'Conecta';
+  employeeName: string;
+  employeeId: string;
+  employeeRole: string;
 }
