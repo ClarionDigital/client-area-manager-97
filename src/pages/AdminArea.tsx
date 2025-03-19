@@ -1,14 +1,17 @@
+
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { UserPlus } from "lucide-react";
 
 // Import components
-import Header from "@/components/Header";
 import Logo from "@/components/Logo";
 import CardsTab from "@/components/admin/tabs/CardsTab";
 import DataTab from "@/components/admin/tabs/DataTab";
 import PhotoCropTab from "@/components/admin/tabs/PhotoCropTab";
+import NewEmployeeDialog from "@/components/admin/NewEmployeeDialog";
 
 // Import sample data
 import { CardData, TransactionData, CardDataWithPhoto, UploadedEmployee } from "@/types/admin";
@@ -53,6 +56,7 @@ const AdminArea = () => {
   const [uploadedEmployees, setUploadedEmployees] = useState<UploadedEmployee[]>([]);
   const [showUploadedData, setShowUploadedData] = useState(false);
   const [selectedCardType, setSelectedCardType] = useState<string>("Light");
+  const [newEmployeeDialogOpen, setNewEmployeeDialogOpen] = useState(false);
   
   const handleExcluirCartao = (id: number) => {
     setCartoesGerados(cartoesGerados.filter(cartao => cartao.id !== id));
@@ -105,19 +109,47 @@ const AdminArea = () => {
       description: "Os cartões serão processados em breve",
     });
   };
+
+  const handleAddNewEmployee = (newEmployee: Omit<UploadedEmployee, 'id'>) => {
+    const newId = Math.max(...uploadedEmployees.map(e => e.id), 0) + 1;
+    
+    const newEmployeeWithId: UploadedEmployee = {
+      id: newId,
+      ...newEmployee
+    };
+    
+    setUploadedEmployees(prev => [...prev, newEmployeeWithId]);
+    
+    if (!showUploadedData) {
+      setShowUploadedData(true);
+      setActiveTab("todos-dados");
+    }
+    
+    toast({
+      title: "Funcionário adicionado",
+      description: `${newEmployee.nome} foi adicionado com sucesso.`
+    });
+  };
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#52aa85]/5 to-[#52aa85]/10 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
             <Logo size="md" />
-            <Header 
-              title="ÁREA LIGHT ADM" 
-              subtitle="Gerenciamento de cartões, segundas vias e controle de dados"
-              showBackButton={false}
-            />
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">ÁREA LIGHT ADM</h1>
+              <p className="text-sm text-gray-500">Gerenciamento de cartões, segundas vias e controle de dados</p>
+            </div>
           </div>
+          
+          <Button 
+            onClick={() => setNewEmployeeDialogOpen(true)}
+            className="bg-brand-primary hover:bg-brand-primaryDark"
+          >
+            <UserPlus className="mr-2 h-4 w-4" />
+            Adicionar Pessoa
+          </Button>
         </div>
         
         <Card className="border-[#52aa85]/20 shadow-lg">
@@ -165,6 +197,12 @@ const AdminArea = () => {
           </CardContent>
         </Card>
       </div>
+      
+      <NewEmployeeDialog 
+        open={newEmployeeDialogOpen}
+        onOpenChange={setNewEmployeeDialogOpen}
+        onSave={handleAddNewEmployee}
+      />
     </div>
   );
 };

@@ -3,12 +3,17 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Camera, Download, Upload, Crop, Image, Check, ArrowLeft, ArrowRight } from "lucide-react";
+import { Camera, Download, Upload, Crop, Image, Check, ArrowLeft, ArrowRight, SendHorizontal } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { CardDataWithPhoto } from '@/types/admin';
+import { CardDataWithPhoto, PhotoCropTabProps, UploadedEmployee } from '@/types/admin';
 import PhotoCropper, { CROP_WIDTH, CROP_HEIGHT } from "../PhotoCropper";
 
-const PhotoCropTab: React.FC = () => {
+const PhotoCropTab: React.FC<PhotoCropTabProps> = ({
+  uploadedEmployees = [],
+  showUploadedData = false,
+  selectedCardType = "Light",
+  onSubmitOrder
+}) => {
   const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -16,18 +21,17 @@ const PhotoCropTab: React.FC = () => {
   const [cropperOpen, setCropperOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState<CardDataWithPhoto | null>(null);
 
-  const [allCards, setAllCards] = useState<CardDataWithPhoto[]>([
-    { id: 1, nome: "Carlos Silva", primeiroNome: "Carlos", matricula: "3001245", cargo: "Analista", setor: "TI", validade: "12/2024", foto: true, tipo: "Light", data: "12/05/2023", status: "Ativo", valor: "--", fotoUrl: "/lovable-uploads/c9519f36-ae3e-4e7c-a3e9-d37747362d44.png" },
-    { id: 2, nome: "Maria Santos", primeiroNome: "Maria", matricula: "3018756", cargo: "Coordenadora", setor: "RH", validade: "12/2024", foto: true, tipo: "Light", data: "15/05/2023", status: "Ativo", valor: "--" },
-    { id: 3, nome: "José Oliveira", primeiroNome: "José", matricula: "7042389", cargo: "Técnico", setor: "Operações", validade: "12/2024", foto: false, tipo: "Conecta", data: "18/05/2023", status: "Pendente", valor: "--" },
-    { id: 4, nome: "Ana Rodrigues", primeiroNome: "Ana", matricula: "3021567", cargo: "Gerente", setor: "Financeiro", validade: "12/2024", foto: true, tipo: "Light", data: "20/05/2023", status: "Ativo", valor: "--" },
-    { id: 5, nome: "Paulo Costa", primeiroNome: "Paulo", matricula: "7031298", cargo: "Supervisor", setor: "Atendimento", validade: "12/2024", foto: false, tipo: "Conecta", data: "22/05/2023", status: "Inativo", valor: "--" },
-    { id: 6, nome: "Fernanda Lima", primeiroNome: "Fernanda", matricula: "3025467", cargo: "Diretora", setor: "Comercial", validade: "12/2024", foto: true, tipo: "Light", data: "25/05/2023", status: "Ativo", valor: "--" },
-    { id: 7, nome: "Ricardo Souza", primeiroNome: "Ricardo", matricula: "7056234", cargo: "Gerente", setor: "TI", validade: "12/2024", foto: false, tipo: "Conecta", data: "26/05/2023", status: "Inativo", valor: "--" },
-    { id: 8, nome: "Juliana Alves", primeiroNome: "Juliana", matricula: "3037654", cargo: "Analista", setor: "Marketing", validade: "12/2024", foto: true, tipo: "Light", data: "27/05/2023", status: "Ativo", valor: "--" },
-    { id: 9, nome: "Eduardo Mendes", primeiroNome: "Eduardo", matricula: "7069872", cargo: "Assistente", setor: "Administração", validade: "12/2024", foto: false, tipo: "Conecta", data: "28/05/2023", status: "Pendente", valor: "--" },
-    { id: 10, nome: "Patrícia Rocha", primeiroNome: "Patrícia", matricula: "3045678", cargo: "Supervisora", setor: "Vendas", validade: "12/2024", foto: true, tipo: "Light", data: "29/05/2023", status: "Ativo", valor: "--" },
-  ]);
+  const [allCards, setAllCards] = useState<UploadedEmployee[]>(
+    uploadedEmployees.length > 0 
+      ? uploadedEmployees 
+      : [
+        { id: 1, nome: "Carlos Silva", matricula: "3001245", cargo: "Analista", setor: "TI", validade: "12/2024", foto: true, tipo: "Light", fotoUrl: "/lovable-uploads/c9519f36-ae3e-4e7c-a3e9-d37747362d44.png" },
+        { id: 2, nome: "Maria Santos", matricula: "3018756", cargo: "Coordenadora", setor: "RH", validade: "12/2024", foto: false, tipo: "Light" },
+        { id: 3, nome: "José Oliveira", matricula: "7042389", cargo: "Técnico", setor: "Operações", validade: "12/2024", foto: false, tipo: "Conecta" },
+        { id: 4, nome: "Ana Rodrigues", matricula: "3021567", cargo: "Gerente", setor: "Financeiro", validade: "12/2024", foto: false, tipo: "Light" },
+        { id: 5, nome: "Paulo Costa", matricula: "7031298", cargo: "Supervisor", setor: "Atendimento", validade: "12/2024", foto: false, tipo: "Conecta" }
+      ]
+  );
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -69,16 +73,16 @@ const PhotoCropTab: React.FC = () => {
       );
       
       setSelectedCard(null);
+      
+      toast({
+        title: "Foto recortada com sucesso",
+        description: "A foto foi recortada nas dimensões corretas para o cartão."
+      });
     }
-    
-    toast({
-      title: "Foto recortada com sucesso",
-      description: "A foto foi recortada nas dimensões corretas para o cartão."
-    });
   };
 
-  const handleAddPhotoToCard = (card: CardDataWithPhoto) => {
-    setSelectedCard(card);
+  const handleAddPhotoToCard = (card: UploadedEmployee) => {
+    setSelectedCard(card as unknown as CardDataWithPhoto);
     
     if (croppedImageUrl) {
       setAllCards(prevCards => 
@@ -121,18 +125,37 @@ const PhotoCropTab: React.FC = () => {
     setSelectedCard(null);
   };
 
+  const handleSubmitOrder = () => {
+    onSubmitOrder();
+    
+    toast({
+      title: "Pedido enviado com sucesso",
+      description: "Os cartões serão processados em breve"
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium">TODOS OS DADOS</h3>
+        <h3 className="text-lg font-medium">{showUploadedData ? `Planilha ${selectedCardType}` : 'TODOS OS DADOS'}</h3>
         <div className="flex gap-2">
           <Button
             variant="outline"
             className="border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white"
           >
             <Download className="mr-2 h-4 w-4" />
-            Exportar Lista Completa
+            Exportar Lista
           </Button>
+          
+          {showUploadedData && (
+            <Button 
+              onClick={handleSubmitOrder}
+              className="bg-brand-primary hover:bg-brand-primaryDark"
+            >
+              <SendHorizontal className="mr-2 h-4 w-4" />
+              Enviar Pedido
+            </Button>
+          )}
         </div>
       </div>
 
@@ -143,9 +166,9 @@ const PhotoCropTab: React.FC = () => {
             <CardContent className="p-4">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 w-16 h-20 rounded overflow-hidden bg-gray-100 border flex items-center justify-center">
-                  {card.foto ? (
+                  {card.foto && card.fotoUrl ? (
                     <img 
-                      src={card.fotoUrl || "/placeholder.svg"} 
+                      src={card.fotoUrl} 
                       alt={card.nome} 
                       className="w-full h-full object-cover" 
                     />
@@ -183,39 +206,41 @@ const PhotoCropTab: React.FC = () => {
         ))}
       </div>
 
-      <div className="flex justify-center mt-6">
-        <nav className="flex items-center gap-1">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          
-          {Array.from({ length: totalPages }, (_, i) => (
-            <Button
-              key={i}
-              variant={currentPage === i + 1 ? "default" : "outline"}
-              size="sm"
-              className={currentPage === i + 1 ? "bg-brand-primary" : ""}
-              onClick={() => setCurrentPage(i + 1)}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-6">
+          <nav className="flex items-center gap-1">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
             >
-              {i + 1}
+              <ArrowLeft className="h-4 w-4" />
             </Button>
-          ))}
-          
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-            disabled={currentPage === totalPages}
-          >
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </nav>
-      </div>
+            
+            {Array.from({ length: totalPages }, (_, i) => (
+              <Button
+                key={i}
+                variant={currentPage === i + 1 ? "default" : "outline"}
+                size="sm"
+                className={currentPage === i + 1 ? "bg-brand-primary" : ""}
+                onClick={() => setCurrentPage(i + 1)}
+              >
+                {i + 1}
+              </Button>
+            ))}
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+            >
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </nav>
+        </div>
+      )}
 
       <h3 className="text-lg font-medium mt-8 mb-4">Recorte de Foto</h3>
       

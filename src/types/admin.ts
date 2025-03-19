@@ -67,3 +67,16 @@ export interface UploadedEmployee {
   foto?: boolean;
   fotoUrl?: string;
 }
+
+export interface PhotoCropTabProps {
+  uploadedEmployees: UploadedEmployee[];
+  showUploadedData: boolean;
+  selectedCardType: string;
+  onSubmitOrder: () => void;
+}
+
+export interface NewEmployeeDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSave: (employee: Omit<UploadedEmployee, 'id'>) => void;
+}
