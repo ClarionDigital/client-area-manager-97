@@ -25,27 +25,22 @@ const FinancialTab: React.FC<FinancialTabProps> = ({ transactions }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Últimas Transações</CardTitle>
+            <CardTitle className="text-lg">Usuários</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="rounded-md border overflow-hidden">
               <Table>
                 <TableHeader className="bg-gray-50">
                   <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Cliente</TableHead>
-                    <TableHead>Valor</TableHead>
-                    <TableHead>Data</TableHead>
+                    <TableHead>Nome</TableHead>
+                    <TableHead>Data de Início</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Método</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {transactions.map((transacao) => (
                     <TableRow key={transacao.id} className="hover:bg-gray-50">
-                      <TableCell className="font-medium">#{transacao.id}</TableCell>
                       <TableCell>{transacao.cliente}</TableCell>
-                      <TableCell>{transacao.valor}</TableCell>
                       <TableCell>{transacao.data}</TableCell>
                       <TableCell>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -56,15 +51,6 @@ const FinancialTab: React.FC<FinancialTabProps> = ({ transactions }) => {
                               : 'bg-red-100 text-red-800'
                         }`}>
                           {transacao.status}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          transacao.metodo === 'Pix' 
-                            ? 'bg-brand-primary/20 text-brand-primaryDark' 
-                            : 'bg-brand-secondary/20 text-brand-accent'
-                        }`}>
-                          {transacao.metodo}
                         </span>
                       </TableCell>
                     </TableRow>

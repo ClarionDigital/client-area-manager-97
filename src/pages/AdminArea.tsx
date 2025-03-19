@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { DollarSign } from "lucide-react";
 
 // Import components
 import Header from "@/components/Header";
@@ -50,6 +51,7 @@ const AdminArea = () => {
   const { toast } = useToast();
   const [cartoesGerados, setCartoesGerados] = useState(segundasVias);
   const [activeTab, setActiveTab] = useState("cartoes");
+  const [walletBalance, setWalletBalance] = useState(500);
   
   const handleExcluirCartao = (id: number) => {
     setCartoesGerados(cartoesGerados.filter(cartao => cartao.id !== id));
@@ -86,10 +88,22 @@ const AdminArea = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#52aa85]/5 to-[#52aa85]/10 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        <Header 
-          title="ÁREA LIGHT ADM" 
-          subtitle="Gerenciamento de cartões, segundas vias e controle financeiro"
-        />
+        <div className="flex items-center justify-between mb-6">
+          <Header 
+            title="ÁREA LIGHT ADM" 
+            subtitle="Gerenciamento de cartões, segundas vias e controle financeiro"
+          />
+          <button 
+            onClick={() => setActiveTab("financeiro")} 
+            className="flex items-center gap-2 bg-[#52aa85] text-white px-4 py-2 rounded-lg hover:bg-[#3a7960] transition-colors"
+          >
+            <DollarSign size={20} />
+            <div>
+              <div className="text-sm font-medium">Carteira</div>
+              <div className="text-lg font-bold">R$ {walletBalance.toFixed(2)}</div>
+            </div>
+          </button>
+        </div>
         
         <Card className="border-[#52aa85]/20 shadow-lg">
           <CardHeader className="bg-gradient-to-r from-[#52aa85] to-[#004c48] text-white rounded-t-lg">
