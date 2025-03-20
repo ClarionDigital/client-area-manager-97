@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -11,16 +12,16 @@ import ExportButton from "@/components/admin/dashboard/ExportButton";
 
 interface CardsTabProps {
   cards: CardData[];
-  onConfirmPayment: (id: number) => void;
-  onDelete: (id: number) => void;
   onDownload: () => void;
   onUpload: (cardType: string) => void;
+  onConfirmPayment?: (id: number) => void;
+  onDelete?: (id: number) => void;
 }
 
 const CardsTab: React.FC<CardsTabProps> = ({
   cards,
-  onConfirmPayment,
-  onDelete,
+  onConfirmPayment = () => {},
+  onDelete = () => {},
   onDownload,
   onUpload
 }) => {
@@ -85,10 +86,7 @@ const CardsTab: React.FC<CardsTabProps> = ({
             <DialogTitle>Visualizar Cartão</DialogTitle>
           </DialogHeader>
           {cartaoSelecionado && (
-            <CardDetail 
-              card={cartaoSelecionado} 
-              onConfirmPayment={onConfirmPayment} 
-            />
+            <CardDetail card={cartaoSelecionado} />
           )}
           <DialogFooter>
             <Button onClick={() => setVisualizarId(null)}>Fechar</Button>
