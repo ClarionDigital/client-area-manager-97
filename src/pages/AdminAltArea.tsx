@@ -14,6 +14,7 @@ import EvolutionApiIntegration from "@/components/admin/EvolutionApiIntegration"
 const AdminAltArea = () => {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+      <Header title="Área Administrativa Alternativa" />
       <div className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <Logo />
@@ -56,4 +57,3 @@ const AdminAltArea = () => {
 };
 
 export default AdminAltArea;
-
