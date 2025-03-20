@@ -22,8 +22,6 @@ const CardDetail: React.FC<CardDetailProps> = ({ card }) => {
           <div className="space-y-2">
             <p className="font-bold">{card.nome}</p>
             <p className="text-sm text-gray-600">Matrícula: {card.matricula}</p>
-            <p className="text-sm text-gray-600">Cargo: Analista</p>
-            <p className="text-sm text-gray-600">Validade: 12/2024</p>
             <p className="text-sm">
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                 card.status === 'Pago' 

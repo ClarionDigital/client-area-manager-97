@@ -1,10 +1,9 @@
-
 import React, { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Search, Filter } from "lucide-react";
+import { Search, Filter, Send } from "lucide-react";
 
 // Import components
 import Logo from "@/components/Logo";
@@ -51,11 +50,11 @@ const mockUploadedEmployees: UploadedEmployee[] = [
 
 // Sample data for users who filled the form via link
 const initialPreenchidosPorLink = [
-  { id: 1, nome: "Roberto Almeida", primeiroNome: "Roberto", email: "roberto.almeida@email.com", telefone: "(21) 99876-5432", empresa: "ABC Ltda", cargo: "Desenvolvedor", dataPreenchimento: "02/06/2023", linkId: "LINK-001", matricula: "3001246", tipo: "Light", foto: false, setor: "TI", validade: "12/2024" },
-  { id: 2, nome: "Camila Ferreira", primeiroNome: "Camila", email: "camila.ferreira@email.com", telefone: "(11) 98765-4321", empresa: "XYZ S.A.", cargo: "Designer", dataPreenchimento: "03/06/2023", linkId: "LINK-001", matricula: "3001247", tipo: "Light", foto: false, setor: "Design", validade: "12/2024" },
-  { id: 3, nome: "Marcelo Gomes", primeiroNome: "Marcelo", email: "marcelo.gomes@email.com", telefone: "(31) 97654-3210", empresa: "123 Inc.", cargo: "Gerente de Projetos", dataPreenchimento: "04/06/2023", linkId: "LINK-002", matricula: "7031299", tipo: "Conecta", foto: false, setor: "Projetos", validade: "12/2024" },
-  { id: 4, nome: "Luciana Martins", primeiroNome: "Luciana", email: "luciana.martins@email.com", telefone: "(41) 96543-2109", empresa: "Tech Solutions", cargo: "Analista de Dados", dataPreenchimento: "05/06/2023", linkId: "LINK-002", matricula: "3001248", tipo: "Light", foto: false, setor: "Dados", validade: "12/2024" },
-  { id: 5, nome: "Felipe Santos", primeiroNome: "Felipe", email: "felipe.santos@email.com", telefone: "(51) 95432-1098", empresa: "Inovação Ltd", cargo: "Diretor de Marketing", dataPreenchimento: "06/06/2023", linkId: "LINK-003", matricula: "7031300", tipo: "Conecta", foto: false, setor: "Marketing", validade: "12/2024" },
+  { id: 1, nome: "Roberto Almeida", primeiroNome: "Roberto", email: "roberto.almeida@email.com", telefone: "(21) 99876-5432", empresa: "ABC Ltda", matricula: "3001246", tipo: "Light", foto: false, validade: "12/2024", cargo: "Desenvolvedor", dataPreenchimento: "02/06/2023", linkId: "LINK-001", setor: "TI" },
+  { id: 2, nome: "Camila Ferreira", primeiroNome: "Camila", email: "camila.ferreira@email.com", telefone: "(11) 98765-4321", empresa: "XYZ S.A.", matricula: "3001247", tipo: "Light", foto: false, validade: "12/2024", cargo: "Designer", dataPreenchimento: "03/06/2023", linkId: "LINK-001", setor: "Design" },
+  { id: 3, nome: "Marcelo Gomes", primeiroNome: "Marcelo", email: "marcelo.gomes@email.com", telefone: "(31) 97654-3210", empresa: "123 Inc.", matricula: "7031299", tipo: "Conecta", foto: false, validade: "12/2024", cargo: "Gerente de Projetos", dataPreenchimento: "04/06/2023", linkId: "LINK-002", setor: "Projetos" },
+  { id: 4, nome: "Luciana Martins", primeiroNome: "Luciana", email: "luciana.martins@email.com", telefone: "(41) 96543-2109", empresa: "Tech Solutions", matricula: "3001248", tipo: "Light", foto: false, validade: "12/2024", cargo: "Analista de Dados", dataPreenchimento: "05/06/2023", linkId: "LINK-002", setor: "Dados" },
+  { id: 5, nome: "Felipe Santos", primeiroNome: "Felipe", email: "felipe.santos@email.com", telefone: "(51) 95432-1098", empresa: "Inovação Ltd", matricula: "7031300", tipo: "Conecta", foto: false, validade: "12/2024", cargo: "Diretor de Marketing", dataPreenchimento: "06/06/2023", linkId: "LINK-003", setor: "Marketing" },
 ];
 
 const AdminArea = () => {
@@ -112,9 +111,6 @@ const AdminArea = () => {
     const employee = uploadedEmployees.find(emp => emp.id === id);
     
     if (employee) {
-      // Generate a unique link ID
-      const linkId = `LINK-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
-      
       // Create a new entry for preenchidosPorLink
       const newEntry = {
         id: Date.now(), // Use timestamp as unique ID
@@ -123,14 +119,14 @@ const AdminArea = () => {
         email: "", // To be filled by the employee
         telefone: "", // To be filled by the employee
         empresa: "", // To be filled by the employee
-        cargo: employee.cargo,
-        dataPreenchimento: new Date().toLocaleDateString('pt-BR'),
-        linkId: linkId,
         matricula: employee.matricula,
         tipo: employee.tipo,
         foto: false,
-        setor: employee.setor,
-        validade: employee.validade
+        validade: employee.validade,
+        cargo: employee.cargo,
+        dataPreenchimento: new Date().toLocaleDateString('pt-BR'),
+        linkId: `LINK-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
+        setor: employee.setor
       };
       
       // Add to preenchidosPorLink
@@ -140,8 +136,8 @@ const AdminArea = () => {
       setActiveTab("preenchidos-link");
       
       toast({
-        title: "Link criado com sucesso",
-        description: `Link para ${employee.nome} foi gerado: ${linkId}`,
+        title: "Segunda via solicitada",
+        description: `Segunda via para ${employee.nome} foi adicionada à lista`,
       });
     }
   };
@@ -170,21 +166,14 @@ const AdminArea = () => {
 
   // Filter for link-filled users
   const [linkSearch, setLinkSearch] = useState("");
-  const [linkFilter, setLinkFilter] = useState("todos");
   
   const filteredLinkUsers = useMemo(() => {
     return preenchidosPorLink.filter(user => 
       (linkSearch === "" || 
         user.nome.toLowerCase().includes(linkSearch.toLowerCase()) || 
-        (user.email && user.email.toLowerCase().includes(linkSearch.toLowerCase()))) &&
-      (linkFilter === "todos" || user.linkId === linkFilter)
+        (user.email && user.email.toLowerCase().includes(linkSearch.toLowerCase())))
     );
-  }, [preenchidosPorLink, linkSearch, linkFilter]);
-
-  // Get unique link IDs for filter dropdown
-  const uniqueLinkIds = useMemo(() => {
-    return [...new Set(preenchidosPorLink.map(user => user.linkId))];
-  }, [preenchidosPorLink]);
+  }, [preenchidosPorLink, linkSearch]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#52aa85]/5 to-[#52aa85]/10 p-4 md:p-8">
@@ -270,12 +259,6 @@ const AdminArea = () => {
                             <p className="text-sm text-gray-500 mb-1">
                               Mat: <span className="font-medium text-gray-700">{employee.matricula}</span>
                             </p>
-                            <p className="text-sm text-gray-500 mb-1">
-                              {employee.cargo} - {employee.setor}
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              Validade: {employee.validade}
-                            </p>
                             <div className="mt-3 flex gap-2">
                               <Button 
                                 variant="orange"
@@ -308,29 +291,15 @@ const AdminArea = () => {
                     </Button>
                   </div>
                   
-                  <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
-                    <div className="relative w-full md:w-auto md:flex-1">
-                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                      <input
-                        type="text"
-                        placeholder="Buscar por nome ou email..."
-                        className="w-full pl-8 pr-4 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#52aa85]"
-                        value={linkSearch}
-                        onChange={(e) => setLinkSearch(e.target.value)}
-                      />
-                    </div>
-                    <div className="w-full md:w-auto">
-                      <select
-                        className="w-full md:w-auto px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#52aa85]"
-                        value={linkFilter}
-                        onChange={(e) => setLinkFilter(e.target.value)}
-                      >
-                        <option value="todos">Todos os Links</option>
-                        {uniqueLinkIds.map(linkId => (
-                          <option key={linkId} value={linkId}>{linkId}</option>
-                        ))}
-                      </select>
-                    </div>
+                  <div className="relative w-full mb-6">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                    <input
+                      type="text"
+                      placeholder="Buscar por nome ou email..."
+                      className="w-full pl-8 pr-4 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#52aa85]"
+                      value={linkSearch}
+                      onChange={(e) => setLinkSearch(e.target.value)}
+                    />
                   </div>
                   
                   <div className="rounded-md border overflow-hidden">
@@ -339,11 +308,7 @@ const AdminArea = () => {
                         <TableRow className="bg-gray-50">
                           <TableHead>Nome</TableHead>
                           <TableHead>Matrícula</TableHead>
-                          <TableHead>Cargo</TableHead>
-                          <TableHead>Setor</TableHead>
                           <TableHead>Tipo</TableHead>
-                          <TableHead>Data Preench.</TableHead>
-                          <TableHead>ID do Link</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -351,8 +316,6 @@ const AdminArea = () => {
                           <TableRow key={user.id}>
                             <TableCell className="font-medium">{user.nome}</TableCell>
                             <TableCell>{user.matricula}</TableCell>
-                            <TableCell>{user.cargo}</TableCell>
-                            <TableCell>{user.setor}</TableCell>
                             <TableCell>
                               <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
                                 user.tipo === "Light" 
@@ -362,16 +325,22 @@ const AdminArea = () => {
                                 {user.tipo}
                               </span>
                             </TableCell>
-                            <TableCell>{user.dataPreenchimento}</TableCell>
-                            <TableCell>
-                              <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
-                                {user.linkId}
-                              </span>
-                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
                     </Table>
+                  </div>
+                  
+                  <div className="flex justify-center mt-8">
+                    <Button 
+                      variant="orange" 
+                      size="lg" 
+                      onClick={handleSubmitOrder}
+                      className="px-8"
+                    >
+                      <Send className="mr-2 h-5 w-5" />
+                      ENVIAR PEDIDO
+                    </Button>
                   </div>
                 </div>
               </TabsContent>
