@@ -10,7 +10,8 @@ import {
   PaginationItem, 
   PaginationLink, 
   PaginationNext, 
-  PaginationPrevious 
+  PaginationPrevious,
+  PaginationEllipsis
 } from "@/components/ui/pagination";
 
 interface CardGridProps {
@@ -20,7 +21,7 @@ interface CardGridProps {
   onDelete: (id: number) => void;
 }
 
-const ITEMS_PER_PAGE = 6;
+const ITEMS_PER_PAGE = 9; // Increased for better use of space
 
 const CardGrid: React.FC<CardGridProps> = ({ 
   cards, 
@@ -39,6 +40,88 @@ const CardGrid: React.FC<CardGridProps> = ({
   // Change page
   const goToPage = (pageNumber: number) => {
     setCurrentPage(pageNumber);
+  };
+
+  // Generate pagination items with ellipsis for large page counts
+  const renderPaginationItems = () => {
+    const items = [];
+    
+    if (totalPages <= 5) {
+      // If total pages is 5 or less, show all page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink 
+              isActive={currentPage === i}
+              onClick={() => goToPage(i)}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    } else {
+      // Always show first page
+      items.push(
+        <PaginationItem key={1}>
+          <PaginationLink 
+            isActive={currentPage === 1}
+            onClick={() => goToPage(1)}
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+      
+      // Show ellipsis if current page is > 3
+      if (currentPage > 3) {
+        items.push(
+          <PaginationItem key="ellipsis-1">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      
+      // Show current page and neighbors
+      const startPage = Math.max(2, currentPage - 1);
+      const endPage = Math.min(totalPages - 1, currentPage + 1);
+      
+      for (let i = startPage; i <= endPage; i++) {
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink 
+              isActive={currentPage === i}
+              onClick={() => goToPage(i)}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+      
+      // Show ellipsis if current page is < totalPages - 2
+      if (currentPage < totalPages - 2) {
+        items.push(
+          <PaginationItem key="ellipsis-2">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      
+      // Always show last page
+      items.push(
+        <PaginationItem key={totalPages}>
+          <PaginationLink 
+            isActive={currentPage === totalPages}
+            onClick={() => goToPage(totalPages)}
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    return items;
   };
 
   return (
@@ -125,16 +208,7 @@ const CardGrid: React.FC<CardGridProps> = ({
               />
             </PaginationItem>
             
-            {Array.from({ length: totalPages }).map((_, index) => (
-              <PaginationItem key={index}>
-                <PaginationLink 
-                  isActive={currentPage === index + 1}
-                  onClick={() => goToPage(index + 1)}
-                >
-                  {index + 1}
-                </PaginationLink>
-              </PaginationItem>
-            ))}
+            {renderPaginationItems()}
             
             <PaginationItem>
               <PaginationNext 
