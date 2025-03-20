@@ -4,15 +4,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { UserPlus, Search, Filter } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 
 // Import components
 import Logo from "@/components/Logo";
 import CardsTab from "@/components/admin/tabs/CardsTab";
 import DataTab from "@/components/admin/tabs/DataTab";
 import PhotoCropTab from "@/components/admin/tabs/PhotoCropTab";
-import NewEmployeeDialog from "@/components/admin/NewEmployeeDialog";
 import SearchFilters from "@/components/admin/SearchFilters";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 // Import sample data
 import { CardData, CardDataWithPhoto, UploadedEmployee } from '@/types/admin';
@@ -50,6 +50,15 @@ const mockUploadedEmployees: UploadedEmployee[] = [
   { id: 5, nome: "Paulo Costa", matricula: "7031298", cargo: "Supervisor", setor: "Atendimento", validade: "12/2024", tipo: "Conecta", foto: true },
 ];
 
+// Sample data for users who filled the form via link
+const preenchidosPorLink = [
+  { id: 1, nome: "Roberto Almeida", email: "roberto.almeida@email.com", telefone: "(21) 99876-5432", empresa: "ABC Ltda", cargo: "Desenvolvedor", dataPreenchimento: "02/06/2023", linkId: "LINK-001" },
+  { id: 2, nome: "Camila Ferreira", email: "camila.ferreira@email.com", telefone: "(11) 98765-4321", empresa: "XYZ S.A.", cargo: "Designer", dataPreenchimento: "03/06/2023", linkId: "LINK-001" },
+  { id: 3, nome: "Marcelo Gomes", email: "marcelo.gomes@email.com", telefone: "(31) 97654-3210", empresa: "123 Inc.", cargo: "Gerente de Projetos", dataPreenchimento: "04/06/2023", linkId: "LINK-002" },
+  { id: 4, nome: "Luciana Martins", email: "luciana.martins@email.com", telefone: "(41) 96543-2109", empresa: "Tech Solutions", cargo: "Analista de Dados", dataPreenchimento: "05/06/2023", linkId: "LINK-002" },
+  { id: 5, nome: "Felipe Santos", email: "felipe.santos@email.com", telefone: "(51) 95432-1098", empresa: "Inovação Ltd", cargo: "Diretor de Marketing", dataPreenchimento: "06/06/2023", linkId: "LINK-003" },
+];
+
 const AdminArea = () => {
   const { toast } = useToast();
   const [cartoesGerados, setCartoesGerados] = useState(segundasVias);
@@ -57,7 +66,6 @@ const AdminArea = () => {
   const [uploadedEmployees, setUploadedEmployees] = useState<UploadedEmployee[]>(mockUploadedEmployees);
   const [showUploadedData, setShowUploadedData] = useState(true);
   const [selectedCardType, setSelectedCardType] = useState<string>("Todos");
-  const [newEmployeeDialogOpen, setNewEmployeeDialogOpen] = useState(false);
   
   // Search and filter states
   const [search, setSearch] = useState("");
@@ -137,23 +145,6 @@ const AdminArea = () => {
       });
     }
   };
-
-  const handleAddNewEmployee = (newEmployee: Omit<UploadedEmployee, 'id'>) => {
-    const newId = Math.max(...uploadedEmployees.map(e => e.id), 0) + 1;
-    
-    const newEmployeeWithId: UploadedEmployee = {
-      id: newId,
-      ...newEmployee,
-      foto: true // Set photo to true for demonstration purposes
-    };
-    
-    setUploadedEmployees(prev => [...prev, newEmployeeWithId]);
-    
-    toast({
-      title: "Funcionário adicionado",
-      description: `${newEmployee.nome} foi adicionado com sucesso.`
-    });
-  };
   
   const handleSortingChange = (field: string, direction: 'asc' | 'desc') => {
     setSorting({ field, direction });
@@ -177,20 +168,24 @@ const AdminArea = () => {
     });
   }, [uploadedEmployees, search, typeFilter, sorting]);
 
+  // Filter for link-filled users
+  const [linkSearch, setLinkSearch] = useState("");
+  const [linkFilter, setLinkFilter] = useState("todos");
+  
+  const filteredLinkUsers = useMemo(() => {
+    return preenchidosPorLink.filter(user => 
+      (linkSearch === "" || 
+        user.nome.toLowerCase().includes(linkSearch.toLowerCase()) || 
+        user.email.toLowerCase().includes(linkSearch.toLowerCase())) &&
+      (linkFilter === "todos" || user.linkId === linkFilter)
+    );
+  }, [linkSearch, linkFilter]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#52aa85]/5 to-[#52aa85]/10 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <Logo size="md" />
-          
-          <Button 
-            onClick={() => setNewEmployeeDialogOpen(true)}
-            className="bg-brand-primary hover:bg-brand-primaryDark"
-            variant="brand"
-          >
-            <UserPlus className="mr-2 h-4 w-4" />
-            Adicionar Pessoa
-          </Button>
         </div>
         
         <Card className="border-[#52aa85]/20 shadow-lg">
@@ -203,17 +198,16 @@ const AdminArea = () => {
           
           <CardContent className="p-6">
             <Tabs defaultValue="cartoes" value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-8">
+              <TabsList className="grid w-full grid-cols-4 mb-8">
                 <TabsTrigger value="cartoes" className="text-sm md:text-base">Cartões Gerados</TabsTrigger>
                 <TabsTrigger value="dados" className="text-sm md:text-base">Dados e Cartões</TabsTrigger>
                 <TabsTrigger value="todos-dados" className="text-sm md:text-base">TODOS OS DADOS</TabsTrigger>
+                <TabsTrigger value="preenchidos-link" className="text-sm md:text-base">Preenchidos pelo Link</TabsTrigger>
               </TabsList>
               
               <TabsContent value="cartoes" className="space-y-6">
                 <CardsTab 
                   cards={cartoesGerados}
-                  onConfirmPayment={handleConfirmarPagamento}
-                  onDelete={handleExcluirCartao}
                   onDownload={handleDownloadPlanilha}
                   onUpload={handleUploadPlanilha}
                 />
@@ -310,16 +304,84 @@ const AdminArea = () => {
                   </div>
                 </div>
               </TabsContent>
+              
+              <TabsContent value="preenchidos-link" className="space-y-6">
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-xl font-semibold text-gray-800">
+                      Preenchidos pelo Link
+                    </h2>
+                    <Button
+                      variant="outline"
+                      onClick={handleDownloadPlanilha}
+                    >
+                      Exportar Lista
+                    </Button>
+                  </div>
+                  
+                  <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+                    <div className="relative w-full md:w-auto md:flex-1">
+                      <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+                      <input
+                        type="text"
+                        placeholder="Buscar por nome ou email..."
+                        className="w-full pl-8 pr-4 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#52aa85]"
+                        value={linkSearch}
+                        onChange={(e) => setLinkSearch(e.target.value)}
+                      />
+                    </div>
+                    <div className="w-full md:w-auto">
+                      <select
+                        className="w-full md:w-auto px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#52aa85]"
+                        value={linkFilter}
+                        onChange={(e) => setLinkFilter(e.target.value)}
+                      >
+                        <option value="todos">Todos os Links</option>
+                        <option value="LINK-001">LINK-001</option>
+                        <option value="LINK-002">LINK-002</option>
+                        <option value="LINK-003">LINK-003</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div className="rounded-md border overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-gray-50">
+                          <TableHead>Nome</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Telefone</TableHead>
+                          <TableHead>Empresa</TableHead>
+                          <TableHead>Cargo</TableHead>
+                          <TableHead>Data</TableHead>
+                          <TableHead>ID do Link</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredLinkUsers.map((user) => (
+                          <TableRow key={user.id}>
+                            <TableCell className="font-medium">{user.nome}</TableCell>
+                            <TableCell>{user.email}</TableCell>
+                            <TableCell>{user.telefone}</TableCell>
+                            <TableCell>{user.empresa}</TableCell>
+                            <TableCell>{user.cargo}</TableCell>
+                            <TableCell>{user.dataPreenchimento}</TableCell>
+                            <TableCell>
+                              <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
+                                {user.linkId}
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </div>
+              </TabsContent>
             </Tabs>
           </CardContent>
         </Card>
       </div>
-      
-      <NewEmployeeDialog 
-        open={newEmployeeDialogOpen}
-        onOpenChange={setNewEmployeeDialogOpen}
-        onSave={handleAddNewEmployee}
-      />
     </div>
   );
 };
