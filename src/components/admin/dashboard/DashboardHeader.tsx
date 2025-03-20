@@ -10,7 +10,7 @@ interface DashboardHeaderProps {
   onViewChange: () => void;
   modoVisualizacao: "lista" | "grade";
   onDownload: () => void;
-  onUpload: () => void; // This expects a function with no parameters
+  onUpload: (cardType: string) => void; // Modified to accept a cardType parameter
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
@@ -33,14 +33,8 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           Relatório
         </Button>
         
-        {/* Create a wrapper function to call the original onUpload with the selected card type */}
-        <UploadSpreadsheet 
-          onUpload={(cardType: string) => {
-            // After the spreadsheet component gets the card type,
-            // we call the original onUpload function
-            onUpload();
-          }} 
-        />
+        {/* Now directly passing the onUpload function which accepts cardType */}
+        <UploadSpreadsheet onUpload={onUpload} />
         
         <Button 
           variant="outline" 
@@ -58,4 +52,3 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 };
 
 export default DashboardHeader;
-
