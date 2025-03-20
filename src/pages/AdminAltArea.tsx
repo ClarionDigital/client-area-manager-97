@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { WhatsAppIntegration } from "@/components/admin/WhatsAppIntegration";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Header } from "@/components/Header";
+import Header from "@/components/Header";
 
 export default function AdminAltArea() {
   return (
