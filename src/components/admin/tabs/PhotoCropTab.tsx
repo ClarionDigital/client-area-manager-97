@@ -1,20 +1,12 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Camera, Download, SendHorizontal, Trash2, Copy, CheckCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { UploadedEmployee } from '@/types/admin';
-import { 
-  Pagination, 
-  PaginationContent, 
-  PaginationItem, 
-  PaginationLink, 
-  PaginationNext, 
-  PaginationPrevious 
-} from "@/components/ui/pagination";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, CheckCircle2, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PhotoCropTabProps {
   uploadedEmployees: UploadedEmployee[];
@@ -24,462 +16,174 @@ interface PhotoCropTabProps {
 }
 
 const PhotoCropTab: React.FC<PhotoCropTabProps> = ({
-  uploadedEmployees = [],
-  showUploadedData = false,
-  selectedCardType = "Light",
+  uploadedEmployees,
+  showUploadedData,
+  selectedCardType,
   onSubmitOrder
 }) => {
   const { toast } = useToast();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [activeTab, setActiveTab] = useState("todos");
-  const itemsPerPage = 5;
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCards, setSelectedCards] = useState<number[]>([]);
   
-  // Sample data if none provided
-  const [allCards, setAllCards] = useState<UploadedEmployee[]>(
-    uploadedEmployees.length > 0 
-      ? uploadedEmployees 
-      : [
-        { id: 1, nome: "Carlos Silva", matricula: "3001245", cargo: "Analista", setor: "TI", validade: "12/2024", foto: true, tipo: "Light", fotoUrl: "/lovable-uploads/c9519f36-ae3e-4e7c-a3e9-d37747362d44.png" },
-        { id: 2, nome: "Maria Santos", matricula: "3018756", cargo: "Coordenadora", setor: "RH", validade: "12/2024", foto: true, tipo: "Light", fotoUrl: "/lovable-uploads/e60ff178-4d52-40cc-bbc3-e91693eff9c1.png" },
-        { id: 3, nome: "José Oliveira", matricula: "7042389", cargo: "Técnico", setor: "Operações", validade: "12/2024", foto: true, tipo: "Conecta", fotoUrl: "/lovable-uploads/c9519f36-ae3e-4e7c-a3e9-d37747362d44.png" },
-        { id: 4, nome: "Ana Rodrigues", matricula: "3021567", cargo: "Gerente", setor: "Financeiro", validade: "12/2024", foto: true, tipo: "Light", fotoUrl: "/lovable-uploads/e60ff178-4d52-40cc-bbc3-e91693eff9c1.png" },
-        { id: 5, nome: "Paulo Costa", matricula: "7031298", cargo: "Supervisor", setor: "Atendimento", validade: "12/2024", foto: true, tipo: "Conecta", fotoUrl: "/lovable-uploads/c9519f36-ae3e-4e7c-a3e9-d37747362d44.png" }
-      ]
+  const filteredEmployees = uploadedEmployees.filter(employee => 
+    employee.nome.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    employee.matricula.includes(searchTerm)
   );
 
-  // Filter cards based on active tab
-  const filteredCards = activeTab === "todos"
-    ? allCards
-    : activeTab === "light"
-      ? allCards.filter(card => card.tipo === "Light")
-      : allCards.filter(card => card.tipo === "Conecta");
-  
-  const totalPages = Math.ceil(filteredCards.length / itemsPerPage);
-  const currentCards = filteredCards.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
-
-  const handleDeleteCard = (id: number) => {
-    setAllCards(allCards.filter(card => card.id !== id));
-    
-    toast({
-      title: "Cartão excluído",
-      description: "O cartão foi excluído com sucesso.",
-      variant: "success",
-    });
-  };
-
-  const handleRequestDuplicate = (card: UploadedEmployee) => {
+  const handleRequestSecondCopy = (employeeId: number) => {
     toast({
       title: "Segunda via solicitada",
-      description: `A segunda via do cartão de ${card.nome} foi solicitada com sucesso.`,
-      variant: "success",
+      description: "A solicitação foi registrada com sucesso",
     });
   };
 
-  const handleSubmitOrder = () => {
-    onSubmitOrder();
-    
+  const handleDeleteCard = (employeeId: number) => {
     toast({
-      title: "Pedido enviado com sucesso",
-      description: "Os cartões serão processados em breve"
+      title: "Cartão excluído",
+      description: "O cartão foi removido com sucesso",
     });
   };
 
-  // Handle tab change and reset pagination
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
-    setCurrentPage(1);
+  const toggleSelectCard = (employeeId: number) => {
+    setSelectedCards(prev => 
+      prev.includes(employeeId) 
+        ? prev.filter(id => id !== employeeId)
+        : [...prev, employeeId]
+    );
   };
+
+  const handleSelectAll = () => {
+    if (selectedCards.length === filteredEmployees.length) {
+      setSelectedCards([]);
+    } else {
+      setSelectedCards(filteredEmployees.map(emp => emp.id));
+    }
+  };
+
+  if (!showUploadedData) {
+    return (
+      <Alert variant="default" className="bg-blue-50 border-blue-200 text-blue-800">
+        <AlertDescription className="flex items-center justify-center py-8">
+          Nenhum dado carregado. Por favor, envie uma planilha na aba anterior.
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
+  if (filteredEmployees.length === 0) {
+    return (
+      <Alert variant="default" className="bg-amber-50 border-amber-200 text-amber-800">
+        <AlertDescription className="flex items-center justify-center py-8">
+          Nenhum funcionário encontrado com os critérios de busca atuais.
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium">{showUploadedData ? `Planilha ${selectedCardType}` : 'TODOS OS DADOS'}</h3>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-xl font-semibold text-gray-800">
+          Cartões {selectedCardType === "Todos" ? "" : selectedCardType} Cadastrados
+        </h2>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            className="border-brand-primary text-brand-primary hover:bg-brand-primary hover:text-white"
+          <Button 
+            variant="brand" 
+            onClick={handleSelectAll}
           >
-            <Download className="mr-2 h-4 w-4" />
-            Exportar Lista
+            {selectedCards.length === filteredEmployees.length ? "Desmarcar Todos" : "Selecionar Todos"}
           </Button>
-          
-          {showUploadedData && (
-            <Button 
-              onClick={handleSubmitOrder}
-              className="bg-brand-primary hover:bg-brand-primaryDark"
-            >
-              <SendHorizontal className="mr-2 h-4 w-4" />
-              Enviar Pedido
-            </Button>
-          )}
+          <Button
+            variant="orange" 
+            onClick={onSubmitOrder}
+          >
+            Finalizar Pedido ({selectedCards.length})
+          </Button>
         </div>
       </div>
-
-      {/* Card Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {currentCards.map((card) => (
-          <Card key={card.id} className="overflow-hidden shadow-md hover:shadow-lg transition-all duration-200">
-            <div className={`h-2 ${card.tipo === 'Light' ? 'bg-brand-primary' : 'bg-blue-600'}`}></div>
-            <CardContent className="p-4">
-              <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-16 h-20 rounded overflow-hidden bg-gray-100 border flex items-center justify-center">
-                  {card.foto && card.fotoUrl ? (
-                    <img 
-                      src={card.fotoUrl} 
-                      alt={card.nome} 
-                      className="w-full h-full object-cover" 
-                    />
-                  ) : (
-                    <Camera className="h-8 w-8 text-gray-400" />
-                  )}
-                </div>
-                <div className="flex-grow">
-                  <h4 className="font-bold text-lg">{card.nome}</h4>
-                  <p className={`text-sm font-medium ${card.matricula.startsWith('3') ? 'text-brand-primary' : 'text-blue-600'}`}>
-                    Mat: {card.matricula}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    {card.cargo} - {card.setor}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Validade: {card.validade}
-                  </p>
-                  <div className="mt-3 flex gap-2">
-                    <Button 
-                      size="sm" 
-                      variant="orange"
-                      onClick={() => handleRequestDuplicate(card)}
-                      className="text-xs"
-                    >
-                      <Copy className="h-3.5 w-3.5 mr-1" />
-                      PEDIR SEGUNDA VIA
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="destructive"
-                      onClick={() => handleDeleteCard(card.id)}
-                      className="text-xs"
-                    >
-                      <Trash2 className="h-3.5 w-3.5 mr-1" />
-                      DELETAR CARTÃO
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      
+      <div className="flex items-center relative w-full mb-6">
+        <Search className="absolute left-3 h-5 w-5 text-gray-400" />
+        <Input
+          placeholder="Buscar por nome ou matrícula"
+          className="pl-10 pr-4 py-2"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
       </div>
 
-      {/* Tabs for list view */}
-      <Tabs defaultValue="todos" value={activeTab} onValueChange={handleTabChange} className="mt-8">
-        <TabsList className="mb-4">
-          <TabsTrigger value="todos">Todos os Cartões</TabsTrigger>
-          <TabsTrigger value="light">Light</TabsTrigger>
-          <TabsTrigger value="conecta">Conecta</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="todos" className="mt-0">
-          <Card>
-            <CardHeader className="pb-2 bg-gradient-to-r from-zinc-50 to-slate-100">
-              <CardTitle className="text-lg">Lista Completa de Cartões</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader className="bg-brand-primary/10">
-                    <TableRow>
-                      <TableHead>Nome Completo</TableHead>
-                      <TableHead>Matrícula</TableHead>
-                      <TableHead>Cargo</TableHead>
-                      <TableHead>Setor</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {currentCards.length > 0 ? (
-                      currentCards.map((card) => (
-                        <TableRow key={card.id} className="hover:bg-brand-primary/5">
-                          <TableCell className="font-medium">{card.nome}</TableCell>
-                          <TableCell>{card.matricula}</TableCell>
-                          <TableCell>{card.cargo}</TableCell>
-                          <TableCell>{card.setor}</TableCell>
-                          <TableCell>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              card.tipo === 'Light' 
-                                ? 'bg-brand-primary/20 text-brand-primaryDark' 
-                                : 'bg-blue-100 text-blue-800'
-                            }`}>
-                              {card.tipo}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-green-600 flex items-center">
-                              <CheckCircle className="h-4 w-4 mr-1" /> Ativo
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button 
-                                size="sm" 
-                                variant="orange"
-                                onClick={() => handleRequestDuplicate(card)}
-                                className="text-xs whitespace-nowrap"
-                              >
-                                <Copy className="h-3.5 w-3.5 mr-1" />
-                                SEGUNDA VIA
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="destructive"
-                                onClick={() => handleDeleteCard(card.id)}
-                                className="text-xs whitespace-nowrap"
-                              >
-                                <Trash2 className="h-3.5 w-3.5 mr-1" />
-                                DELETAR
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={7} className="text-center py-4 text-gray-500">
-                          Nenhum cartão encontrado
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredEmployees.map((employee) => (
+          <div 
+            key={employee.id} 
+            className={`relative rounded-lg border p-4 ${
+              employee.tipo === "Light" 
+                ? "border-[#52aa85]/20 bg-gradient-to-b from-white to-[#52aa85]/5" 
+                : "border-[#0a5eb3]/20 bg-gradient-to-b from-white to-[#0a5eb3]/5"
+            } shadow-sm transition-all duration-200 hover:shadow-md`}
+          >
+            <div className="absolute top-2 right-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 rounded-full"
+                onClick={() => toggleSelectCard(employee.id)}
+              >
+                {selectedCards.includes(employee.id) ? (
+                  <CheckCircle2 className="h-5 w-5 text-[#52aa85]" />
+                ) : (
+                  <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
+                )}
+              </Button>
+            </div>
+            
+            <div className="flex items-start space-x-4">
+              <div className="h-20 w-16 overflow-hidden rounded-md border bg-gray-100 flex items-center justify-center">
+                {employee.foto ? (
+                  <img 
+                    src={`/placeholder.svg`} 
+                    alt={employee.nome}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="text-gray-400 text-xs text-center">Sem foto</div>
+                )}
               </div>
               
-              {totalPages > 1 && (
-                <Pagination className="mt-4">
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                      />
-                    </PaginationItem>
-                    
-                    {Array.from({ length: totalPages }).map((_, index) => (
-                      <PaginationItem key={index}>
-                        <PaginationLink 
-                          isActive={currentPage === index + 1}
-                          onClick={() => setCurrentPage(index + 1)}
-                        >
-                          {index + 1}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    
-                    <PaginationItem>
-                      <PaginationNext 
-                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="light" className="mt-0">
-          <Card>
-            <CardHeader className="pb-2 bg-gradient-to-r from-[#8cdcd8]/10 to-[#52aa85]/10">
-              <CardTitle className="text-lg">Cartões Light</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader className="bg-brand-primary/10">
-                    <TableRow>
-                      <TableHead>Nome Completo</TableHead>
-                      <TableHead>Matrícula</TableHead>
-                      <TableHead>Setor</TableHead>
-                      <TableHead>Validade</TableHead>
-                      <TableHead>Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {currentCards.length > 0 ? (
-                      currentCards.map((card) => (
-                        <TableRow key={card.id} className="hover:bg-brand-primary/5">
-                          <TableCell className="font-medium">{card.nome}</TableCell>
-                          <TableCell>{card.matricula}</TableCell>
-                          <TableCell>{card.setor}</TableCell>
-                          <TableCell>{card.validade}</TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button 
-                                size="sm" 
-                                variant="orange"
-                                onClick={() => handleRequestDuplicate(card)}
-                                className="text-xs whitespace-nowrap"
-                              >
-                                <Copy className="h-3.5 w-3.5 mr-1" />
-                                SEGUNDA VIA
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="destructive"
-                                onClick={() => handleDeleteCard(card.id)}
-                                className="text-xs whitespace-nowrap"
-                              >
-                                <Trash2 className="h-3.5 w-3.5 mr-1" />
-                                DELETAR
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center py-4 text-gray-500">
-                          Nenhum cartão Light encontrado
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+              <div className="flex-1">
+                <h3 className="font-medium text-gray-900">{employee.nome}</h3>
+                <p className="text-sm text-gray-500 mb-1">
+                  Mat: <span className="font-medium text-gray-700">{employee.matricula}</span>
+                </p>
+                <p className="text-sm text-gray-500 mb-1">
+                  {employee.cargo} - {employee.setor}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Validade: {employee.validade}
+                </p>
+                <div className="mt-3 flex gap-2">
+                  <Button 
+                    variant="orange"
+                    size="sm"
+                    className="h-8 text-xs"
+                    onClick={() => handleRequestSecondCopy(employee.id)}
+                  >
+                    PEDIR SEGUNDA VIA
+                  </Button>
+                  <Button 
+                    variant="destructive"
+                    size="sm"
+                    className="h-8 text-xs"
+                    onClick={() => handleDeleteCard(employee.id)}
+                  >
+                    DELETAR CARTÃO
+                  </Button>
+                </div>
               </div>
-              
-              {totalPages > 1 && (
-                <Pagination className="mt-4">
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                      />
-                    </PaginationItem>
-                    
-                    {Array.from({ length: totalPages }).map((_, index) => (
-                      <PaginationItem key={index}>
-                        <PaginationLink 
-                          isActive={currentPage === index + 1}
-                          onClick={() => setCurrentPage(index + 1)}
-                        >
-                          {index + 1}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    
-                    <PaginationItem>
-                      <PaginationNext 
-                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="conecta" className="mt-0">
-          <Card>
-            <CardHeader className="pb-2 bg-gradient-to-r from-blue-50 to-blue-100/50">
-              <CardTitle className="text-lg">Cartões Conecta</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader className="bg-blue-100/50">
-                    <TableRow>
-                      <TableHead>Nome Completo</TableHead>
-                      <TableHead>Matrícula</TableHead>
-                      <TableHead>Setor</TableHead>
-                      <TableHead>Validade</TableHead>
-                      <TableHead>Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {currentCards.length > 0 ? (
-                      currentCards.map((card) => (
-                        <TableRow key={card.id} className="hover:bg-blue-50/50">
-                          <TableCell className="font-medium">{card.nome}</TableCell>
-                          <TableCell>{card.matricula}</TableCell>
-                          <TableCell>{card.setor}</TableCell>
-                          <TableCell>{card.validade}</TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              <Button 
-                                size="sm" 
-                                variant="orange"
-                                onClick={() => handleRequestDuplicate(card)}
-                                className="text-xs whitespace-nowrap"
-                              >
-                                <Copy className="h-3.5 w-3.5 mr-1" />
-                                SEGUNDA VIA
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="destructive"
-                                onClick={() => handleDeleteCard(card.id)}
-                                className="text-xs whitespace-nowrap"
-                              >
-                                <Trash2 className="h-3.5 w-3.5 mr-1" />
-                                DELETAR
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell colSpan={5} className="text-center py-4 text-gray-500">
-                          Nenhum cartão Conecta encontrado
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-              
-              {totalPages > 1 && (
-                <Pagination className="mt-4">
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious 
-                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                      />
-                    </PaginationItem>
-                    
-                    {Array.from({ length: totalPages }).map((_, index) => (
-                      <PaginationItem key={index}>
-                        <PaginationLink 
-                          isActive={currentPage === index + 1}
-                          onClick={() => setCurrentPage(index + 1)}
-                        >
-                          {index + 1}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    
-                    <PaginationItem>
-                      <PaginationNext 
-                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

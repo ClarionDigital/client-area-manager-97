@@ -1,10 +1,10 @@
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Search, Filter } from "lucide-react";
 
 // Import components
 import Logo from "@/components/Logo";
@@ -12,6 +12,7 @@ import CardsTab from "@/components/admin/tabs/CardsTab";
 import DataTab from "@/components/admin/tabs/DataTab";
 import PhotoCropTab from "@/components/admin/tabs/PhotoCropTab";
 import NewEmployeeDialog from "@/components/admin/NewEmployeeDialog";
+import SearchFilters from "@/components/admin/SearchFilters";
 
 // Import sample data
 import { CardData, CardDataWithPhoto, UploadedEmployee } from '@/types/admin';
@@ -42,24 +43,32 @@ const dadosCartoes: CardDataWithPhoto[] = [
 
 // Sample uploaded employees data
 const mockUploadedEmployees: UploadedEmployee[] = [
-  { id: 1, nome: "Carlos Silva", matricula: "3001245", cargo: "Analista", setor: "TI", validade: "12/2024", tipo: "Light", foto: false },
-  { id: 2, nome: "Maria Santos", matricula: "3018756", cargo: "Coordenadora", setor: "RH", validade: "12/2024", tipo: "Light", foto: false },
-  { id: 3, nome: "José Oliveira", matricula: "7042389", cargo: "Técnico", setor: "Operações", validade: "12/2024", tipo: "Conecta", foto: false },
-  { id: 4, nome: "Ana Rodrigues", matricula: "3021567", cargo: "Gerente", setor: "Financeiro", validade: "12/2024", tipo: "Light", foto: false },
-  { id: 5, nome: "Paulo Costa", matricula: "7031298", cargo: "Supervisor", setor: "Atendimento", validade: "12/2024", tipo: "Conecta", foto: false },
+  { id: 1, nome: "Carlos Silva", matricula: "3001245", cargo: "Analista", setor: "TI", validade: "12/2024", tipo: "Light", foto: true },
+  { id: 2, nome: "Maria Santos", matricula: "3018756", cargo: "Coordenadora", setor: "RH", validade: "12/2024", tipo: "Light", foto: true },
+  { id: 3, nome: "José Oliveira", matricula: "7042389", cargo: "Técnico", setor: "Operações", validade: "12/2024", tipo: "Conecta", foto: true },
+  { id: 4, nome: "Ana Rodrigues", matricula: "3021567", cargo: "Gerente", setor: "Financeiro", validade: "12/2024", tipo: "Light", foto: true },
+  { id: 5, nome: "Paulo Costa", matricula: "7031298", cargo: "Supervisor", setor: "Atendimento", validade: "12/2024", tipo: "Conecta", foto: true },
 ];
 
 const AdminArea = () => {
   const { toast } = useToast();
   const [cartoesGerados, setCartoesGerados] = useState(segundasVias);
   const [activeTab, setActiveTab] = useState("cartoes");
-  const [uploadedEmployees, setUploadedEmployees] = useState<UploadedEmployee[]>([]);
-  const [showUploadedData, setShowUploadedData] = useState(false);
-  const [selectedCardType, setSelectedCardType] = useState<string>("Light");
+  const [uploadedEmployees, setUploadedEmployees] = useState<UploadedEmployee[]>(mockUploadedEmployees);
+  const [showUploadedData, setShowUploadedData] = useState(true);
+  const [selectedCardType, setSelectedCardType] = useState<string>("Todos");
   const [newEmployeeDialogOpen, setNewEmployeeDialogOpen] = useState(false);
+  
+  // Search and filter states
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("todos");
+  const [typeFilter, setTypeFilter] = useState("todos");
+  const [sorting, setSorting] = useState({ field: 'nome', direction: 'asc' as 'asc' | 'desc' });
   
   const handleExcluirCartao = (id: number) => {
     setCartoesGerados(cartoesGerados.filter(cartao => cartao.id !== id));
+    setUploadedEmployees(uploadedEmployees.filter(employee => employee.id !== id));
+    
     toast({
       title: "Cartão excluído",
       description: "O cartão foi removido com sucesso",
@@ -68,14 +77,6 @@ const AdminArea = () => {
   
   const handleUploadPlanilha = (cardType: string) => {
     setSelectedCardType(cardType);
-    
-    const filteredEmployees = mockUploadedEmployees.filter(employee => {
-      const employeeCardType = getCardTypeFromEmployeeId(employee.matricula);
-      return cardType === "Todos" || employeeCardType === cardType;
-    });
-    
-    setUploadedEmployees(filteredEmployees);
-    setShowUploadedData(true);
     setActiveTab("todos-dados");
     
     toast({
@@ -88,6 +89,7 @@ const AdminArea = () => {
     setCartoesGerados(cartoesGerados.map(cartao => 
       cartao.id === id ? { ...cartao, status: "Pago" } : cartao
     ));
+    
     toast({
       title: "Pagamento confirmado",
       description: "Status do pagamento atualizado para 'Pago'",
@@ -102,12 +104,38 @@ const AdminArea = () => {
   };
 
   const handleSubmitOrder = () => {
-    setShowUploadedData(false);
-    
     toast({
       title: "Pedido enviado com sucesso",
       description: "Os cartões serão processados em breve",
     });
+  };
+
+  const handleRequestSecondCopy = (id: number) => {
+    // Add the employee to the segundasVias list if not already there
+    const employee = uploadedEmployees.find(emp => emp.id === id);
+    
+    if (employee) {
+      const alreadyInList = cartoesGerados.some(cartao => cartao.id === id);
+      
+      if (!alreadyInList) {
+        const newCard: CardData = {
+          id: employee.id,
+          nome: employee.nome,
+          matricula: employee.matricula,
+          data: new Date().toLocaleDateString('pt-BR'),
+          status: "Pendente",
+          valor: "--",
+          tipo: employee.tipo
+        };
+        
+        setCartoesGerados([...cartoesGerados, newCard]);
+      }
+      
+      toast({
+        title: "Segunda via solicitada",
+        description: `Segunda via do cartão para ${employee.nome} foi solicitada`,
+      });
+    }
   };
 
   const handleAddNewEmployee = (newEmployee: Omit<UploadedEmployee, 'id'>) => {
@@ -115,15 +143,11 @@ const AdminArea = () => {
     
     const newEmployeeWithId: UploadedEmployee = {
       id: newId,
-      ...newEmployee
+      ...newEmployee,
+      foto: true // Set photo to true for demonstration purposes
     };
     
     setUploadedEmployees(prev => [...prev, newEmployeeWithId]);
-    
-    if (!showUploadedData) {
-      setShowUploadedData(true);
-      setActiveTab("todos-dados");
-    }
     
     toast({
       title: "Funcionário adicionado",
@@ -131,9 +155,27 @@ const AdminArea = () => {
     });
   };
   
-  const handleUploadForCardsTab = () => {
-    handleUploadPlanilha(selectedCardType);
+  const handleSortingChange = (field: string, direction: 'asc' | 'desc') => {
+    setSorting({ field, direction });
   };
+
+  // Filter and sort all employee data
+  const filteredEmployees = useMemo(() => {
+    return uploadedEmployees.filter(employee => 
+      (search === "" || 
+        employee.nome.toLowerCase().includes(search.toLowerCase()) || 
+        employee.matricula.includes(search)) &&
+      (typeFilter === "todos" || employee.tipo === typeFilter)
+    ).sort((a, b) => {
+      if (sorting.field === 'nome') {
+        return sorting.direction === 'asc' 
+          ? a.nome.localeCompare(b.nome) 
+          : b.nome.localeCompare(a.nome);
+      }
+      // Add other sorting options as needed
+      return 0;
+    });
+  }, [uploadedEmployees, search, typeFilter, sorting]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#52aa85]/5 to-[#52aa85]/10 p-4 md:p-8">
@@ -144,6 +186,7 @@ const AdminArea = () => {
           <Button 
             onClick={() => setNewEmployeeDialogOpen(true)}
             className="bg-brand-primary hover:bg-brand-primaryDark"
+            variant="brand"
           >
             <UserPlus className="mr-2 h-4 w-4" />
             Adicionar Pessoa
@@ -172,7 +215,7 @@ const AdminArea = () => {
                   onConfirmPayment={handleConfirmarPagamento}
                   onDelete={handleExcluirCartao}
                   onDownload={handleDownloadPlanilha}
-                  onUpload={handleUploadForCardsTab}
+                  onUpload={handleUploadPlanilha}
                 />
               </TabsContent>
               
@@ -184,12 +227,88 @@ const AdminArea = () => {
               </TabsContent>
               
               <TabsContent value="todos-dados" className="space-y-6">
-                <PhotoCropTab 
-                  uploadedEmployees={uploadedEmployees}
-                  showUploadedData={showUploadedData}
-                  selectedCardType={selectedCardType}
-                  onSubmitOrder={handleSubmitOrder}
-                />
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-xl font-semibold text-gray-800">
+                      Todos os Cartões Cadastrados
+                    </h2>
+                    <Button
+                      variant="outline"
+                      onClick={handleDownloadPlanilha}
+                    >
+                      Exportar Lista
+                    </Button>
+                  </div>
+                  
+                  <SearchFilters
+                    search={search}
+                    onSearchChange={setSearch}
+                    statusFilter={statusFilter}
+                    onStatusFilterChange={setStatusFilter}
+                    typeFilter={typeFilter}
+                    onTypeFilterChange={setTypeFilter}
+                    sorting={sorting}
+                    onSortingChange={handleSortingChange}
+                  />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredEmployees.map((employee) => (
+                      <div 
+                        key={employee.id} 
+                        className={`rounded-lg border p-4 ${
+                          employee.tipo === "Light" 
+                            ? "border-[#52aa85]/20 bg-gradient-to-b from-white to-[#52aa85]/5" 
+                            : "border-[#0a5eb3]/20 bg-gradient-to-b from-white to-[#0a5eb3]/5"
+                        } shadow-sm transition-all duration-200 hover:shadow-md`}
+                      >
+                        <div className="flex items-start space-x-4">
+                          <div className="h-20 w-16 overflow-hidden rounded-md border bg-gray-100 flex items-center justify-center">
+                            {employee.foto ? (
+                              <img 
+                                src={`/placeholder.svg`} 
+                                alt={employee.nome}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <div className="text-gray-400 text-xs text-center">Sem foto</div>
+                            )}
+                          </div>
+                          
+                          <div className="flex-1">
+                            <h3 className="font-medium text-gray-900">{employee.nome}</h3>
+                            <p className="text-sm text-gray-500 mb-1">
+                              Mat: <span className="font-medium text-gray-700">{employee.matricula}</span>
+                            </p>
+                            <p className="text-sm text-gray-500 mb-1">
+                              {employee.cargo} - {employee.setor}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              Validade: {employee.validade}
+                            </p>
+                            <div className="mt-3 flex gap-2">
+                              <Button 
+                                variant="orange"
+                                size="sm"
+                                className="h-8 text-xs"
+                                onClick={() => handleRequestSecondCopy(employee.id)}
+                              >
+                                PEDIR SEGUNDA VIA
+                              </Button>
+                              <Button 
+                                variant="destructive"
+                                size="sm"
+                                className="h-8 text-xs"
+                                onClick={() => handleExcluirCartao(employee.id)}
+                              >
+                                DELETAR CARTÃO
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </TabsContent>
             </Tabs>
           </CardContent>
