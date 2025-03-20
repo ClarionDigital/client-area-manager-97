@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Table, TableBody, TableCell, TableHead, 
@@ -6,7 +5,7 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, CheckCircle, Trash2 } from "lucide-react";
+import { Eye } from "lucide-react";
 import { CardData } from '@/types/admin';
 import { 
   Pagination, 
@@ -21,37 +20,33 @@ import {
 interface CardListProps {
   cards: CardData[];
   onView: (id: number) => void;
-  onConfirmPayment: (id: number) => void;
-  onDelete: (id: number) => void;
+  onConfirmPayment?: (id: number) => void;
+  onDelete?: (id: number) => void;
 }
 
-const ITEMS_PER_PAGE = 10; // Increased for better space utilization
+const ITEMS_PER_PAGE = 10;
 
 const CardList: React.FC<CardListProps> = ({ 
   cards, 
-  onView, 
-  onConfirmPayment, 
-  onDelete 
+  onView,
+  onConfirmPayment,
+  onDelete
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   
-  // Calculate pagination values
   const totalPages = Math.ceil(cards.length / ITEMS_PER_PAGE);
   const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
   const currentItems = cards.slice(indexOfFirstItem, indexOfLastItem);
   
-  // Change page
   const goToPage = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
 
-  // Generate pagination items with ellipsis for large page counts
   const renderPaginationItems = () => {
     const items = [];
     
     if (totalPages <= 5) {
-      // If total pages is 5 or less, show all page numbers
       for (let i = 1; i <= totalPages; i++) {
         items.push(
           <PaginationItem key={i}>
@@ -65,7 +60,6 @@ const CardList: React.FC<CardListProps> = ({
         );
       }
     } else {
-      // Always show first page
       items.push(
         <PaginationItem key={1}>
           <PaginationLink 
@@ -77,7 +71,6 @@ const CardList: React.FC<CardListProps> = ({
         </PaginationItem>
       );
       
-      // Show ellipsis if current page is > 3
       if (currentPage > 3) {
         items.push(
           <PaginationItem key="ellipsis-1">
@@ -86,7 +79,6 @@ const CardList: React.FC<CardListProps> = ({
         );
       }
       
-      // Show current page and neighbors
       const startPage = Math.max(2, currentPage - 1);
       const endPage = Math.min(totalPages - 1, currentPage + 1);
       
@@ -103,7 +95,6 @@ const CardList: React.FC<CardListProps> = ({
         );
       }
       
-      // Show ellipsis if current page is < totalPages - 2
       if (currentPage < totalPages - 2) {
         items.push(
           <PaginationItem key="ellipsis-2">
@@ -112,7 +103,6 @@ const CardList: React.FC<CardListProps> = ({
         );
       }
       
-      // Always show last page
       items.push(
         <PaginationItem key={totalPages}>
           <PaginationLink 
@@ -188,26 +178,6 @@ const CardList: React.FC<CardListProps> = ({
                           onClick={() => onView(card.id)}
                         >
                           <Eye className="h-4 w-4" />
-                        </Button>
-                        
-                        {card.status === "Pendente" && (
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8 w-8 p-0 text-green-600 hover:text-green-700 hover:bg-green-50"
-                            onClick={() => onConfirmPayment(card.id)}
-                          >
-                            <CheckCircle className="h-4 w-4" />
-                          </Button>
-                        )}
-                        
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => onDelete(card.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
                     </TableCell>

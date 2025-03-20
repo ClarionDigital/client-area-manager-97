@@ -67,15 +67,11 @@ const CardsTab: React.FC<CardsTabProps> = ({
         <CardList 
           cards={cartoesFiltrados}
           onView={setVisualizarId}
-          onConfirmPayment={onConfirmPayment}
-          onDelete={onDelete}
         />
       ) : (
         <CardGrid 
           cards={cartoesFiltrados}
           onView={setVisualizarId}
-          onConfirmPayment={onConfirmPayment}
-          onDelete={onDelete}
         />
       )}
       

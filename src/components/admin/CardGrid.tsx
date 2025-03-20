@@ -1,8 +1,7 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, CheckCircle, Trash2, ImagePlus } from "lucide-react";
+import { Eye, ImagePlus } from "lucide-react";
 import { CardData } from '@/types/admin';
 import { 
   Pagination, 
@@ -17,37 +16,33 @@ import {
 interface CardGridProps {
   cards: CardData[];
   onView: (id: number) => void;
-  onConfirmPayment: (id: number) => void;
-  onDelete: (id: number) => void;
+  onConfirmPayment?: (id: number) => void;
+  onDelete?: (id: number) => void;
 }
 
-const ITEMS_PER_PAGE = 9; // Increased for better use of space
+const ITEMS_PER_PAGE = 9;
 
 const CardGrid: React.FC<CardGridProps> = ({ 
   cards, 
-  onView, 
-  onConfirmPayment, 
-  onDelete 
+  onView,
+  onConfirmPayment,
+  onDelete
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   
-  // Calculate pagination values
   const totalPages = Math.ceil(cards.length / ITEMS_PER_PAGE);
   const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
   const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
   const currentItems = cards.slice(indexOfFirstItem, indexOfLastItem);
   
-  // Change page
   const goToPage = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
 
-  // Generate pagination items with ellipsis for large page counts
   const renderPaginationItems = () => {
     const items = [];
     
     if (totalPages <= 5) {
-      // If total pages is 5 or less, show all page numbers
       for (let i = 1; i <= totalPages; i++) {
         items.push(
           <PaginationItem key={i}>
@@ -61,7 +56,6 @@ const CardGrid: React.FC<CardGridProps> = ({
         );
       }
     } else {
-      // Always show first page
       items.push(
         <PaginationItem key={1}>
           <PaginationLink 
@@ -73,7 +67,6 @@ const CardGrid: React.FC<CardGridProps> = ({
         </PaginationItem>
       );
       
-      // Show ellipsis if current page is > 3
       if (currentPage > 3) {
         items.push(
           <PaginationItem key="ellipsis-1">
@@ -82,7 +75,6 @@ const CardGrid: React.FC<CardGridProps> = ({
         );
       }
       
-      // Show current page and neighbors
       const startPage = Math.max(2, currentPage - 1);
       const endPage = Math.min(totalPages - 1, currentPage + 1);
       
@@ -99,7 +91,6 @@ const CardGrid: React.FC<CardGridProps> = ({
         );
       }
       
-      // Show ellipsis if current page is < totalPages - 2
       if (currentPage < totalPages - 2) {
         items.push(
           <PaginationItem key="ellipsis-2">
@@ -108,7 +99,6 @@ const CardGrid: React.FC<CardGridProps> = ({
         );
       }
       
-      // Always show last page
       items.push(
         <PaginationItem key={totalPages}>
           <PaginationLink 
@@ -164,28 +154,6 @@ const CardGrid: React.FC<CardGridProps> = ({
                   >
                     <Eye className="h-3 w-3 mr-1" />
                     Ver
-                  </Button>
-                  
-                  {card.status === "Pendente" && (
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      className="text-green-600 border-green-200 hover:bg-green-50"
-                      onClick={() => onConfirmPayment(card.id)}
-                    >
-                      <CheckCircle className="h-3 w-3 mr-1" />
-                      Pago
-                    </Button>
-                  )}
-                  
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    className="text-red-600 border-red-200 hover:bg-red-50"
-                    onClick={() => onDelete(card.id)}
-                  >
-                    <Trash2 className="h-3 w-3 mr-1" />
-                    Excluir
                   </Button>
                 </div>
               </CardContent>
