@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { FileText, Eye, Download, Link as LinkIcon } from "lucide-react";
+import { FileText, Eye, Download, Link as LinkIcon, Copy, Check } from "lucide-react";
 import UploadSpreadsheet from "@/components/admin/UploadSpreadsheet";
+import { useToast } from "@/hooks/use-toast";
 
 interface DashboardHeaderProps {
   title: string;
@@ -21,25 +22,45 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onDownload,
   onUpload
 }) => {
+  const { toast } = useToast();
+  const [copied, setCopied] = useState(false);
+  const registrationLink = "https://example.com/register";
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(registrationLink);
+    setCopied(true);
+    
+    toast({
+      title: "Link copiado!",
+      description: "Link copiado para a área de transferência"
+    });
+    
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="space-y-4">
       {/* Employee registration link section */}
       <div className="p-4 bg-blue-50 border border-blue-200 rounded-md mb-4">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-2">
-          <p className="text-sm font-medium text-blue-800">
-            LINK PARA PREENCHIMENTO INDIVIDUAL DO FUNCIONÁRIO
-          </p>
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex-1">
+            <p className="text-sm font-medium text-blue-800 mb-1">
+              LINK PARA PREENCHIMENTO INDIVIDUAL DO FUNCIONÁRIO
+            </p>
+            <div className="bg-white rounded border border-blue-100 p-2 text-sm text-blue-700 overflow-x-auto">
+              {registrationLink}
+            </div>
+          </div>
           <Button 
             variant="outline" 
-            className="text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700"
-            onClick={() => {
-              // Copy link to clipboard
-              navigator.clipboard.writeText("https://example.com/register");
-              // You might want to show a toast notification here
-            }}
+            className="whitespace-nowrap text-blue-600 border-blue-200 hover:bg-blue-100 hover:text-blue-700"
+            onClick={handleCopyLink}
           >
-            <LinkIcon className="mr-2 h-4 w-4" />
-            LINK AQUI
+            {copied ? (
+              <><Check className="mr-2 h-4 w-4" />Copiado</>
+            ) : (
+              <><Copy className="mr-2 h-4 w-4" />Copiar Link</>
+            )}
           </Button>
         </div>
       </div>
