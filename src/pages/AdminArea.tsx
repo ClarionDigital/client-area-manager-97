@@ -1,10 +1,9 @@
-
 import React, { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, Send, Trash, Upload, PlusCircle } from "lucide-react";
+import { Search, Filter, Send, Trash, Upload, PlusCircle, Download } from "lucide-react";
 
 // Import components
 import Logo from "@/components/Logo";
@@ -100,10 +99,10 @@ const AdminArea = () => {
     setActiveTab("novo-pedido");
     
     // Simulate adding new employees from the uploaded file
-    const newEmployees = [
-      { id: Date.now(), nome: "Pedro Rocha", matricula: "3005678", tipo: "Light", foto: false },
-      { id: Date.now() + 1, nome: "Laura Oliveira", matricula: "7008765", tipo: "Conecta", foto: false },
-      { id: Date.now() + 2, nome: "Roberto Maia", matricula: "3009854", tipo: "Light", foto: false },
+    const newEmployees: UploadedEmployee[] = [
+      { id: Date.now(), nome: "Pedro Rocha", matricula: "3005678", tipo: "Light", foto: false, cargo: "Analista", setor: "TI", validade: "12/2024" },
+      { id: Date.now() + 1, nome: "Laura Oliveira", matricula: "7008765", tipo: "Conecta", foto: false, cargo: "Gerente", setor: "Vendas", validade: "12/2024" },
+      { id: Date.now() + 2, nome: "Roberto Maia", matricula: "3009854", tipo: "Light", foto: false, cargo: "Técnico", setor: "Suporte", validade: "12/2024" },
     ];
     
     setNovoPedido(newEmployees);
@@ -133,7 +132,7 @@ const AdminArea = () => {
     const employee = uploadedEmployees.find(emp => emp.id === id);
     
     if (employee) {
-      // Create a new entry for preenchidosPorLink
+      // Create a new entry for preenchidosPorLink with all required fields
       const newEntry = {
         id: Date.now(), // Use timestamp as unique ID
         nome: employee.nome,
@@ -142,6 +141,14 @@ const AdminArea = () => {
         tipo: employee.tipo,
         foto: false,
         validade: employee.validade || "12/2024",
+        cargo: employee.cargo || "",
+        setor: employee.setor || "",
+        // Add required fields with default values
+        email: "",
+        telefone: "",
+        empresa: "",
+        dataPreenchimento: new Date().toLocaleDateString(),
+        linkId: ""
       };
       
       // Add to preenchidosPorLink
