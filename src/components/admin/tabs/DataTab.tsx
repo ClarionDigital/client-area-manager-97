@@ -2,9 +2,8 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Upload, FileSpreadsheet, Camera, Check, Download, Save, Edit } from "lucide-react";
+import { Upload, Download, Check } from "lucide-react";
 import { CardDataWithPhoto, SpreadsheetTemplate } from '@/types/admin';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
@@ -22,43 +21,8 @@ const spreadsheetTemplate: SpreadsheetTemplate[] = [
 
 const DataTab: React.FC<DataTabProps> = ({ cards: initialCards, onDownloadSpreadsheet }) => {
   const { toast } = useToast();
-  const [cards, setCards] = useState<CardDataWithPhoto[]>(initialCards);
-  const [selectedCard, setSelectedCard] = useState<CardDataWithPhoto | null>(null);
-  const [photoUploadOpen, setPhotoUploadOpen] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [spreadsheetUploaded, setSpreadsheetUploaded] = useState(false);
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
-
-  const handlePhotoSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
-    }
-  };
-
-  const handleUploadClick = (card: CardDataWithPhoto) => {
-    setSelectedCard(card);
-    setPhotoUploadOpen(true);
-  };
-
-  const handleSavePhoto = () => {
-    if (selectedCard && previewUrl) {
-      // Update the card's photo status
-      setCards(prevCards => 
-        prevCards.map(card => 
-          card.id === selectedCard.id ? { ...card, foto: true } : card
-        )
-      );
-      
-      toast({
-        title: "Foto salva com sucesso",
-        description: `A foto para ${selectedCard.nome} foi adicionada.`
-      });
-    }
-    setPhotoUploadOpen(false);
-    setPreviewUrl(null);
-  };
 
   // Handle spreadsheet upload
   const handleSpreadsheetUpload = () => {
@@ -137,7 +101,7 @@ const DataTab: React.FC<DataTabProps> = ({ cards: initialCards, onDownloadSpread
                 Planilha carregada com sucesso!
               </h4>
               <p className="text-sm text-gray-500">
-                Acesse a aba "TODOS OS DADOS" para visualizar, adicionar fotos e gerenciar os cartões.
+                Acesse a aba "TODOS OS DADOS" para visualizar e gerenciar os cartões.
               </p>
               <Button 
                 onClick={() => toast({
@@ -202,52 +166,6 @@ const DataTab: React.FC<DataTabProps> = ({ cards: initialCards, onDownloadSpread
             >
               <Download className="mr-2 h-4 w-4" />
               Baixar Modelo
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Photo Upload Dialog */}
-      <Dialog open={photoUploadOpen} onOpenChange={setPhotoUploadOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Upload de Foto - {selectedCard?.nome}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            {previewUrl ? (
-              <div className="mt-2 relative rounded-md overflow-hidden aspect-[3/4] max-w-[280px] mx-auto">
-                <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center gap-4 py-8">
-                <Camera className="h-12 w-12 text-gray-400" />
-                <label className="cursor-pointer">
-                  <Button variant="outline">Selecionar Foto</Button>
-                  <input type="file" className="hidden" accept="image/*" onChange={handlePhotoSelect} />
-                </label>
-              </div>
-            )}
-            
-            <p className="text-sm text-gray-500 text-center">
-              Matrícula: {selectedCard?.matricula}<br />
-              Tipo: {selectedCard?.tipo}<br />
-              Validade: {selectedCard?.validade}
-            </p>
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="secondary" onClick={() => {
-              setPhotoUploadOpen(false);
-              setPreviewUrl(null);
-            }}>
-              Cancelar
-            </Button>
-            <Button 
-              type="button" 
-              onClick={handleSavePhoto} 
-              disabled={!previewUrl}
-              className="bg-brand-primary hover:bg-brand-primaryDark"
-            >
-              Salvar Foto
             </Button>
           </DialogFooter>
         </DialogContent>

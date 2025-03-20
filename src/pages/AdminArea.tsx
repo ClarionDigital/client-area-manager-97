@@ -10,7 +10,6 @@ import { Search, Filter } from "lucide-react";
 import Logo from "@/components/Logo";
 import CardsTab from "@/components/admin/tabs/CardsTab";
 import DataTab from "@/components/admin/tabs/DataTab";
-import PhotoCropTab from "@/components/admin/tabs/PhotoCropTab";
 import SearchFilters from "@/components/admin/SearchFilters";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
@@ -51,12 +50,12 @@ const mockUploadedEmployees: UploadedEmployee[] = [
 ];
 
 // Sample data for users who filled the form via link
-const preenchidosPorLink = [
-  { id: 1, nome: "Roberto Almeida", email: "roberto.almeida@email.com", telefone: "(21) 99876-5432", empresa: "ABC Ltda", cargo: "Desenvolvedor", dataPreenchimento: "02/06/2023", linkId: "LINK-001" },
-  { id: 2, nome: "Camila Ferreira", email: "camila.ferreira@email.com", telefone: "(11) 98765-4321", empresa: "XYZ S.A.", cargo: "Designer", dataPreenchimento: "03/06/2023", linkId: "LINK-001" },
-  { id: 3, nome: "Marcelo Gomes", email: "marcelo.gomes@email.com", telefone: "(31) 97654-3210", empresa: "123 Inc.", cargo: "Gerente de Projetos", dataPreenchimento: "04/06/2023", linkId: "LINK-002" },
-  { id: 4, nome: "Luciana Martins", email: "luciana.martins@email.com", telefone: "(41) 96543-2109", empresa: "Tech Solutions", cargo: "Analista de Dados", dataPreenchimento: "05/06/2023", linkId: "LINK-002" },
-  { id: 5, nome: "Felipe Santos", email: "felipe.santos@email.com", telefone: "(51) 95432-1098", empresa: "Inovação Ltd", cargo: "Diretor de Marketing", dataPreenchimento: "06/06/2023", linkId: "LINK-003" },
+const initialPreenchidosPorLink = [
+  { id: 1, nome: "Roberto Almeida", primeiroNome: "Roberto", email: "roberto.almeida@email.com", telefone: "(21) 99876-5432", empresa: "ABC Ltda", cargo: "Desenvolvedor", dataPreenchimento: "02/06/2023", linkId: "LINK-001", matricula: "3001246", tipo: "Light", foto: false, setor: "TI", validade: "12/2024" },
+  { id: 2, nome: "Camila Ferreira", primeiroNome: "Camila", email: "camila.ferreira@email.com", telefone: "(11) 98765-4321", empresa: "XYZ S.A.", cargo: "Designer", dataPreenchimento: "03/06/2023", linkId: "LINK-001", matricula: "3001247", tipo: "Light", foto: false, setor: "Design", validade: "12/2024" },
+  { id: 3, nome: "Marcelo Gomes", primeiroNome: "Marcelo", email: "marcelo.gomes@email.com", telefone: "(31) 97654-3210", empresa: "123 Inc.", cargo: "Gerente de Projetos", dataPreenchimento: "04/06/2023", linkId: "LINK-002", matricula: "7031299", tipo: "Conecta", foto: false, setor: "Projetos", validade: "12/2024" },
+  { id: 4, nome: "Luciana Martins", primeiroNome: "Luciana", email: "luciana.martins@email.com", telefone: "(41) 96543-2109", empresa: "Tech Solutions", cargo: "Analista de Dados", dataPreenchimento: "05/06/2023", linkId: "LINK-002", matricula: "3001248", tipo: "Light", foto: false, setor: "Dados", validade: "12/2024" },
+  { id: 5, nome: "Felipe Santos", primeiroNome: "Felipe", email: "felipe.santos@email.com", telefone: "(51) 95432-1098", empresa: "Inovação Ltd", cargo: "Diretor de Marketing", dataPreenchimento: "06/06/2023", linkId: "LINK-003", matricula: "7031300", tipo: "Conecta", foto: false, setor: "Marketing", validade: "12/2024" },
 ];
 
 const AdminArea = () => {
@@ -66,6 +65,7 @@ const AdminArea = () => {
   const [uploadedEmployees, setUploadedEmployees] = useState<UploadedEmployee[]>(mockUploadedEmployees);
   const [showUploadedData, setShowUploadedData] = useState(true);
   const [selectedCardType, setSelectedCardType] = useState<string>("Todos");
+  const [preenchidosPorLink, setPreenchidosPorLink] = useState(initialPreenchidosPorLink);
   
   // Search and filter states
   const [search, setSearch] = useState("");
@@ -93,17 +93,6 @@ const AdminArea = () => {
     });
   };
 
-  const handleConfirmarPagamento = (id: number) => {
-    setCartoesGerados(cartoesGerados.map(cartao => 
-      cartao.id === id ? { ...cartao, status: "Pago" } : cartao
-    ));
-    
-    toast({
-      title: "Pagamento confirmado",
-      description: "Status do pagamento atualizado para 'Pago'",
-    });
-  };
-  
   const handleDownloadPlanilha = () => {
     toast({
       title: "Download iniciado",
@@ -119,29 +108,40 @@ const AdminArea = () => {
   };
 
   const handleRequestSecondCopy = (id: number) => {
-    // Add the employee to the segundasVias list if not already there
+    // Find the employee
     const employee = uploadedEmployees.find(emp => emp.id === id);
     
     if (employee) {
-      const alreadyInList = cartoesGerados.some(cartao => cartao.id === id);
+      // Generate a unique link ID
+      const linkId = `LINK-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`;
       
-      if (!alreadyInList) {
-        const newCard: CardData = {
-          id: employee.id,
-          nome: employee.nome,
-          matricula: employee.matricula,
-          data: new Date().toLocaleDateString('pt-BR'),
-          status: "Pendente",
-          valor: "--",
-          tipo: employee.tipo
-        };
-        
-        setCartoesGerados([...cartoesGerados, newCard]);
-      }
+      // Create a new entry for preenchidosPorLink
+      const newEntry = {
+        id: Date.now(), // Use timestamp as unique ID
+        nome: employee.nome,
+        primeiroNome: employee.nome.split(' ')[0],
+        email: "", // To be filled by the employee
+        telefone: "", // To be filled by the employee
+        empresa: "", // To be filled by the employee
+        cargo: employee.cargo,
+        dataPreenchimento: new Date().toLocaleDateString('pt-BR'),
+        linkId: linkId,
+        matricula: employee.matricula,
+        tipo: employee.tipo,
+        foto: false,
+        setor: employee.setor,
+        validade: employee.validade
+      };
+      
+      // Add to preenchidosPorLink
+      setPreenchidosPorLink(prev => [...prev, newEntry]);
+      
+      // Switch to the preenchidos-link tab
+      setActiveTab("preenchidos-link");
       
       toast({
-        title: "Segunda via solicitada",
-        description: `Segunda via do cartão para ${employee.nome} foi solicitada`,
+        title: "Link criado com sucesso",
+        description: `Link para ${employee.nome} foi gerado: ${linkId}`,
       });
     }
   };
@@ -176,10 +176,15 @@ const AdminArea = () => {
     return preenchidosPorLink.filter(user => 
       (linkSearch === "" || 
         user.nome.toLowerCase().includes(linkSearch.toLowerCase()) || 
-        user.email.toLowerCase().includes(linkSearch.toLowerCase())) &&
+        (user.email && user.email.toLowerCase().includes(linkSearch.toLowerCase()))) &&
       (linkFilter === "todos" || user.linkId === linkFilter)
     );
-  }, [linkSearch, linkFilter]);
+  }, [preenchidosPorLink, linkSearch, linkFilter]);
+
+  // Get unique link IDs for filter dropdown
+  const uniqueLinkIds = useMemo(() => {
+    return [...new Set(preenchidosPorLink.map(user => user.linkId))];
+  }, [preenchidosPorLink]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#52aa85]/5 to-[#52aa85]/10 p-4 md:p-8">
@@ -198,9 +203,8 @@ const AdminArea = () => {
           
           <CardContent className="p-6">
             <Tabs defaultValue="cartoes" value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-4 mb-8">
+              <TabsList className="grid w-full grid-cols-3 mb-8">
                 <TabsTrigger value="cartoes" className="text-sm md:text-base">Cartões Gerados</TabsTrigger>
-                <TabsTrigger value="dados" className="text-sm md:text-base">Dados e Cartões</TabsTrigger>
                 <TabsTrigger value="todos-dados" className="text-sm md:text-base">TODOS OS DADOS</TabsTrigger>
                 <TabsTrigger value="preenchidos-link" className="text-sm md:text-base">Preenchidos pelo Link</TabsTrigger>
               </TabsList>
@@ -210,13 +214,6 @@ const AdminArea = () => {
                   cards={cartoesGerados}
                   onDownload={handleDownloadPlanilha}
                   onUpload={handleUploadPlanilha}
-                />
-              </TabsContent>
-              
-              <TabsContent value="dados" className="space-y-6">
-                <DataTab 
-                  cards={dadosCartoes}
-                  onDownloadSpreadsheet={handleDownloadPlanilha}
                 />
               </TabsContent>
               
@@ -288,14 +285,6 @@ const AdminArea = () => {
                               >
                                 PEDIR SEGUNDA VIA
                               </Button>
-                              <Button 
-                                variant="destructive"
-                                size="sm"
-                                className="h-8 text-xs"
-                                onClick={() => handleExcluirCartao(employee.id)}
-                              >
-                                DELETAR CARTÃO
-                              </Button>
                             </div>
                           </div>
                         </div>
@@ -337,9 +326,9 @@ const AdminArea = () => {
                         onChange={(e) => setLinkFilter(e.target.value)}
                       >
                         <option value="todos">Todos os Links</option>
-                        <option value="LINK-001">LINK-001</option>
-                        <option value="LINK-002">LINK-002</option>
-                        <option value="LINK-003">LINK-003</option>
+                        {uniqueLinkIds.map(linkId => (
+                          <option key={linkId} value={linkId}>{linkId}</option>
+                        ))}
                       </select>
                     </div>
                   </div>
@@ -349,11 +338,11 @@ const AdminArea = () => {
                       <TableHeader>
                         <TableRow className="bg-gray-50">
                           <TableHead>Nome</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Telefone</TableHead>
-                          <TableHead>Empresa</TableHead>
+                          <TableHead>Matrícula</TableHead>
                           <TableHead>Cargo</TableHead>
-                          <TableHead>Data</TableHead>
+                          <TableHead>Setor</TableHead>
+                          <TableHead>Tipo</TableHead>
+                          <TableHead>Data Preench.</TableHead>
                           <TableHead>ID do Link</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -361,10 +350,18 @@ const AdminArea = () => {
                         {filteredLinkUsers.map((user) => (
                           <TableRow key={user.id}>
                             <TableCell className="font-medium">{user.nome}</TableCell>
-                            <TableCell>{user.email}</TableCell>
-                            <TableCell>{user.telefone}</TableCell>
-                            <TableCell>{user.empresa}</TableCell>
+                            <TableCell>{user.matricula}</TableCell>
                             <TableCell>{user.cargo}</TableCell>
+                            <TableCell>{user.setor}</TableCell>
+                            <TableCell>
+                              <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                                user.tipo === "Light" 
+                                  ? "bg-green-50 text-green-700" 
+                                  : "bg-blue-50 text-blue-700"
+                              }`}>
+                                {user.tipo}
+                              </span>
+                            </TableCell>
                             <TableCell>{user.dataPreenchimento}</TableCell>
                             <TableCell>
                               <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">

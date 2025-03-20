@@ -1,15 +1,14 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { ImagePlus, CheckCircle } from "lucide-react";
+import { ImagePlus } from "lucide-react";
 import { CardData } from '@/types/admin';
 
 interface CardDetailProps {
   card: CardData;
-  onConfirmPayment: (id: number) => void;
 }
 
-const CardDetail: React.FC<CardDetailProps> = ({ card, onConfirmPayment }) => {
+const CardDetail: React.FC<CardDetailProps> = ({ card }) => {
   return (
     <div className="py-4">
       <div className="bg-white border rounded-lg p-4 max-w-xs mx-auto shadow-md">
@@ -39,18 +38,6 @@ const CardDetail: React.FC<CardDetailProps> = ({ card, onConfirmPayment }) => {
           </div>
         </div>
       </div>
-      
-      {card.status === "Pendente" && (
-        <div className="mt-4 flex justify-center">
-          <Button 
-            onClick={() => onConfirmPayment(card.id)}
-            className="bg-green-600 hover:bg-green-700"
-          >
-            <CheckCircle className="mr-2 h-4 w-4" />
-            Confirmar Pagamento
-          </Button>
-        </div>
-      )}
     </div>
   );
 };
