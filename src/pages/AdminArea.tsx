@@ -1,16 +1,25 @@
+
 import React, { useState, useMemo } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Search, Filter, Send } from "lucide-react";
+import { Search, Filter, Send, Trash, Upload, PlusCircle } from "lucide-react";
 
 // Import components
 import Logo from "@/components/Logo";
 import CardsTab from "@/components/admin/tabs/CardsTab";
-import DataTab from "@/components/admin/tabs/DataTab";
 import SearchFilters from "@/components/admin/SearchFilters";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { 
+  Pagination, 
+  PaginationContent, 
+  PaginationItem, 
+  PaginationLink, 
+  PaginationNext, 
+  PaginationPrevious,
+  PaginationEllipsis 
+} from "@/components/ui/pagination";
 
 // Import sample data
 import { CardData, CardDataWithPhoto, UploadedEmployee } from '@/types/admin';
@@ -62,15 +71,19 @@ const AdminArea = () => {
   const [cartoesGerados, setCartoesGerados] = useState(segundasVias);
   const [activeTab, setActiveTab] = useState("cartoes");
   const [uploadedEmployees, setUploadedEmployees] = useState<UploadedEmployee[]>(mockUploadedEmployees);
-  const [showUploadedData, setShowUploadedData] = useState(true);
   const [selectedCardType, setSelectedCardType] = useState<string>("Todos");
   const [preenchidosPorLink, setPreenchidosPorLink] = useState(initialPreenchidosPorLink);
+  const [novoPedido, setNovoPedido] = useState<UploadedEmployee[]>([]);
   
   // Search and filter states
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [typeFilter, setTypeFilter] = useState("todos");
   const [sorting, setSorting] = useState({ field: 'nome', direction: 'asc' as 'asc' | 'desc' });
+  
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   
   const handleExcluirCartao = (id: number) => {
     setCartoesGerados(cartoesGerados.filter(cartao => cartao.id !== id));
@@ -84,7 +97,16 @@ const AdminArea = () => {
   
   const handleUploadPlanilha = (cardType: string) => {
     setSelectedCardType(cardType);
-    setActiveTab("todos-dados");
+    setActiveTab("novo-pedido");
+    
+    // Simulate adding new employees from the uploaded file
+    const newEmployees = [
+      { id: Date.now(), nome: "Pedro Rocha", matricula: "3005678", tipo: "Light", foto: false },
+      { id: Date.now() + 1, nome: "Laura Oliveira", matricula: "7008765", tipo: "Conecta", foto: false },
+      { id: Date.now() + 2, nome: "Roberto Maia", matricula: "3009854", tipo: "Light", foto: false },
+    ];
+    
+    setNovoPedido(newEmployees);
     
     toast({
       title: "Planilha enviada",
@@ -116,17 +138,10 @@ const AdminArea = () => {
         id: Date.now(), // Use timestamp as unique ID
         nome: employee.nome,
         primeiroNome: employee.nome.split(' ')[0],
-        email: "", // To be filled by the employee
-        telefone: "", // To be filled by the employee
-        empresa: "", // To be filled by the employee
         matricula: employee.matricula,
         tipo: employee.tipo,
         foto: false,
-        validade: employee.validade,
-        cargo: employee.cargo,
-        dataPreenchimento: new Date().toLocaleDateString('pt-BR'),
-        linkId: `LINK-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`,
-        setor: employee.setor
+        validade: employee.validade || "12/2024",
       };
       
       // Add to preenchidosPorLink
@@ -140,6 +155,14 @@ const AdminArea = () => {
         description: `Segunda via para ${employee.nome} foi adicionada à lista`,
       });
     }
+  };
+  
+  const handleDeleteUploadedEmployee = (id: number) => {
+    setUploadedEmployees(prev => prev.filter(emp => emp.id !== id));
+    toast({
+      title: "Registro excluído",
+      description: "O funcionário foi removido da lista",
+    });
   };
   
   const handleSortingChange = (field: string, direction: 'asc' | 'desc') => {
@@ -171,9 +194,95 @@ const AdminArea = () => {
     return preenchidosPorLink.filter(user => 
       (linkSearch === "" || 
         user.nome.toLowerCase().includes(linkSearch.toLowerCase()) || 
-        (user.email && user.email.toLowerCase().includes(linkSearch.toLowerCase())))
+        (user.matricula && user.matricula.toLowerCase().includes(linkSearch.toLowerCase())))
     );
   }, [preenchidosPorLink, linkSearch]);
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentEmployees = filteredEmployees.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
+
+  // Pagination controls
+  const goToPage = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const renderPaginationItems = () => {
+    const items = [];
+    
+    if (totalPages <= 5) {
+      for (let i = 1; i <= totalPages; i++) {
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink 
+              isActive={currentPage === i}
+              onClick={() => goToPage(i)}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    } else {
+      items.push(
+        <PaginationItem key={1}>
+          <PaginationLink 
+            isActive={currentPage === 1}
+            onClick={() => goToPage(1)}
+          >
+            1
+          </PaginationLink>
+        </PaginationItem>
+      );
+      
+      if (currentPage > 3) {
+        items.push(
+          <PaginationItem key="ellipsis-1">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      
+      const startPage = Math.max(2, currentPage - 1);
+      const endPage = Math.min(totalPages - 1, currentPage + 1);
+      
+      for (let i = startPage; i <= endPage; i++) {
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink 
+              isActive={currentPage === i}
+              onClick={() => goToPage(i)}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+      
+      if (currentPage < totalPages - 2) {
+        items.push(
+          <PaginationItem key="ellipsis-2">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      
+      items.push(
+        <PaginationItem key={totalPages}>
+          <PaginationLink 
+            isActive={currentPage === totalPages}
+            onClick={() => goToPage(totalPages)}
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    return items;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#52aa85]/5 to-[#52aa85]/10 p-4 md:p-8">
@@ -192,10 +301,11 @@ const AdminArea = () => {
           
           <CardContent className="p-6">
             <Tabs defaultValue="cartoes" value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3 mb-8">
+              <TabsList className="grid w-full grid-cols-4 mb-8">
                 <TabsTrigger value="cartoes" className="text-sm md:text-base">Cartões Gerados</TabsTrigger>
                 <TabsTrigger value="todos-dados" className="text-sm md:text-base">TODOS OS DADOS</TabsTrigger>
                 <TabsTrigger value="preenchidos-link" className="text-sm md:text-base">Preenchidos pelo Link</TabsTrigger>
+                <TabsTrigger value="novo-pedido" className="text-sm md:text-base">Criar Pedido</TabsTrigger>
               </TabsList>
               
               <TabsContent value="cartoes" className="space-y-6">
@@ -231,49 +341,89 @@ const AdminArea = () => {
                     onSortingChange={handleSortingChange}
                   />
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredEmployees.map((employee) => (
-                      <div 
-                        key={employee.id} 
-                        className={`rounded-lg border p-4 ${
-                          employee.tipo === "Light" 
-                            ? "border-[#52aa85]/20 bg-gradient-to-b from-white to-[#52aa85]/5" 
-                            : "border-[#0a5eb3]/20 bg-gradient-to-b from-white to-[#0a5eb3]/5"
-                        } shadow-sm transition-all duration-200 hover:shadow-md`}
-                      >
-                        <div className="flex items-start space-x-4">
-                          <div className="h-20 w-16 overflow-hidden rounded-md border bg-gray-100 flex items-center justify-center">
-                            {employee.foto ? (
-                              <img 
-                                src={`/placeholder.svg`} 
-                                alt={employee.nome}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <div className="text-gray-400 text-xs text-center">Sem foto</div>
-                            )}
-                          </div>
-                          
-                          <div className="flex-1">
-                            <h3 className="font-medium text-gray-900">{employee.nome}</h3>
-                            <p className="text-sm text-gray-500 mb-1">
-                              Mat: <span className="font-medium text-gray-700">{employee.matricula}</span>
-                            </p>
-                            <div className="mt-3 flex gap-2">
-                              <Button 
-                                variant="orange"
-                                size="sm"
-                                className="h-8 text-xs"
-                                onClick={() => handleRequestSecondCopy(employee.id)}
-                              >
-                                PEDIR SEGUNDA VIA
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="rounded-md border overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-gray-50">
+                          <TableHead>Nome</TableHead>
+                          <TableHead>Nome Completo</TableHead>
+                          <TableHead>Matrícula</TableHead>
+                          <TableHead>Foto</TableHead>
+                          <TableHead className="text-right">Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {currentEmployees.length > 0 ? (
+                          currentEmployees.map((employee) => (
+                            <TableRow key={employee.id} className="hover:bg-brand-primary/5">
+                              <TableCell className="font-medium">{employee.nome.split(' ')[0]}</TableCell>
+                              <TableCell>{employee.nome}</TableCell>
+                              <TableCell>
+                                <span className={`${employee.matricula.startsWith('3') ? 'text-brand-primary' : 'text-blue-600'} font-medium`}>
+                                  {employee.matricula}
+                                </span>
+                              </TableCell>
+                              <TableCell>
+                                {employee.foto ? (
+                                  <span className="text-green-600 font-medium">Sim</span>
+                                ) : (
+                                  <span className="text-red-600 font-medium">Não</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex justify-end gap-2">
+                                  <Button 
+                                    variant="orange" 
+                                    size="sm" 
+                                    className="h-8 text-xs"
+                                    onClick={() => handleRequestSecondCopy(employee.id)}
+                                  >
+                                    PEDIR SEGUNDA VIA
+                                  </Button>
+                                  <Button 
+                                    variant="destructive" 
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => handleDeleteUploadedEmployee(employee.id)}
+                                  >
+                                    <Trash className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+                              Nenhum cartão encontrado
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
                   </div>
+                  
+                  {totalPages > 1 && (
+                    <Pagination className="mt-4">
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious 
+                            onClick={() => goToPage(Math.max(1, currentPage - 1))}
+                            className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                          />
+                        </PaginationItem>
+                        
+                        {renderPaginationItems()}
+                        
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={() => goToPage(Math.min(totalPages, currentPage + 1))}
+                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
                 </div>
               </TabsContent>
               
@@ -295,7 +445,7 @@ const AdminArea = () => {
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
                     <input
                       type="text"
-                      placeholder="Buscar por nome ou email..."
+                      placeholder="Buscar por nome ou matrícula..."
                       className="w-full pl-8 pr-4 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#52aa85]"
                       value={linkSearch}
                       onChange={(e) => setLinkSearch(e.target.value)}
@@ -307,6 +457,7 @@ const AdminArea = () => {
                       <TableHeader>
                         <TableRow className="bg-gray-50">
                           <TableHead>Nome</TableHead>
+                          <TableHead>Nome Completo</TableHead>
                           <TableHead>Matrícula</TableHead>
                           <TableHead>Tipo</TableHead>
                         </TableRow>
@@ -314,7 +465,8 @@ const AdminArea = () => {
                       <TableBody>
                         {filteredLinkUsers.map((user) => (
                           <TableRow key={user.id}>
-                            <TableCell className="font-medium">{user.nome}</TableCell>
+                            <TableCell className="font-medium">{user.primeiroNome}</TableCell>
+                            <TableCell>{user.nome}</TableCell>
                             <TableCell>{user.matricula}</TableCell>
                             <TableCell>
                               <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
@@ -342,6 +494,117 @@ const AdminArea = () => {
                       ENVIAR PEDIDO
                     </Button>
                   </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="novo-pedido" className="space-y-6">
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-xl font-semibold text-gray-800">
+                      Criar Novo Pedido
+                    </h2>
+                    <div className="flex space-x-2">
+                      <Button 
+                        variant="outline"
+                        onClick={handleDownloadPlanilha}
+                        className="flex items-center gap-2"
+                      >
+                        <Download className="h-4 w-4" />
+                        Baixar Modelo
+                      </Button>
+                      <Button
+                        variant="brand"
+                        className="flex items-center gap-2"
+                        onClick={() => document.getElementById('upload-planilha')?.click()}
+                      >
+                        <Upload className="h-4 w-4" />
+                        Importar Planilha
+                      </Button>
+                      <input 
+                        type="file" 
+                        id="upload-planilha" 
+                        className="hidden" 
+                        accept=".xlsx,.csv"
+                        onChange={() => handleUploadPlanilha(selectedCardType || "Light")}
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="rounded-md border overflow-hidden">
+                    <Table>
+                      <TableHeader>
+                        <TableRow className="bg-gray-50">
+                          <TableHead>Nome</TableHead>
+                          <TableHead>Nome Completo</TableHead>
+                          <TableHead>Matrícula</TableHead>
+                          <TableHead>Foto</TableHead>
+                          <TableHead className="text-right">Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {novoPedido.length > 0 ? (
+                          novoPedido.map((employee) => (
+                            <TableRow key={employee.id} className="hover:bg-brand-primary/5">
+                              <TableCell className="font-medium">{employee.nome.split(' ')[0]}</TableCell>
+                              <TableCell>{employee.nome}</TableCell>
+                              <TableCell>
+                                <span className={`${employee.matricula.startsWith('3') ? 'text-brand-primary' : 'text-blue-600'} font-medium`}>
+                                  {employee.matricula}
+                                </span>
+                              </TableCell>
+                              <TableCell>
+                                {employee.foto ? (
+                                  <span className="text-green-600 font-medium">Sim</span>
+                                ) : (
+                                  <span className="text-red-600 font-medium">Não</span>
+                                )}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <div className="flex justify-end gap-2">
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm"
+                                    className="h-8 text-xs"
+                                  >
+                                    <PlusCircle className="h-3.5 w-3.5 mr-1" />
+                                    Adicionar Foto
+                                  </Button>
+                                  <Button 
+                                    variant="destructive" 
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => setNovoPedido(prev => prev.filter(emp => emp.id !== employee.id))}
+                                  >
+                                    <Trash className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        ) : (
+                          <TableRow>
+                            <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+                              Nenhum funcionário adicionado. Importe uma planilha para começar.
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  
+                  {novoPedido.length > 0 && (
+                    <div className="flex justify-center mt-8">
+                      <Button 
+                        variant="orange" 
+                        size="lg" 
+                        onClick={handleSubmitOrder}
+                        className="px-8"
+                      >
+                        <Send className="mr-2 h-5 w-5" />
+                        ENVIAR PEDIDO
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
             </Tabs>

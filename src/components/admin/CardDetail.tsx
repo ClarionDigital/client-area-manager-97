@@ -22,17 +22,6 @@ const CardDetail: React.FC<CardDetailProps> = ({ card }) => {
           <div className="space-y-2">
             <p className="font-bold">{card.nome}</p>
             <p className="text-sm text-gray-600">Matrícula: {card.matricula}</p>
-            <p className="text-sm">
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                card.status === 'Pago' 
-                  ? 'bg-green-100 text-green-800' 
-                  : card.status === 'Pendente'
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : 'bg-red-100 text-red-800'
-              }`}>
-                {card.status}
-              </span>
-            </p>
           </div>
         </div>
       </div>
