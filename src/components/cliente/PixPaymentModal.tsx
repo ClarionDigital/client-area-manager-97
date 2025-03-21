@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { AlertCircle, Check, Clock, Copy, QrCode } from "lucide-react";
 import { LoaderCircle } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PixPaymentModalProps {
   open: boolean;
@@ -28,8 +29,8 @@ interface PixData {
   paymentId: string;
 }
 
-// Exemplo de QR Code em base64 para teste
-const MOCK_QR_CODE = "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";
+// Exemplo de QR Code em base64 para teste (um QR code real para simulação)
+const MOCK_QR_CODE = "iVBORw0KGgoAAAANSUhEUgAAAOQAAADkCAYAAACIV4iNAAAAAklEQVR4AewaftIAAAxSSURBVO3BQW4ERxLAQLKh/3+ZO8c8FSCQ3dM7wYjYD9Y6xmNYq8RjWKvEY1irxGNYq8RjWKvEY1irxGNYq8RjWKvEY1irxGNYq8RjWKvEY1irxGNYq8RjWKvEY1irxA+fUvm3VNxQuaFyo+JG5YbKv6XyiWGtEo9hrRKPYa0SP3xZxTepfELlRsUnKjcqbqh8k8o3DWuVeAxrlXgMa5X44Y+pfELlDZU3VN6oeEPlDZVPqPyThrVKPIa1SjyGtUr88D8uVE5U/kvDWiUew1olHsNaJX74L6NyUvEmldPDWiUew1olHsNaJX74Yyp/SuWGyv+SyknFn3RY9cew1g88hrVK/PBlKv+kihsVJxUnFTcqblROKv5NDmuVeAxrlXgMa5XYDz8gldOKG5UTlTcqTlROKk5UbqicVJyofFLxTcNaJR7DWiUew1ol9oO1jvEY1irxGNYq8RjWKvEY1irxGNYq8RjWKvEY1irxGNYq8RjWKvEY1irxGNYq8RjWKvEY1irxGNYq8RjWKvF/P/EiqJLf/VMAAAAASUVORK5CYII=";
 
 const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
   open,
@@ -40,6 +41,7 @@ const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
   quantity
 }) => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [pixData, setPixData] = useState<PixData | null>(null);
@@ -81,6 +83,7 @@ const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
       // Isso evita erros de CORS e permite testar o fluxo da aplicação
       const mockPaymentId = `pix_${Date.now()}`;
       
+      // Garantimos que o QR code seja fornecido (usando o exemplo fixo)
       setTimeout(() => {
         setPixData({
           qrCode: MOCK_QR_CODE, // QR Code fixo para teste
@@ -94,7 +97,8 @@ const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
         setLoading(false);
       }, 1500);
       
-      /* Código original que tenta chamar a API - Comentado para evitar erros
+      /* Código para referência futura - Chamada real à API Asaas
+      // Criar o pagamento
       const createPaymentResponse = await fetch("https://sandbox.asaas.com/api/v3/payments", {
         method: "POST",
         headers: {
@@ -105,7 +109,7 @@ const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
           customer: "cus_000005115434", // Cliente de teste
           billingType: "PIX",
           value: valorTotal,
-          dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0], // Data de vencimento: amanhã
+          dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0],
           description: `Compra de ${quantity} KIT Funcional Light`,
           externalReference: `LIGHT-${Date.now()}`,
           postalService: false
@@ -119,7 +123,7 @@ const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
       const paymentData = await createPaymentResponse.json();
       console.log("Pagamento criado:", paymentData);
 
-      // Obtém o QR Code do pagamento
+      // Obter o QR Code do pagamento
       const qrCodeResponse = await fetch(`https://sandbox.asaas.com/api/v3/payments/${paymentData.id}/pixQrCode`, {
         method: "GET",
         headers: {
@@ -138,11 +142,10 @@ const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
       setPixData({
         qrCode: qrCodeData.encodedImage,
         pixKey: qrCodeData.payload,
-        expirationDate: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
+        expirationDate: paymentData.dueDate,
         paymentId: paymentData.id
       });
 
-      // Salva o ID do pagamento no localStorage
       localStorage.setItem("lastPaymentId", paymentData.id);
       */
 
@@ -161,7 +164,7 @@ const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
     try {
       console.log("Simulando verificação de status de pagamento");
       
-      // Simular um atraso na verificação de pagamento para dar tempo de clicar em "Já paguei"
+      // Simular um atraso na verificação de pagamento
       setTimeout(() => {
         setPaymentStatus("success");
         // Salva o ID do pagamento no localStorage
@@ -181,7 +184,7 @@ const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
         setCheckingPayment(false);
       }, 1500);
       
-      /* Código original que tenta chamar a API - Comentado para evitar erros
+      /* Código para referência futura - Chamada real à API Asaas
       const response = await fetch(`https://sandbox.asaas.com/api/v3/payments/${pixData.paymentId}`, {
         method: "GET",
         headers: {
@@ -199,7 +202,6 @@ const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
 
       if (data.status === "RECEIVED" || data.status === "CONFIRMED") {
         setPaymentStatus("success");
-        // Salva o ID do pagamento no localStorage
         localStorage.setItem("lastPaymentId", pixData.paymentId);
         
         toast({
@@ -208,7 +210,6 @@ const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
           className: "bg-green-50 border-green-200",
         });
         
-        // Aguarda 2 segundos antes de fechar o modal e confirmar
         setTimeout(() => {
           onConfirm();
         }, 2000);
@@ -244,29 +245,11 @@ const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
     };
   }, [open, remainingTime, paymentStatus]);
 
-  // Verificar status do pagamento a cada 10 segundos
-  useEffect(() => {
-    let checkInterval: number | undefined;
-    
-    if (open && pixData && paymentStatus === "pending") {
-      // Comentado para usar o botão manual em vez de verificação automática
-      // checkPaymentStatus();
-      
-      // checkInterval = window.setInterval(() => {
-      //   checkPaymentStatus();
-      // }, 10000);
-    }
-    
-    return () => {
-      if (checkInterval) clearInterval(checkInterval);
-    };
-  }, [open, pixData, paymentStatus]);
-
   return (
     <Dialog open={open} onOpenChange={(isOpen) => {
       if (!isOpen) onClose();
     }}>
-      <DialogContent className="sm:max-w-md md:max-w-xl">
+      <DialogContent className={`${isMobile ? 'w-[95vw] max-w-[95vw] p-4' : 'sm:max-w-md md:max-w-xl'}`}>
         <DialogHeader>
           <DialogTitle className="text-center text-xl">Pagamento PIX</DialogTitle>
         </DialogHeader>
@@ -317,8 +300,8 @@ const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
                 </p>
               </div>
               
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
+              <div className={`flex ${isMobile ? 'flex-col' : 'flex-col md:flex-row'} gap-4`}>
+                <div className={`${isMobile ? 'w-full' : 'flex-1'}`}>
                   <Card className="border-2 border-dashed border-gray-300 bg-gray-50 p-4 flex flex-col items-center">
                     <div className="mb-2 text-sm font-medium text-gray-700">QR Code PIX</div>
                     {pixData?.qrCode ? (
@@ -340,7 +323,7 @@ const PixPaymentModal: React.FC<PixPaymentModalProps> = ({
                   </Card>
                 </div>
                 
-                <div className="flex-1">
+                <div className={`${isMobile ? 'w-full' : 'flex-1'}`}>
                   <Card className="border border-gray-200 p-4 h-full flex flex-col">
                     <div className="mb-3 text-sm font-medium text-gray-700">Código PIX Copia e Cola</div>
                     <div className="relative">
