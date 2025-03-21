@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -204,7 +203,6 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
           open={shareDialogOpen}
           onOpenChange={setShareDialogOpen}
           matricula={selectedUser.matricula}
-          nome={selectedUser.nome}
         />
       )}
     </div>
