@@ -1,6 +1,6 @@
 
 import React from 'react';
-import SupabaseConfigForm from '@/components/admin/SupabaseConfigForm';
+import SupabaseConfigForm from '@/components/admin/supabase/SupabaseConfigForm';
 
 const Integracoes: React.FC = () => {
   return (
