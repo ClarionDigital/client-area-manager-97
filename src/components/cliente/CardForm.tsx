@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -203,15 +204,15 @@ const CardForm: React.FC<CardFormProps> = ({
           <div className="space-y-2">
             <Label className="text-gray-700 font-medium flex items-center gap-2">
               <Camera className="h-4 w-4 text-[#52aa85]" />
-              Foto
+              Foto {fotoUrl && !foto && <span className="text-xs text-green-600 ml-2">(Já cadastrada, mas você pode modificar)</span>}
             </Label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition-colors hover:bg-gray-50">
               <Label htmlFor="foto-upload" className="cursor-pointer">
                 <div className="flex flex-col items-center">
                   <Upload className="h-8 w-8 text-[#8cdcd8] mb-2" />
-                  <span className="text-sm text-gray-500">Clique para selecionar</span>
+                  <span className="text-sm text-gray-500">Clique para {fotoUrl ? 'modificar' : 'selecionar'}</span>
                   {fotoUrl && !foto && <span className="text-xs text-green-600 mt-2">Foto já cadastrada</span>}
-                  {foto && <span className="text-xs text-green-600 mt-2">Foto selecionada: {foto.name}</span>}
+                  {foto && <span className="text-xs text-green-600 mt-2">Nova foto selecionada: {foto.name}</span>}
                 </div>
                 <Input
                   id="foto-upload"
