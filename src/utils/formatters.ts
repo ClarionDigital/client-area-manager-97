@@ -25,3 +25,14 @@ export const formatPhone = (value: string) => {
     .replace(/(\d{5})(\d)/, '$1-$2')
     .replace(/(-\d{4})\d+?$/, '$1');
 };
+
+/**
+ * Format a date in DD/MM/YYYY format
+ */
+export const formatDate = (value: string) => {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '$1/$2')
+    .replace(/(\d{2})(\d)/, '$1/$2')
+    .replace(/(\d{4})\d+?$/, '$1');
+};

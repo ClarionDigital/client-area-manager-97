@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -29,13 +28,13 @@ const Cadastro = () => {
   const [cpf, setCpf] = useState("");
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
+  const [dataNascimento, setDataNascimento] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
   
   const valorUnitario = 66.40;
   
   useEffect(() => {
-    // Recuperar dados do usuário do localStorage
     const dadosUsuarioJSON = localStorage.getItem("usuarioDados");
     
     if (!dadosUsuarioJSON) {
@@ -54,12 +53,10 @@ const Cadastro = () => {
       setNomeAbreviado(dadosUsuario.nomeAbreviado);
       setNomeCompleto(dadosUsuario.nomeCompleto);
       
-      // Se o usuário já tiver foto, definir a URL da foto
       if (dadosUsuario.foto) {
         setFotoUrl(dadosUsuario.foto);
       }
       
-      // Gerar URL de pré-visualização
       const cardId = dadosUsuario.matricula.startsWith("3") ? "3" : "7";
       const previewUrl = `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(dadosUsuario.nomeAbreviado)}&nome_completo=${encodeURIComponent(dadosUsuario.nomeCompleto)}&matricula=${encodeURIComponent(dadosUsuario.matricula)}&foto=${dadosUsuario.foto ? encodeURIComponent(dadosUsuario.foto) : ""}&id=${cardId}&keep_case=true`;
       setPreviewUrl(previewUrl);
@@ -158,16 +155,58 @@ const Cadastro = () => {
     const formCpf = document.getElementById("cpf") as HTMLInputElement;
     const formEmail = document.getElementById("email") as HTMLInputElement;
     const formTelefone = document.getElementById("telefone") as HTMLInputElement;
+    const formDataNascimento = document.getElementById("data-nascimento") as HTMLInputElement;
     
     if (formNome && !nomeCompleto) setNomeCompleto(formNome.value);
     if (formCpf && !cpf) setCpf(formCpf.value);
     if (formEmail && !email) setEmail(formEmail.value);
     if (formTelefone && !telefone) setTelefone(formTelefone.value);
+    if (formDataNascimento && !dataNascimento) setDataNascimento(formDataNascimento.value);
     
-    if (!formNome?.value || !formCpf?.value || !formEmail?.value || !formTelefone?.value) {
+    if (!formNome?.value || !formCpf?.value || !formEmail?.value || !formTelefone?.value || !formDataNascimento?.value) {
       toast({
         title: "Dados incompletos",
         description: "Por favor preencha todos os campos de dados pessoais",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
+    if (!cpfRegex.test(formCpf.value)) {
+      toast({
+        title: "CPF inválido",
+        description: "Por favor insira um CPF válido no formato 000.000.000-00",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formEmail.value)) {
+      toast({
+        title: "Email inválido",
+        description: "Por favor insira um email válido",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const phoneRegex = /^\(\d{2}\) \d{5}-\d{4}$/;
+    if (!phoneRegex.test(formTelefone.value)) {
+      toast({
+        title: "Telefone inválido",
+        description: "Por favor insira um telefone válido no formato (00) 00000-0000",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+    if (!dateRegex.test(formDataNascimento.value)) {
+      toast({
+        title: "Data de nascimento inválida",
+        description: "Por favor insira uma data no formato DD/MM/AAAA",
         variant: "destructive",
       });
       return;
@@ -183,6 +222,7 @@ const Cadastro = () => {
         cpf: formCpf.value,
         email: formEmail.value,
         telefone: formTelefone.value,
+        dataNascimento: formDataNascimento.value,
         quantity,
         valorUnitario,
         nomeAbreviado,
@@ -249,10 +289,12 @@ const Cadastro = () => {
               cpf={cpf}
               email={email}
               telefone={telefone}
+              dataNascimento={dataNascimento}
               onNomeCompletoChange={setNomeCompleto}
               onCpfChange={setCpf}
               onEmailChange={setEmail}
               onTelefoneChange={setTelefone}
+              onDataNascimentoChange={setDataNascimento}
             />
             
             <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">Finalização</h2>
