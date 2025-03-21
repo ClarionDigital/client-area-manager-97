@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -108,8 +109,8 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-      <div className="flex flex-col items-center">
-        <div className="w-full h-72 rounded-lg overflow-hidden shadow-lg">
+      <div className="flex flex-col items-center md:col-span-1">
+        <div className="w-full h-96 rounded-lg overflow-hidden shadow-lg mb-4">
           <img 
             src={previewUrl} 
             alt="Modelo do Cartão" 

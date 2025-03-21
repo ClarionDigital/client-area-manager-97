@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -5,10 +6,12 @@ import { useNavigate } from "react-router-dom";
 import CardForm from "@/components/cliente/CardForm";
 import PersonalInfoForm from "@/components/cliente/PersonalInfoForm";
 import OrderSummary from "@/components/cliente/OrderSummary";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Cadastro = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [matricula, setMatricula] = useState("");
   const [foto, setFoto] = useState<File | null>(null);
   const [fotoUrl, setFotoUrl] = useState<string | null>(null);
@@ -129,7 +132,7 @@ const Cadastro = () => {
   
   return (
     <div className="min-h-screen bg-amber-50 p-4 md:py-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <Card className="bg-white shadow-lg rounded-xl overflow-hidden mb-6 border-0">
           <div className="p-4 md:p-6 flex flex-col items-center">
             <img 
