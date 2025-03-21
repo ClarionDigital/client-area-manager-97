@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -44,8 +43,8 @@ const CardForm: React.FC<CardFormProps> = ({
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [nomeCompletoError, setNomeCompletoError] = useState(false);
   
-  // Maximum character limit for nome completo
-  const MAX_NOME_COMPLETO_LENGTH = 23;
+  // Updated maximum character limit for nome completo from 23 to 27
+  const MAX_NOME_COMPLETO_LENGTH = 27;
   
   useEffect(() => {
     // Initialize with initial values if provided
@@ -143,7 +142,7 @@ const CardForm: React.FC<CardFormProps> = ({
     if (nomeCompletoError) {
       toast({
         title: "Erro",
-        description: "O nome completo deve ter no máximo 23 caracteres. Por favor, abrevie o nome.",
+        description: `O nome completo deve ter no máximo ${MAX_NOME_COMPLETO_LENGTH} caracteres. Por favor, abrevie o nome.`,
         variant: "destructive",
       });
       return;
@@ -278,7 +277,7 @@ const CardForm: React.FC<CardFormProps> = ({
             {nomeCompletoError && (
               <div className="flex items-center gap-1.5 text-sm text-red-500 mt-1">
                 <AlertCircle className="h-4 w-4" />
-                <span>O nome completo deve ter no máximo 23 caracteres. Por favor, abrevie o nome.</span>
+                <span>O nome completo deve ter no máximo {MAX_NOME_COMPLETO_LENGTH} caracteres. Por favor, abrevie o nome.</span>
               </div>
             )}
             <div className="flex justify-end">
