@@ -10,7 +10,6 @@ import Login from "./pages/cliente/Login";
 import Cadastro from "./pages/cliente/Cadastro";
 import Pagamento from "./pages/cliente/Pagamento";
 import ConfirmacaoPagamento from "./pages/cliente/ConfirmacaoPagamento";
-import AdminArea from "./pages/AdminArea";
 import AdminAltArea from "./pages/AdminAltArea";
 import NotFound from "./pages/NotFound";
 
@@ -40,20 +39,22 @@ const App = () => (
           <Route path="/cliente/pagamento" element={<Pagamento />} />
           <Route path="/cliente/confirmacao" element={<ConfirmacaoPagamento />} />
           
-          {/* Admin routes */}
-          <Route path="/admin" element={<AdminArea />} />
+          {/* Admin-alt routes */}
           <Route path="/admin-alt" element={<AdminAltArea />} />
           
-          {/* New modular admin routes */}
-          <Route path="/admin-modular" element={<AdminModular />}>
+          {/* Admin routes - nova versão modular */}
+          <Route path="/admin" element={<AdminModular />}>
             <Route element={<AdminLayout />}>
-              <Route index element={<Navigate to="/admin-modular/cartoes-gerados" replace />} />
+              <Route index element={<Navigate to="/admin/cartoes-gerados" replace />} />
               <Route path="cartoes-gerados" element={<CartoesGerados />} />
               <Route path="todos-cartoes" element={<TodosCartoes />} />
               <Route path="preenchidos-links" element={<PreenchidosLinks />} />
               <Route path="novo-pedido" element={<NovoPedido />} />
             </Route>
           </Route>
+          
+          {/* Redirecionar de admin-modular para admin */}
+          <Route path="/admin-modular/*" element={<Navigate to="/admin" replace />} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

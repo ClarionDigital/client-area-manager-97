@@ -33,7 +33,7 @@ const Index = () => {
           <Button
             className="w-full h-24 text-lg flex flex-col gap-2 bg-brand-darkest hover:bg-brand-darkest/90"
           >
-            <span className="font-semibold">Área LIGHT ADM</span>
+            <span className="font-semibold">Área ADM</span>
             <span className="text-xs opacity-75">Gerenciamento de cartões</span>
           </Button>
         </Link>

@@ -40,7 +40,7 @@ const AdminLayout: React.FC = () => {
           <CardContent className="p-6">
             <div className="grid grid-cols-4 gap-2 mb-8 tabs-responsive w-full">
               <NavLink 
-                to="/admin-modular/cartoes-gerados" 
+                to="/admin/cartoes-gerados" 
                 className={`flex justify-center items-center px-3 py-2 rounded-md transition-colors ${
                   isActive('/cartoes-gerados') ? 
                   'bg-background text-foreground shadow-sm' : 
@@ -50,7 +50,7 @@ const AdminLayout: React.FC = () => {
                 {getTabLabel("Cartões Gerados", "Cartões")}
               </NavLink>
               <NavLink 
-                to="/admin-modular/todos-cartoes" 
+                to="/admin/todos-cartoes" 
                 className={`flex justify-center items-center px-3 py-2 rounded-md transition-colors ${
                   isActive('/todos-cartoes') ? 
                   'bg-background text-foreground shadow-sm' : 
@@ -60,7 +60,7 @@ const AdminLayout: React.FC = () => {
                 {getTabLabel("TODOS OS DADOS", "DADOS")}
               </NavLink>
               <NavLink 
-                to="/admin-modular/preenchidos-links" 
+                to="/admin/preenchidos-links" 
                 className={`flex justify-center items-center px-3 py-2 rounded-md transition-colors ${
                   isActive('/preenchidos-links') ? 
                   'bg-background text-foreground shadow-sm' : 
@@ -70,7 +70,7 @@ const AdminLayout: React.FC = () => {
                 {getTabLabel("Preenchidos pelo Link", "Link")}
               </NavLink>
               <NavLink 
-                to="/admin-modular/novo-pedido" 
+                to="/admin/novo-pedido" 
                 className={`flex justify-center items-center px-3 py-2 rounded-md transition-colors ${
                   isActive('/novo-pedido') ? 
                   'bg-background text-foreground shadow-sm' : 
