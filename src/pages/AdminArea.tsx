@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Search, Filter, Send, Trash, Upload, PlusCircle, Download } from "lucide-react";
+import { useIsSmallMobile, useIsMobile } from "@/hooks/use-mobile";
 
 // Import components
 import Logo from "@/components/Logo";
@@ -68,6 +69,9 @@ const initialPreenchidosPorLink = [
 
 const AdminArea = () => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
+  const isSmallMobile = useIsSmallMobile();
+  
   const [cartoesGerados, setCartoesGerados] = useState(segundasVias);
   const [activeTab, setActiveTab] = useState("cartoes");
   const [uploadedEmployees, setUploadedEmployees] = useState<UploadedEmployee[]>(mockUploadedEmployees);
@@ -75,13 +79,11 @@ const AdminArea = () => {
   const [preenchidosPorLink, setPreenchidosPorLink] = useState(initialPreenchidosPorLink);
   const [novoPedido, setNovoPedido] = useState<UploadedEmployee[]>([]);
   
-  // Search and filter states
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [typeFilter, setTypeFilter] = useState("todos");
   const [sorting, setSorting] = useState({ field: 'nome', direction: 'asc' as 'asc' | 'desc' });
   
-  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   
@@ -99,7 +101,6 @@ const AdminArea = () => {
     setSelectedCardType(cardType);
     setActiveTab("novo-pedido");
     
-    // Simulate adding new employees from the uploaded file
     const newEmployees: UploadedEmployee[] = [
       { id: Date.now(), nome: "Pedro Rocha", matricula: "3005678", tipo: "Light", foto: false, cargo: "Analista", setor: "TI", validade: "12/2024" },
       { id: Date.now() + 1, nome: "Laura Oliveira", matricula: "7008765", tipo: "Conecta", foto: false, cargo: "Gerente", setor: "Vendas", validade: "12/2024" },
@@ -129,13 +130,11 @@ const AdminArea = () => {
   };
 
   const handleRequestSecondCopy = (id: number) => {
-    // Find the employee
     const employee = uploadedEmployees.find(emp => emp.id === id);
     
     if (employee) {
-      // Create a new entry for preenchidosPorLink with all required fields
       const newEntry = {
-        id: Date.now(), // Use timestamp as unique ID
+        id: Date.now(),
         nome: employee.nome,
         primeiroNome: employee.nome.split(' ')[0],
         matricula: employee.matricula,
@@ -144,7 +143,6 @@ const AdminArea = () => {
         validade: employee.validade || "12/2024",
         cargo: employee.cargo || "",
         setor: employee.setor || "",
-        // Add required fields with default values
         email: "",
         telefone: "",
         empresa: "",
@@ -152,10 +150,8 @@ const AdminArea = () => {
         linkId: ""
       };
       
-      // Add to preenchidosPorLink
       setPreenchidosPorLink(prev => [...prev, newEntry]);
       
-      // Switch to the preenchidos-link tab
       setActiveTab("preenchidos-link");
       
       toast({
@@ -177,7 +173,11 @@ const AdminArea = () => {
     setSorting({ field, direction });
   };
 
-  // Filter and sort all employee data
+  const getTabLabel = (fullLabel: string, shortLabel: string) => {
+    if (isSmallMobile) return shortLabel;
+    return fullLabel;
+  };
+
   const filteredEmployees = useMemo(() => {
     return uploadedEmployees.filter(employee => 
       (search === "" || 
@@ -190,12 +190,10 @@ const AdminArea = () => {
           ? a.nome.localeCompare(b.nome) 
           : b.nome.localeCompare(a.nome);
       }
-      // Add other sorting options as needed
       return 0;
     });
   }, [uploadedEmployees, search, typeFilter, sorting]);
 
-  // Filter for link-filled users
   const [linkSearch, setLinkSearch] = useState("");
   
   const filteredLinkUsers = useMemo(() => {
@@ -206,13 +204,11 @@ const AdminArea = () => {
     );
   }, [preenchidosPorLink, linkSearch]);
 
-  // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentEmployees = filteredEmployees.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
 
-  // Pagination controls
   const goToPage = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
@@ -308,12 +304,20 @@ const AdminArea = () => {
           </CardHeader>
           
           <CardContent className="p-6">
-            <Tabs defaultValue="cartoes" value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <Tabs defaultValue="cartoes" value={activeTab} onValueChange={setActiveTab} className="w-full tabs-responsive">
               <TabsList className="grid w-full grid-cols-4 mb-8">
-                <TabsTrigger value="cartoes" className="text-sm md:text-base">Cartões Gerados</TabsTrigger>
-                <TabsTrigger value="todos-dados" className="text-sm md:text-base">TODOS OS DADOS</TabsTrigger>
-                <TabsTrigger value="preenchidos-link" className="text-sm md:text-base">Preenchidos pelo Link</TabsTrigger>
-                <TabsTrigger value="novo-pedido" className="text-sm md:text-base">Criar Pedido</TabsTrigger>
+                <TabsTrigger value="cartoes">
+                  {getTabLabel("Cartões Gerados", "Cartões")}
+                </TabsTrigger>
+                <TabsTrigger value="todos-dados">
+                  {getTabLabel("TODOS OS DADOS", "DADOS")}
+                </TabsTrigger>
+                <TabsTrigger value="preenchidos-link">
+                  {getTabLabel("Preenchidos pelo Link", "Link")}
+                </TabsTrigger>
+                <TabsTrigger value="novo-pedido">
+                  {getTabLabel("Criar Pedido", "Pedido")}
+                </TabsTrigger>
               </TabsList>
               
               <TabsContent value="cartoes" className="space-y-6">

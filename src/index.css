@@ -170,4 +170,21 @@
   .responsive-padding {
     @apply p-2 sm:p-4 md:p-6;
   }
+  
+  /* Estilos responsivos para as abas */
+  .tabs-responsive [role="tablist"] {
+    @apply flex-wrap;
+  }
+  
+  .tabs-responsive [role="tab"] {
+    @apply text-xs sm:text-sm md:text-base py-1.5 px-2 sm:px-3 md:px-4;
+    @apply whitespace-nowrap overflow-hidden text-ellipsis;
+  }
+  
+  /* Para dispositivos muito pequenos, estilo específico */
+  @media (max-width: 480px) {
+    .tabs-responsive [role="tab"] {
+      @apply py-1 px-1.5 text-[10px] max-w-[80px];
+    }
+  }
 }

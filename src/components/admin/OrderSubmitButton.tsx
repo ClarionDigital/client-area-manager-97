@@ -2,7 +2,8 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsMobile, useIsSmallMobile } from '@/hooks/use-mobile';
+import { Progress } from "@/components/ui/progress";
 
 interface OrderSubmitButtonProps {
   onClick: () => void;
@@ -20,6 +21,12 @@ const OrderSubmitButton: React.FC<OrderSubmitButtonProps> = ({
   showProgress = false
 }) => {
   const isMobile = useIsMobile();
+  const isSmallMobile = useIsSmallMobile();
+  
+  // Simplify label for very small devices
+  const displayLabel = isSmallMobile && label.length > 8 
+    ? "ENVIAR" 
+    : (isMobile && label.length > 10 ? label.split(' ')[0] : label);
   
   return (
     <div className="flex flex-col items-center mt-8 w-full">
@@ -29,12 +36,7 @@ const OrderSubmitButton: React.FC<OrderSubmitButtonProps> = ({
             <span>Progresso</span>
             <span>{progress}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2.5">
-            <div 
-              className="bg-gradient-to-r from-[#52aa85] to-[#8cdcd8] h-2.5 rounded-full transition-all duration-500 ease-in-out" 
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
+          <Progress value={progress} className="h-2.5" />
         </div>
       )}
       
@@ -46,7 +48,7 @@ const OrderSubmitButton: React.FC<OrderSubmitButtonProps> = ({
         className={`px-4 md:px-8 w-full max-w-xs md:max-w-md ${showProgress ? 'mt-2' : ''}`}
       >
         <Send className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'} mr-2`} />
-        {isMobile && label.length > 10 ? label.split(' ')[0] : label}
+        {displayLabel}
       </Button>
     </div>
   );
