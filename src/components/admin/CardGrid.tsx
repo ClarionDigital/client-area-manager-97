@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -125,8 +126,12 @@ const CardGrid: React.FC<CardGridProps> = ({
               </div>
               <CardContent className="p-4">
                 <div className="flex items-start space-x-4">
-                  <div className="bg-gray-200 w-16 h-20 flex items-center justify-center text-gray-400 rounded-md mt-2">
-                    <ImagePlus className="h-6 w-6" />
+                  <div className="bg-gray-200 w-16 h-20 flex items-center justify-center text-gray-400 rounded-md mt-2 overflow-hidden">
+                    {card.fotoUrl ? (
+                      <img src={card.fotoUrl} alt={card.nome} className="w-full h-full object-cover" />
+                    ) : (
+                      <ImagePlus className="h-6 w-6" />
+                    )}
                   </div>
                   <div className="space-y-1 flex-1">
                     <p className="font-bold truncate">{card.nome}</p>

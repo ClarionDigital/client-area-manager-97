@@ -44,6 +44,11 @@ const CardsTab: React.FC<CardsTabProps> = ({
   const cartoesFiltrados = filtrarCartoes();
   const cartaoSelecionado = visualizarId ? cards.find(cartao => cartao.id === visualizarId) : null;
 
+  const getCardPreviewUrl = (card: CardData) => {
+    const cardId = card.matricula.startsWith("3") ? "3" : "7";
+    return `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(card.nome.split(' ')[0])}&nome_completo=${encodeURIComponent(card.nome)}&matricula=${encodeURIComponent(card.matricula)}&foto=${card.fotoUrl ? encodeURIComponent(card.fotoUrl) : ""}&id=${cardId}`;
+  };
+
   return (
     <div className="space-y-6">
       <DashboardHeader 
@@ -81,12 +86,25 @@ const CardsTab: React.FC<CardsTabProps> = ({
       </div>
 
       <Dialog open={visualizarId !== null} onOpenChange={(open) => !open && setVisualizarId(null)}>
-        <DialogContent>
+        <DialogContent className="max-w-3xl">
           <DialogHeader>
             <DialogTitle>Visualizar Cartão</DialogTitle>
           </DialogHeader>
           {cartaoSelecionado && (
-            <CardDetail card={cartaoSelecionado} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardDetail card={cartaoSelecionado} />
+              <div className="flex flex-col items-center">
+                <h3 className="text-lg font-semibold mb-2">Prévia do Cartão</h3>
+                <div className="border rounded-md overflow-hidden w-full shadow-md">
+                  <iframe 
+                    src={getCardPreviewUrl(cartaoSelecionado)}
+                    className="w-full h-56 md:h-64"
+                    title="Prévia do Cartão"
+                    sandbox="allow-scripts"
+                  />
+                </div>
+              </div>
+            </div>
           )}
           <DialogFooter>
             <Button onClick={() => setVisualizarId(null)}>Fechar</Button>

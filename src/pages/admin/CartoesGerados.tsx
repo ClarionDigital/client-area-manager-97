@@ -8,6 +8,12 @@ const CartoesGerados: React.FC = () => {
   const { cartoesGerados, handleDownloadPlanilha, handleUploadPlanilha } = useAdmin();
   const { toast } = useToast();
   
+  // Add sample photo URLs to some cards for demonstration
+  const cartoesComFotos = cartoesGerados.map(cartao => ({
+    ...cartao,
+    fotoUrl: cartao.id % 3 === 0 ? 'https://www.psicologo.com.br/wp-content/uploads/sou-uma-pessoa-boa-ou-nao.jpg' : undefined
+  }));
+  
   const handleConfirmPayment = (id: number) => {
     toast({
       title: "Pagamento confirmado",
@@ -24,7 +30,7 @@ const CartoesGerados: React.FC = () => {
 
   return (
     <CardsTab 
-      cards={cartoesGerados}
+      cards={cartoesComFotos}
       onDownload={handleDownloadPlanilha}
       onUpload={handleUploadPlanilha}
       onConfirmPayment={handleConfirmPayment}
