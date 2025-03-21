@@ -181,7 +181,7 @@ const CardForm: React.FC<CardFormProps> = ({
             <iframe 
               src={previewUrl} 
               className="w-full h-full border-none"
-              style={{ width: "100%", height: "100%", border: "none" }}
+              style={{ width: "100%", height: "100%", border: "none", overflow: "hidden", transform: "scale(0.43)", transformOrigin: "top center" }}
               frameBorder="0"
               scrolling="no"
               title="Previsualização do Cartão"
