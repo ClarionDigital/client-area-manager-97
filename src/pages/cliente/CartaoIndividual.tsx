@@ -8,11 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Search, Check } from "lucide-react";
+import { useAdmin } from "@/context/AdminContext";
 
 const CartaoIndividual = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const location = useLocation();
+  const { setPreenchidosPorLink } = useAdmin();
   const [matricula, setMatricula] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [found, setFound] = useState<boolean>(false);
@@ -79,6 +81,29 @@ const CartaoIndividual = () => {
     setLoading(true);
     
     setTimeout(() => {
+      // Add the new card to the PreenchidosPorLink in AdminContext
+      if (funcionarioDados) {
+        const isTipoLight = funcionarioDados.matricula.startsWith("3");
+        const newEntry = {
+          id: Date.now(),
+          nome: cardData.nomeCompleto,
+          primeiroNome: cardData.nomeAbreviado,
+          email: "funcionario@empresa.com", // Default email since we don't collect it
+          telefone: "(00) 00000-0000", // Default phone since we don't collect it
+          empresa: isTipoLight ? "Light" : "Conecta",
+          matricula: funcionarioDados.matricula,
+          tipo: isTipoLight ? "Light" : "Conecta",
+          foto: cardData.foto !== null,
+          validade: "12/2024", // Default validade
+          cargo: "Funcionário", // Default cargo
+          dataPreenchimento: new Date().toLocaleDateString(),
+          linkId: "CARTAO-INDIVIDUAL", // Identifying that it came from individual card form
+          setor: "Geral" // Default setor
+        };
+        
+        setPreenchidosPorLink(prev => [...prev, newEntry]);
+      }
+      
       setLoading(false);
       setSubmitted(true);
       

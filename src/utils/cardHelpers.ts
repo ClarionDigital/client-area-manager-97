@@ -1,4 +1,3 @@
-
 import { CardData, CardDataWithPhoto, UploadedEmployee } from '@/types/admin';
 
 // Get card type based on employee ID
@@ -27,6 +26,44 @@ export const createLinkFilledEntry = (employee: UploadedEmployee) => {
     dataPreenchimento: new Date().toLocaleDateString(),
     linkId: ""
   };
+};
+
+// Create a new entry for individual card form
+export const createIndividualCardEntry = (cardData: {
+  nome: string;
+  nomeAbreviado: string;
+  matricula: string;
+  tipo: string;
+  foto: boolean;
+}) => {
+  return {
+    id: Date.now(),
+    nome: cardData.nome,
+    primeiroNome: cardData.nomeAbreviado,
+    matricula: cardData.matricula,
+    tipo: cardData.tipo,
+    foto: cardData.foto,
+    validade: "12/2024", // Default validade
+    cargo: "Funcionário", // Default cargo
+    setor: "Geral", // Default setor
+    email: "funcionario@empresa.com", // Default email
+    telefone: "(00) 00000-0000", // Default phone
+    empresa: cardData.tipo,
+    dataPreenchimento: new Date().toLocaleDateString(),
+    linkId: "CARTAO-INDIVIDUAL" // Identifying that it came from individual card form
+  };
+};
+
+// Get link origin display name
+export const getLinkOriginDisplayName = (linkId: string): string => {
+  if (linkId === "CARTAO-INDIVIDUAL") return "Portal Individual";
+  return "Link";
+};
+
+// Filter cards by type
+export const filterCardsByType = (cards: any[], type: string): any[] => {
+  if (type === "Todos") return cards;
+  return cards.filter(card => card.tipo === type);
 };
 
 // Export data as CSV

@@ -2,9 +2,10 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, Search } from "lucide-react";
+import { Download, Search, Eye } from "lucide-react";
 import AdminPagination from "@/components/admin/AdminPagination";
 import OrderSubmitButton from "@/components/admin/OrderSubmitButton";
+import { useToast } from "@/hooks/use-toast";
 
 interface PreenchidosLinkUser {
   id: number;
@@ -36,13 +37,15 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
   onDownload,
   onSubmitOrder
 }) => {
+  const { toast } = useToast();
   const [linkSearch, setLinkSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   
   const filteredLinkUsers = initialUsers.filter(user => 
     (linkSearch === "" || 
       user.nome.toLowerCase().includes(linkSearch.toLowerCase()) || 
-      (user.matricula && user.matricula.toLowerCase().includes(linkSearch.toLowerCase())))
+      (user.matricula && user.matricula.toLowerCase().includes(linkSearch.toLowerCase())) ||
+      (user.linkId && user.linkId.toLowerCase().includes(linkSearch.toLowerCase())))
   );
 
   const totalPages = Math.ceil(filteredLinkUsers.length / ITEMS_PER_PAGE);
@@ -51,10 +54,10 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
   const currentUsers = filteredLinkUsers.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleExportCSV = () => {
-    const header = "Nome,Nome Completo,Matrícula,Tipo,Email,Telefone,Empresa,Data Preenchimento,Validade";
+    const header = "Nome,Nome Completo,Matrícula,Tipo,Email,Telefone,Empresa,Data Preenchimento,Validade,Origem";
     
     const csvData = filteredLinkUsers.map(user => {
-      return `${user.primeiroNome},${user.nome},${user.matricula},${user.tipo},${user.email},${user.telefone},${user.empresa},${user.dataPreenchimento},${user.validade}`;
+      return `${user.primeiroNome},${user.nome},${user.matricula},${user.tipo},${user.email},${user.telefone},${user.empresa},${user.dataPreenchimento},${user.validade},${user.linkId}`;
     }).join("\n");
     
     const csvContent = `${header}\n${csvData}`;
@@ -72,6 +75,11 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
     link.click();
     document.body.removeChild(link);
     
+    toast({
+      title: "Download concluído",
+      description: "A planilha foi baixada com sucesso",
+    });
+    
     onDownload();
   };
 
@@ -79,7 +87,7 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-semibold text-gray-800">
-          Preenchidos pelo Link
+          Preenchidos pelo Link e Portal Individual
         </h2>
         <Button
           variant="outline"
@@ -95,7 +103,7 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
         <input
           type="text"
-          placeholder="Buscar por nome ou matrícula..."
+          placeholder="Buscar por nome, matrícula ou origem..."
           className="w-full pl-8 pr-4 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-[#52aa85]"
           value={linkSearch}
           onChange={(e) => setLinkSearch(e.target.value)}
@@ -110,6 +118,9 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
               <TableHead>Nome Completo</TableHead>
               <TableHead>Matrícula</TableHead>
               <TableHead>Tipo</TableHead>
+              <TableHead>Foto</TableHead>
+              <TableHead>Origem</TableHead>
+              <TableHead>Data</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -128,11 +139,28 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
                       {user.tipo}
                     </span>
                   </TableCell>
+                  <TableCell>
+                    {user.foto ? (
+                      <span className="text-green-600 font-medium">Sim</span>
+                    ) : (
+                      <span className="text-red-600 font-medium">Não</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                      user.linkId === "CARTAO-INDIVIDUAL" 
+                        ? "bg-purple-50 text-purple-700" 
+                        : "bg-amber-50 text-amber-700"
+                    }`}>
+                      {user.linkId === "CARTAO-INDIVIDUAL" ? "Portal Individual" : "Link"}
+                    </span>
+                  </TableCell>
+                  <TableCell>{user.dataPreenchimento}</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-6 text-gray-500">
+                <TableCell colSpan={7} className="text-center py-6 text-gray-500">
                   Nenhum registro encontrado
                 </TableCell>
               </TableRow>

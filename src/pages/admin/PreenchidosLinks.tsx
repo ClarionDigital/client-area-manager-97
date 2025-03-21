@@ -17,11 +17,14 @@ const PreenchidosLinks: React.FC = () => {
   };
 
   return (
-    <PreenchidosLinkTab 
-      preenchidosPorLink={preenchidosPorLink}
-      onDownload={handleDownloadPlanilha}
-      onSubmitOrder={handleOnSubmitOrder}
-    />
+    <div>
+      <h1 className="text-2xl font-bold mb-6">Preenchidos por Link e Portal Individual</h1>
+      <PreenchidosLinkTab 
+        preenchidosPorLink={preenchidosPorLink}
+        onDownload={handleDownloadPlanilha}
+        onSubmitOrder={handleOnSubmitOrder}
+      />
+    </div>
   );
 };
 
