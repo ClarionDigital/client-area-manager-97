@@ -148,9 +148,10 @@ const CardForm: React.FC<CardFormProps> = ({
         </div>
         <div className="p-4 h-full flex items-center justify-center">
           <div className="w-full overflow-hidden rounded-xl shadow-lg" style={{ 
-            height: isMobile ? '300px' : '450px', 
+            aspectRatio: '1 / 1.6',
             position: 'relative',
-            aspectRatio: '1 / 1.6' 
+            maxWidth: isMobile ? '280px' : '320px',
+            height: 'auto'
           }}>
             <iframe 
               src={previewUrl} 
