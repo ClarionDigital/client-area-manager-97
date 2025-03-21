@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { CardData } from "@/types/admin";
+import { ImagePlus } from "lucide-react";
 import DashboardHeader from "@/components/admin/dashboard/DashboardHeader";
 import SearchFilters from "@/components/admin/SearchFilters";
 import CardList from "@/components/admin/CardList";
