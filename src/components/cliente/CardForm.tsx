@@ -118,7 +118,7 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
           <p className="text-sm text-gray-600">Esta é uma pré-visualização digital ilustrativa de como ficará o seu cartão.</p>
         </div>
         <div className="p-4 flex items-center justify-center">
-          <div className="w-full h-[500px] rounded-lg overflow-hidden bg-white select-none flex items-center justify-center p-2">
+          <div className="w-full h-[540px] rounded-lg overflow-hidden bg-white select-none flex items-center justify-center p-2">
             <img 
               src={previewUrl} 
               alt="Modelo do Cartão" 
