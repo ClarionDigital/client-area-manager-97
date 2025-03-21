@@ -61,7 +61,7 @@ const Cadastro = () => {
       
       // Gerar URL de pré-visualização
       const cardId = dadosUsuario.matricula.startsWith("3") ? "3" : "7";
-      const previewUrl = `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(dadosUsuario.nomeAbreviado)}&nome_completo=${encodeURIComponent(dadosUsuario.nomeCompleto)}&matricula=${encodeURIComponent(dadosUsuario.matricula)}&foto=${dadosUsuario.foto ? encodeURIComponent(dadosUsuario.foto) : ""}&id=${cardId}`;
+      const previewUrl = `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(dadosUsuario.nomeAbreviado)}&nome_completo=${encodeURIComponent(dadosUsuario.nomeCompleto)}&matricula=${encodeURIComponent(dadosUsuario.matricula)}&foto=${dadosUsuario.foto ? encodeURIComponent(dadosUsuario.foto) : ""}&id=${cardId}&keep_case=true`;
       setPreviewUrl(previewUrl);
     } catch (error) {
       console.error("Erro ao processar dados do usuário:", error);
