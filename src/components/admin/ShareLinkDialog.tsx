@@ -19,14 +19,12 @@ interface ShareLinkDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   matricula: string;
-  nome: string;
 }
 
 const ShareLinkDialog: React.FC<ShareLinkDialogProps> = ({
   open,
   onOpenChange,
-  matricula,
-  nome
+  matricula
 }) => {
   const { toast } = useToast();
   const qrCodeRef = useRef<HTMLDivElement>(null);
@@ -74,7 +72,7 @@ const ShareLinkDialog: React.FC<ShareLinkDialogProps> = ({
   };
   
   const shareOnWhatsApp = () => {
-    const message = `Olá ${nome.split(' ')[0]}, acesse este link para preencher os dados do seu cartão: ${linkWithMatricula}`;
+    const message = `Acesse este link para preencher os dados do seu cartão: ${linkWithMatricula}`;
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -109,7 +107,7 @@ const ShareLinkDialog: React.FC<ShareLinkDialogProps> = ({
         <DialogHeader>
           <DialogTitle>Compartilhar Link</DialogTitle>
           <DialogDescription>
-            Compartilhe o link do cartão com matrícula pré-preenchida para {nome}.
+            Compartilhe o link do cartão com matrícula {matricula} pré-preenchida.
           </DialogDescription>
         </DialogHeader>
         
@@ -139,7 +137,7 @@ const ShareLinkDialog: React.FC<ShareLinkDialogProps> = ({
           <TabsContent value="whatsapp" className="space-y-4">
             <div className="flex flex-col items-center justify-center py-6 space-y-4">
               <p className="text-sm text-gray-700 mb-2">
-                Compartilhar link do cartão via WhatsApp para {nome}:
+                Compartilhar link do cartão via WhatsApp para matrícula {matricula}:
               </p>
               <Button 
                 onClick={shareOnWhatsApp} 

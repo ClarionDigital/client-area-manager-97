@@ -11,7 +11,6 @@ import ShareLinkDialog from "@/components/admin/ShareLinkDialog";
 const LinkGenerator: React.FC = () => {
   const { toast } = useToast();
   const [matricula, setMatricula] = useState("");
-  const [nome, setNome] = useState("");
   const [generatedLink, setGeneratedLink] = useState("");
   const [shareDialogOpen, setShareDialogOpen] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
@@ -60,10 +59,10 @@ const LinkGenerator: React.FC = () => {
   };
 
   const handleOpenShareDialog = () => {
-    if (!matricula || !nome) {
+    if (!matricula) {
       toast({
-        title: "Informações obrigatórias",
-        description: "Digite a matrícula e o nome para compartilhar o link",
+        title: "Matrícula obrigatória",
+        description: "Digite a matrícula para compartilhar o link",
         variant: "destructive",
       });
       return;
@@ -83,26 +82,15 @@ const LinkGenerator: React.FC = () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="matricula">Matrícula *</Label>
-            <Input
-              id="matricula"
-              value={matricula}
-              onChange={(e) => setMatricula(e.target.value)}
-              placeholder="Digite a matrícula"
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="nome">Nome do Funcionário</Label>
-            <Input
-              id="nome"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              placeholder="Digite o nome (para WhatsApp)"
-            />
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="matricula">Matrícula *</Label>
+          <Input
+            id="matricula"
+            value={matricula}
+            onChange={(e) => setMatricula(e.target.value)}
+            placeholder="Digite a matrícula"
+            required
+          />
         </div>
 
         {generatedLink && (
@@ -143,12 +131,11 @@ const LinkGenerator: React.FC = () => {
         </Button>
       </CardFooter>
 
-      {matricula && nome && (
+      {matricula && (
         <ShareLinkDialog
           open={shareDialogOpen}
           onOpenChange={setShareDialogOpen}
           matricula={matricula}
-          nome={nome}
         />
       )}
     </Card>
