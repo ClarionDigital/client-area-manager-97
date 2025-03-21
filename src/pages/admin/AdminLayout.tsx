@@ -2,14 +2,20 @@
 import React from 'react';
 import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useIsSmallMobile, useIsMobile } from "@/hooks/use-mobile";
 import Logo from "@/components/Logo";
+import { useAuth } from "@/context/AuthContext";
+import { LogOut, Users } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminLayout: React.FC = () => {
   const isSmallMobile = useIsSmallMobile();
   const isMobile = useIsMobile();
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { toast } = useToast();
   
   // Função para obter o rótulo do menu de acordo com o tamanho da tela
   const getTabLabel = (fullLabel: string, shortLabel: string) => {
@@ -21,12 +27,38 @@ const AdminLayout: React.FC = () => {
   const isActive = (path: string) => {
     return location.pathname.includes(path);
   };
+  
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Sessão encerrada",
+      description: "Você foi desconectado com sucesso",
+      className: "bg-[#8cdcd8]/20 border-[#8cdcd8]",
+    });
+    navigate("/admin/login");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#52aa85]/5 to-[#52aa85]/10 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <Logo size="md" />
+          
+          <div className="flex items-center gap-4">
+            <div className="hidden md:block text-right">
+              <p className="text-sm text-gray-600">Bem-vindo,</p>
+              <p className="font-medium text-[#52aa85]">{user?.name || "Administrador"}</p>
+            </div>
+            
+            <Button 
+              onClick={handleLogout}
+              variant="outline" 
+              className="border-[#52aa85] text-[#52aa85] hover:bg-[#52aa85]/10"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              {isMobile ? "" : "Sair"}
+            </Button>
+          </div>
         </div>
         
         <Card className="border-[#52aa85]/20 shadow-lg">
@@ -38,7 +70,7 @@ const AdminLayout: React.FC = () => {
           </CardHeader>
           
           <CardContent className="p-6">
-            <div className="grid grid-cols-4 gap-2 mb-8 tabs-responsive w-full">
+            <div className="grid grid-cols-5 gap-2 mb-8 tabs-responsive w-full">
               <NavLink 
                 to="/admin/cartoes-gerados" 
                 className={`flex justify-center items-center px-3 py-2 rounded-md transition-colors ${
@@ -78,6 +110,17 @@ const AdminLayout: React.FC = () => {
                 }`}
               >
                 {getTabLabel("Criar Pedido", "Pedido")}
+              </NavLink>
+              <NavLink 
+                to="/admin/gerenciar-usuarios" 
+                className={`flex justify-center items-center px-3 py-2 rounded-md transition-colors ${
+                  isActive('/gerenciar-usuarios') ? 
+                  'bg-background text-foreground shadow-sm' : 
+                  'bg-muted text-muted-foreground hover:bg-muted/80'
+                }`}
+              >
+                <Users className="h-4 w-4 mr-1" />
+                {getTabLabel("Usuários", "Users")}
               </NavLink>
             </div>
             
