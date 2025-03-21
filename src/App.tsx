@@ -15,6 +15,7 @@ import AdminAltArea from "./pages/AdminAltArea";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "@/context/AuthContext";
 import AuthGuard from "@/components/admin/AuthGuard";
+import AuthGuardAlt from "@/components/admin-alt/AuthGuardAlt";
 
 // Admin module routes
 import AdminModular from "./pages/admin";
@@ -26,6 +27,11 @@ import TodosCartoes from "./pages/admin/TodosCartoes";
 import PreenchidosLinks from "./pages/admin/PreenchidosLinks";
 import NovoPedido from "./pages/admin/NovoPedido";
 import GerenciarUsuarios from "./pages/admin/GerenciarUsuarios";
+
+// Admin Alt module routes
+import AdminAltLogin from "./pages/admin-alt/Login";
+import AdminAltLayout from "./pages/admin-alt/AdminAltLayout";
+import Dashboard from "./pages/admin-alt/Dashboard";
 
 const queryClient = new QueryClient();
 
@@ -48,7 +54,16 @@ const App = () => (
             <Route path="/cartao-individual" element={<CartaoIndividual />} />
             
             {/* Admin-alt routes */}
-            <Route path="/admin-alt" element={<AdminAltArea />} />
+            <Route path="/admin-alt" element={<Navigate to="/admin-alt/login" replace />} />
+            <Route path="/admin-alt/login" element={<AdminAltLogin />} />
+            
+            {/* Protected admin-alt routes */}
+            <Route element={<AuthGuardAlt />}>
+              <Route path="/admin-alt/dashboard" element={<AdminAltLayout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="*" element={<Dashboard />} />
+              </Route>
+            </Route>
             
             {/* Admin auth routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
