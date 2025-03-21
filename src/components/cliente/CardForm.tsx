@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Upload, Save, CreditCard, User, BadgeCheck, Camera, Type, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface CardFormProps {
   matricula: string;
@@ -34,33 +35,33 @@ const CardForm: React.FC<CardFormProps> = ({
 }) => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const [nomeAbreviado, setNomeAbreviado] = useState(nomeAbreviadoInicial);
-  const [nomeCompleto, setNomeCompleto] = useState(nomeCompletoInicial);
+  const [nomeAbreviado, setNomeAbreviado] = useState("");
+  const [nomeCompleto, setNomeCompleto] = useState("");
   const [foto, setFoto] = useState<File | null>(null);
-  const [fotoUrl, setFotoUrl] = useState<string | null>(fotoUrlInicial);
+  const [fotoUrl, setFotoUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState(previewUrlInicial);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   
   useEffect(() => {
-    setNomeAbreviado(nomeAbreviadoInicial);
-    setNomeCompleto(nomeCompletoInicial);
-    setFotoUrl(fotoUrlInicial);
-    
-    if (previewUrlInicial) {
-      setPreviewUrl(previewUrlInicial);
-    } else {
-      // Gera URL padrão se não houver uma inicial
-      updatePreviewUrl(nomeAbreviadoInicial, nomeCompletoInicial, matricula, fotoUrlInicial);
-    }
-  }, [nomeAbreviadoInicial, nomeCompletoInicial, fotoUrlInicial, previewUrlInicial, matricula]);
+    // We're not using initial values anymore since we want the form to be filled from scratch
+    // Just update the preview initially
+    updatePreviewUrl("", "", matricula, null);
+  }, [matricula]);
 
   const updatePreviewUrl = (nome: string, nomeCompleto: string, matricula: string, fotoUrl: string | null) => {
+    setIsPreviewLoading(true);
     const cardId = matricula.startsWith("3") ? "3" : "7";
     
     // Adicionar parâmetros para manter o formato exato e prevenir redimensionamento
     const url = `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(nome)}&nome_completo=${encodeURIComponent(nomeCompleto)}&matricula=${encodeURIComponent(matricula)}&foto=${fotoUrl ? encodeURIComponent(fotoUrl) : ""}&id=${cardId}&keep_case=true&no_resize=true`;
     
     setPreviewUrl(url);
+  };
+
+  // Handler for when the preview iframe finishes loading
+  const handlePreviewLoad = () => {
+    setIsPreviewLoading(false);
   };
 
   const handleUploadFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,12 +148,17 @@ const CardForm: React.FC<CardFormProps> = ({
           <p className="text-sm text-gray-600">Esta é uma pré-visualização digital ilustrativa de como ficará o seu cartão.</p>
         </div>
         <div className="p-4 h-full flex items-center justify-center">
-          <div className="w-full overflow-hidden rounded-xl shadow-lg" style={{ 
+          <div className="w-full overflow-hidden rounded-xl shadow-lg relative" style={{ 
             aspectRatio: '1 / 1.6',
             position: 'relative',
             maxWidth: isMobile ? '280px' : '320px',
             height: 'auto'
           }}>
+            {isPreviewLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
+                <div className="h-8 w-8 border-4 border-[#8cdcd8] border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
             <iframe 
               src={previewUrl} 
               style={{
@@ -165,6 +171,7 @@ const CardForm: React.FC<CardFormProps> = ({
                 transform: 'scale(1)',
                 transformOrigin: 'top left'
               }}
+              onLoad={handlePreviewLoad}
               frameBorder="0"
               scrolling="no"
               title="Previsualização do Cartão"
@@ -188,7 +195,6 @@ const CardForm: React.FC<CardFormProps> = ({
                 updatePreviewUrl(e.target.value, nomeCompleto, matricula, fotoUrl);
               }}
               className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all"
-              readOnly={!!nomeAbreviadoInicial}
             />
           </div>
           
@@ -205,7 +211,6 @@ const CardForm: React.FC<CardFormProps> = ({
                 updatePreviewUrl(nomeAbreviado, e.target.value, matricula, fotoUrl);
               }}
               className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all"
-              readOnly={!!nomeCompletoInicial}
             />
           </div>
           
@@ -224,14 +229,13 @@ const CardForm: React.FC<CardFormProps> = ({
           <div className="space-y-2">
             <Label className="text-gray-700 font-medium flex items-center gap-2">
               <Camera className="h-4 w-4 text-[#52aa85]" />
-              Foto {fotoUrl && !foto && <span className="text-xs text-green-600 ml-2">(Já cadastrada, mas você pode modificar)</span>}
+              Foto
             </Label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition-colors hover:bg-gray-50">
               <Label htmlFor="foto-upload" className="cursor-pointer">
                 <div className="flex flex-col items-center">
                   <Upload className="h-8 w-8 text-[#8cdcd8] mb-2" />
                   <span className="text-sm text-gray-500">Clique para {fotoUrl ? 'modificar' : 'selecionar'}</span>
-                  {fotoUrl && !foto && <span className="text-xs text-green-600 mt-2">Foto já cadastrada</span>}
                   {foto && <span className="text-xs text-green-600 mt-2">Nova foto selecionada: {foto.name}</span>}
                 </div>
                 <Input

@@ -20,9 +20,6 @@ const CartaoIndividual = () => {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [funcionarioDados, setFuncionarioDados] = useState<{
     matricula: string;
-    nomeAbreviado: string;
-    nomeCompleto: string;
-    foto?: string | null;
   } | null>(null);
 
   // Parse matricula from URL query parameter
@@ -44,14 +41,9 @@ const CartaoIndividual = () => {
       const searchMatricula = mat || matricula;
       
       if (searchMatricula.length >= 5) {
-        const isTipoLight = searchMatricula.startsWith("3");
-        
-        // Mock data for demonstration
+        // Just validate matricula format and create a basic record
         setFuncionarioDados({
-          matricula: searchMatricula,
-          nomeAbreviado: isTipoLight ? "J. Silva" : "Pedro Oliveira",
-          nomeCompleto: isTipoLight ? "João da Silva" : "Pedro Oliveira Santos",
-          foto: null
+          matricula: searchMatricula
         });
         
         setFound(true);
@@ -150,10 +142,6 @@ const CartaoIndividual = () => {
                 
                 <CardForm 
                   matricula={funcionarioDados.matricula}
-                  nomeAbreviadoInicial={funcionarioDados.nomeAbreviado}
-                  nomeCompletoInicial={funcionarioDados.nomeCompleto}
-                  fotoUrlInicial={funcionarioDados.foto || null}
-                  previewUrlInicial=""
                   onCardSaved={handleCardSaved}
                   saveButtonText="Enviar Pedido"
                 />
