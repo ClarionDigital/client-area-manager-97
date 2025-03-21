@@ -1,8 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Plus, Minus, ShoppingCart, Check } from "lucide-react";
+import { MinusCircle, PlusCircle, ShoppingCart } from "lucide-react";
 
 interface OrderSummaryProps {
   quantity: number;
@@ -10,6 +9,7 @@ interface OrderSummaryProps {
   onIncreaseQuantity: () => void;
   onDecreaseQuantity: () => void;
   onFinalizarCompra: () => void;
+  isSubmitting?: boolean;
 }
 
 const OrderSummary: React.FC<OrderSummaryProps> = ({
@@ -17,92 +17,80 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   valorUnitario,
   onIncreaseQuantity,
   onDecreaseQuantity,
-  onFinalizarCompra
+  onFinalizarCompra,
+  isSubmitting = false,
 }) => {
-  const valorTotal = valorUnitario * quantity;
+  const valorTotal = quantity * valorUnitario;
+  
+  const formatCurrency = (value: number) => {
+    return value.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    });
+  };
   
   return (
-    <div className="w-full space-y-6 mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition-all">
-          <img 
-            src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e3f6bd0fe.png" 
-            alt="Crachá PVC" 
-            className="w-24 h-24 object-contain rounded-md mb-3"
-          />
-          <div className="font-medium text-center">Crachá PVC</div>
-        </div>
+    <div className="w-full space-y-6">
+      <div className="border border-gray-200 rounded-lg p-4 shadow-sm">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Resumo do Pedido</h3>
         
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition-all">
-          <img 
-            src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e2f02ac11.png" 
-            alt="Cordão" 
-            className="w-24 h-24 object-contain rounded-md mb-3"
-          />
-          <div className="font-medium text-center">CORDÃO</div>
-        </div>
-        
-        <div className="bg-white rounded-lg p-4 shadow-sm border border-gray-100 flex flex-col items-center hover:shadow-md transition-all">
-          <img 
-            src="https://areadocliente.alternativacard.com/up/uploads/alt-67d2e3f6bd0fe.png" 
-            alt="Porta Crachá" 
-            className="w-24 h-24 object-contain rounded-md mb-3"
-          />
-          <div className="font-medium text-center">PORTA CRACHÁ</div>
-        </div>
-      </div>
-      
-      <div className="bg-gradient-to-r from-blue-50 to-[#8cdcd8]/10 border border-blue-100 rounded-lg p-5 shadow-inner">
-        <div className="flex justify-between items-center">
-          <span className="font-bold text-lg text-blue-800">Total:</span>
-          <span className="font-bold text-lg text-blue-800">R$ {valorTotal.toFixed(2)}</span>
-        </div>
-        
-        <div className="mt-4">
-          <div className="flex items-center justify-between mb-4">
-            <span className="font-medium">Quantidade:</span>
-            <div className="flex items-center">
-              <Button 
-                variant="outline" 
-                size="icon" 
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600">Produto:</span>
+            <span className="font-medium">Cartão Funcional Light</span>
+          </div>
+          
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600">Valor unitário:</span>
+            <span className="font-medium">{formatCurrency(valorUnitario)}</span>
+          </div>
+          
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600">Quantidade:</span>
+            <div className="flex items-center gap-3">
+              <button 
                 onClick={onDecreaseQuantity}
-                className="h-8 w-8 shadow-sm hover:bg-[#8cdcd8]/10 hover:border-[#8cdcd8] transition-colors"
+                className="text-gray-500 hover:text-blue-600 transition-colors"
+                disabled={quantity <= 1}
               >
-                <Minus className="h-4 w-4" />
-              </Button>
-              <span className="mx-4 font-medium">{quantity}</span>
-              <Button 
-                variant="outline" 
-                size="icon" 
+                <MinusCircle size={20} />
+              </button>
+              <span className="font-medium w-6 text-center">{quantity}</span>
+              <button 
                 onClick={onIncreaseQuantity}
-                className="h-8 w-8 shadow-sm hover:bg-[#8cdcd8]/10 hover:border-[#8cdcd8] transition-colors"
+                className="text-gray-500 hover:text-blue-600 transition-colors"
               >
-                <Plus className="h-4 w-4" />
-              </Button>
+                <PlusCircle size={20} />
+              </button>
             </div>
+          </div>
+          
+          <div className="pt-3 border-t border-gray-200 flex justify-between items-center">
+            <span className="text-gray-700 font-medium">Valor Total:</span>
+            <span className="text-lg font-bold text-[#ff6a34]">{formatCurrency(valorTotal)}</span>
           </div>
         </div>
       </div>
       
-      <div className="text-sm text-gray-700 bg-gray-50 p-4 rounded-lg shadow-inner border border-gray-100">
-        <p className="font-semibold mb-2">Informações de entrega:</p>
-        <p>Após a confirmação do pedido, os materiais serão entregues na sede da Light. Você será notificado sobre o status da entrega via e-mail e WhatsApp.</p>
-      </div>
-      
-      <Alert variant="success" className="bg-[#8cdcd8]/10 border-[#8cdcd8] shadow-md">
-        <Check className="h-4 w-4 text-[#8cdcd8]" />
-        <AlertTitle>Importante</AlertTitle>
-        <AlertDescription>
-          Ao finalizar o pedido, você receberá um comprovante por e-mail. Mantenha seus dados atualizados.
-        </AlertDescription>
-      </Alert>
-      
       <Button 
-        className="w-full bg-orange-500 hover:bg-orange-600 text-white h-12 shadow-md transition-all duration-200" 
-        onClick={onFinalizarCompra}
+        onClick={onFinalizarCompra} 
+        className="w-full h-12 bg-[#ff6a34] hover:bg-[#ff5c23] text-white font-semibold shadow-md transition-all duration-200"
+        disabled={isSubmitting}
       >
-        <ShoppingCart className="mr-2 h-5 w-5" />
-        Finalizar Pedido
+        {isSubmitting ? (
+          <div className="flex items-center">
+            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Processando...
+          </div>
+        ) : (
+          <>
+            <ShoppingCart className="mr-2 h-5 w-5" />
+            Finalizar Compra
+          </>
+        )}
       </Button>
     </div>
   );
