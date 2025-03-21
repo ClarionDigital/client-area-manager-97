@@ -85,6 +85,37 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
     }
   };
 
+  // Function to download the template file
+  const handleDownloadTemplate = () => {
+    // Define the CSV content for the template
+    const header = "Nome,Matrícula,Cargo,Setor";
+    const sampleData = [
+      "João da Silva,3001234,Analista,TI",
+      "Maria Souza,3005678,Gerente,RH",
+      "Pedro Oliveira,7009876,Técnico,Suporte"
+    ].join("\n");
+    
+    const csvContent = `${header}\n${sampleData}`;
+    
+    // Create a Blob with the CSV content
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    // Create a download link and trigger the download
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `modelo-cartoes-${selectedCardType.toLowerCase() === 'todos' ? 'geral' : selectedCardType.toLowerCase()}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Call the original onDownloadTemplate for any additional logic
+    onDownloadTemplate();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -94,7 +125,7 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
         <div className="flex space-x-2">
           <Button 
             variant="outline"
-            onClick={onDownloadTemplate}
+            onClick={handleDownloadTemplate}
             className="flex items-center gap-2"
           >
             <Download className="h-4 w-4" />
@@ -102,7 +133,7 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
           </Button>
           <UploadSpreadsheet
             onUpload={onUploadPlanilha}
-            onDownloadTemplate={onDownloadTemplate}
+            onDownloadTemplate={handleDownloadTemplate}
           />
         </div>
       </div>
