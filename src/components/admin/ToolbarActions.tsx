@@ -1,8 +1,11 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, Bell, AlertCircle } from "lucide-react";
 import UploadSpreadsheet from './UploadSpreadsheet';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useToast } from "@/hooks/use-toast";
+import { exportDataAsCSV, downloadTemplateCSV } from '@/utils/cardHelpers';
 
 interface ToolbarActionsProps {
   selectedCardType: string;
@@ -10,6 +13,7 @@ interface ToolbarActionsProps {
   onUploadPlanilha: (cardType: string) => void;
   onExportData?: () => void;
   novoPedido?: any[];
+  hasNotifications?: boolean;
 }
 
 const ToolbarActions: React.FC<ToolbarActionsProps> = ({
@@ -17,30 +21,25 @@ const ToolbarActions: React.FC<ToolbarActionsProps> = ({
   onDownloadTemplate,
   onUploadPlanilha,
   onExportData,
-  novoPedido = []
+  novoPedido = [],
+  hasNotifications = false
 }) => {
+  const isMobile = useIsMobile();
+  const { toast } = useToast();
+  
   const handleDownloadTemplate = () => {
-    const header = "Nome,Nome Completo,Matrícula,Foto";
+    const headers = ["Nome", "Nome Completo", "Matrícula", "Foto"];
     const sampleData = [
       "João,João da Silva,3001234,",
       "Maria,Maria Souza,3005678,",
       "Pedro,Pedro Oliveira,7009876,"
-    ].join("\n");
+    ];
     
-    const csvContent = `${header}\n${sampleData}`;
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `modelo-cartoes-${selectedCardType.toLowerCase() === 'todos' ? 'geral' : selectedCardType.toLowerCase()}.csv`);
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    downloadTemplateCSV(
+      headers,
+      sampleData,
+      `modelo-cartoes-${selectedCardType.toLowerCase() === 'todos' ? 'geral' : selectedCardType.toLowerCase()}.csv`
+    );
     
     onDownloadTemplate();
   };
@@ -48,45 +47,66 @@ const ToolbarActions: React.FC<ToolbarActionsProps> = ({
   const handleExportData = () => {
     if (!onExportData || novoPedido.length === 0) return;
     
-    const header = "Nome,Nome Completo,Matrícula,Tipo,Validade,Foto";
+    const headers = ["Nome", "Nome Completo", "Matrícula", "Tipo", "Validade", "Foto"];
     
-    const csvData = novoPedido.map(employee => {
-      const primeiroNome = employee.nome.split(' ')[0];
-      return `${primeiroNome},${employee.nome},${employee.matricula},${employee.tipo},${employee.validade || '12/2024'},${employee.foto ? 'Sim' : 'Não'}`;
-    }).join("\n");
+    const fieldMappings = {
+      primeiroNome: (employee: any) => employee.nome.split(' ')[0],
+      nomeCompleto: (employee: any) => employee.nome,
+      matricula: (employee: any) => employee.matricula,
+      tipo: (employee: any) => employee.tipo,
+      validade: (employee: any) => employee.validade || '12/2024',
+      foto: (employee: any) => employee.foto ? 'Sim' : 'Não'
+    };
     
-    const csvContent = `${header}\n${csvData}`;
-    
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    
-    link.setAttribute('href', url);
-    link.setAttribute('download', `pedido-cartoes-${selectedCardType.toLowerCase() === 'todos' ? 'geral' : selectedCardType.toLowerCase()}-${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    exportDataAsCSV(
+      novoPedido,
+      headers,
+      fieldMappings,
+      `pedido-cartoes-${selectedCardType.toLowerCase() === 'todos' ? 'geral' : selectedCardType.toLowerCase()}`
+    );
     
     onExportData();
   };
+  
+  const showNotificationToast = () => {
+    toast({
+      title: "Notificações",
+      description: "Você tem 3 novos pedidos para processar",
+      variant: "default",
+    });
+  };
 
   return (
-    <div className="flex space-x-2">
+    <div className={`flex ${isMobile ? 'flex-col space-y-2' : 'flex-row space-x-2'} w-full md:w-auto`}>
+      {hasNotifications && (
+        <Button 
+          variant="outline"
+          onClick={showNotificationToast}
+          className="flex items-center gap-2 relative md:mr-2"
+        >
+          <Bell className="h-4 w-4" />
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
+            3
+          </span>
+          {!isMobile && <span>Notificações</span>}
+        </Button>
+      )}
+      
       <Button 
         variant="outline"
         onClick={handleDownloadTemplate}
         className="flex items-center gap-2"
       >
         <Download className="h-4 w-4" />
-        Baixar Modelo
+        {!isMobile && "Baixar Modelo"}
+        {isMobile && "Modelo"}
       </Button>
+      
       <UploadSpreadsheet
         onUpload={onUploadPlanilha}
         onDownloadTemplate={handleDownloadTemplate}
       />
+      
       {onExportData && novoPedido && novoPedido.length > 0 && (
         <Button 
           variant="outline"
@@ -94,7 +114,8 @@ const ToolbarActions: React.FC<ToolbarActionsProps> = ({
           className="flex items-center gap-2"
         >
           <Download className="h-4 w-4" />
-          Exportar Pedido
+          {!isMobile && "Exportar Pedido"}
+          {isMobile && "Exportar"}
         </Button>
       )}
     </div>

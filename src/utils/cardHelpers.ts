@@ -89,3 +89,37 @@ export const paginateData = (data: any[], currentPage: number, itemsPerPage: num
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   return data.slice(indexOfFirstItem, indexOfLastItem);
 };
+
+// Calculate progress percentage
+export const calculateProgress = (completedSteps: number, totalSteps: number): number => {
+  if (totalSteps === 0) return 0;
+  return Math.round((completedSteps / totalSteps) * 100);
+};
+
+// Format date for display
+export const formatDate = (dateString: string): string => {
+  try {
+    const parts = dateString.split('/');
+    if (parts.length !== 3) return dateString;
+    
+    const day = parts[0].padStart(2, '0');
+    const month = parts[1].padStart(2, '0');
+    const year = parts[2];
+    
+    return `${day}/${month}/${year}`;
+  } catch (error) {
+    return dateString;
+  }
+};
+
+// Check if a notification is new (less than 24 hours old)
+export const isNewNotification = (timestamp: number): boolean => {
+  const now = Date.now();
+  const oneDayMs = 24 * 60 * 60 * 1000;
+  return (now - timestamp) < oneDayMs;
+};
+
+// Get count of new or unread notifications
+export const getUnreadNotificationsCount = (notifications: any[]): number => {
+  return notifications.filter(notification => !notification.read).length;
+};

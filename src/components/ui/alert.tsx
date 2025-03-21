@@ -1,7 +1,6 @@
 
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-
 import { cn } from "@/lib/utils"
 
 const alertVariants = cva(
@@ -14,6 +13,8 @@ const alertVariants = cva(
           "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
         success: "bg-[#8cdcd8]/20 border-[#8cdcd8] text-foreground [&>svg]:text-[#8cdcd8] shadow-md",
         info: "bg-brand-light-blue border-brand-blue/30 text-foreground [&>svg]:text-brand-blue shadow-md",
+        warning: "bg-amber-50 border-amber-200 text-amber-800 [&>svg]:text-amber-500 shadow-md",
+        notification: "bg-white border-[#52aa85] text-foreground [&>svg]:text-[#52aa85] shadow-md",
       },
     },
     defaultVariants: {
@@ -29,7 +30,7 @@ const Alert = React.forwardRef<
   <div
     ref={ref}
     role="alert"
-    className={cn(alertVariants({ variant }), className)}
+    className={cn(alertVariants({ variant }), className, "transition-all duration-300 ease-in-out")}
     {...props}
   />
 ))

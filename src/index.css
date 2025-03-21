@@ -114,3 +114,60 @@
     @apply focus:ring-2 focus:ring-[#8cdcd8]/50 focus:border-[#8cdcd8] transition-all duration-200;
   }
 }
+
+/* Estilos de Notificação e Alertas */
+@layer components {
+  .notification-badge {
+    @apply absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs;
+  }
+  
+  .alert-banner {
+    @apply flex items-center p-4 mb-4 rounded-md border;
+  }
+  
+  .alert-banner.info {
+    @apply bg-blue-50 border-blue-200 text-blue-800;
+  }
+  
+  .alert-banner.success {
+    @apply bg-green-50 border-green-200 text-green-800;
+  }
+  
+  .alert-banner.warning {
+    @apply bg-amber-50 border-amber-200 text-amber-800;
+  }
+  
+  .alert-banner.error {
+    @apply bg-red-50 border-red-200 text-red-800;
+  }
+  
+  /* Estilos da barra de progresso */
+  .progress-container {
+    @apply w-full bg-gray-200 rounded-full h-2.5 mb-4;
+  }
+  
+  .progress-bar {
+    @apply h-2.5 rounded-full transition-all duration-500 ease-in-out;
+  }
+  
+  .progress-bar.primary {
+    @apply bg-gradient-to-r from-[#52aa85] to-[#8cdcd8];
+  }
+  
+  .progress-bar.secondary {
+    @apply bg-gradient-to-r from-[#f59e0b] to-[#f97316];
+  }
+  
+  /* Estilos responsivos adicionais */
+  .responsive-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4;
+  }
+  
+  .responsive-flex {
+    @apply flex flex-col md:flex-row;
+  }
+  
+  .responsive-padding {
+    @apply p-2 sm:p-4 md:p-6;
+  }
+}
