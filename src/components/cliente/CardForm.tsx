@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Upload, Save, CreditCard, User, BadgeCheck, Camera, Type, Send } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CardFormProps {
   matricula: string;
@@ -32,6 +33,7 @@ const CardForm: React.FC<CardFormProps> = ({
   onCardSaved 
 }) => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const [nomeAbreviado, setNomeAbreviado] = useState(nomeAbreviadoInicial);
   const [nomeCompleto, setNomeCompleto] = useState(nomeCompletoInicial);
   const [foto, setFoto] = useState<File | null>(null);
@@ -55,8 +57,8 @@ const CardForm: React.FC<CardFormProps> = ({
   const updatePreviewUrl = (nome: string, nomeCompleto: string, matricula: string, fotoUrl: string | null) => {
     const cardId = matricula.startsWith("3") ? "3" : "7";
     
-    // Adicionando parâmetro para manter o formato exato do nome completo
-    const url = `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(nome)}&nome_completo=${encodeURIComponent(nomeCompleto)}&matricula=${encodeURIComponent(matricula)}&foto=${fotoUrl ? encodeURIComponent(fotoUrl) : ""}&id=${cardId}&keep_case=true`;
+    // Adicionar parâmetros para manter o formato exato e prevenir redimensionamento
+    const url = `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(nome)}&nome_completo=${encodeURIComponent(nomeCompleto)}&matricula=${encodeURIComponent(matricula)}&foto=${fotoUrl ? encodeURIComponent(fotoUrl) : ""}&id=${cardId}&keep_case=true&no_resize=true`;
     
     setPreviewUrl(url);
   };
@@ -145,13 +147,28 @@ const CardForm: React.FC<CardFormProps> = ({
           <p className="text-sm text-gray-600">Esta é uma pré-visualização digital ilustrativa de como ficará o seu cartão.</p>
         </div>
         <div className="p-4 h-full flex items-center justify-center">
-          <iframe 
-            src={previewUrl} 
-            className="w-full h-[450px] border-none rounded-xl shadow-lg"
-            frameBorder="0"
-            scrolling="no"
-            title="Previsualização do Cartão"
-          />
+          <div className="w-full overflow-hidden rounded-xl shadow-lg" style={{ 
+            height: isMobile ? '300px' : '450px', 
+            position: 'relative',
+            aspectRatio: '1 / 1.6' 
+          }}>
+            <iframe 
+              src={previewUrl} 
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                border: 'none',
+                transform: 'scale(1)',
+                transformOrigin: 'top left'
+              }}
+              frameBorder="0"
+              scrolling="no"
+              title="Previsualização do Cartão"
+            />
+          </div>
         </div>
       </div>
 
