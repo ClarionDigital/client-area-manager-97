@@ -1,11 +1,12 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { authService } from '@/services/authService';
 
 interface User {
-  id: number;
+  id: string;
   email: string;
-  name: string;
-  role: string;
+  nome: string;
+  papel: string;
 }
 
 interface AuthContextType {
@@ -16,23 +17,13 @@ interface AuthContextType {
   resetPassword: (email: string) => Promise<boolean>;
 }
 
-const defaultUsers = [
-  {
-    id: 1,
-    email: 'admin@admin.com',
-    password: 'admin',
-    name: 'Administrador',
-    role: 'admin',
-  },
-];
-
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
-  // Check for existing session on mount
+  // Verificar sessão existente ao montar
   useEffect(() => {
     const storedUser = localStorage.getItem('adminUser');
     if (storedUser) {
@@ -43,16 +34,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    // In a real app, this would be an API call
-    const foundUser = defaultUsers.find(
-      (u) => u.email === email && u.password === password
-    );
-
-    if (foundUser) {
-      const { password: _, ...userWithoutPassword } = foundUser;
-      setUser(userWithoutPassword);
+    // Será implementado com authService.loginAdmin real
+    const response = await authService.loginAdmin(email, password);
+    
+    if (response.success && response.data) {
+      const userData = {
+        id: response.data.id,
+        email: response.data.email,
+        nome: response.data.nome,
+        papel: response.data.papel
+      };
+      
+      setUser(userData);
       setIsAuthenticated(true);
-      localStorage.setItem('adminUser', JSON.stringify(userWithoutPassword));
+      localStorage.setItem('adminUser', JSON.stringify(userData));
       return true;
     }
     
@@ -60,15 +55,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const logout = () => {
+    authService.logout();
     setUser(null);
     setIsAuthenticated(false);
-    localStorage.removeItem('adminUser');
   };
 
   const resetPassword = async (email: string): Promise<boolean> => {
-    // In a real app, this would send a reset email
-    const userExists = defaultUsers.some((u) => u.email === email);
-    return userExists;
+    const response = await authService.resetPassword(email);
+    return response.success;
   };
 
   return (
