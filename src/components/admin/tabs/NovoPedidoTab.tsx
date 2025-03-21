@@ -87,12 +87,12 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
 
   // Function to download the template file
   const handleDownloadTemplate = () => {
-    // Define the CSV content for the template
-    const header = "Nome,Matrícula,Cargo,Setor";
+    // Define the CSV content for the template - updated with only the required fields
+    const header = "Nome,Nome Completo,Matrícula,Foto";
     const sampleData = [
-      "João da Silva,3001234,Analista,TI",
-      "Maria Souza,3005678,Gerente,RH",
-      "Pedro Oliveira,7009876,Técnico,Suporte"
+      "João,João da Silva,3001234,",
+      "Maria,Maria Souza,3005678,",
+      "Pedro,Pedro Oliveira,7009876,"
     ].join("\n");
     
     const csvContent = `${header}\n${sampleData}`;
