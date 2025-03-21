@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Upload, Save, CreditCard } from "lucide-react";
+import { Upload, Save, CreditCard, User, BadgeCheck, Camera, Type } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface CardFormProps {
@@ -118,7 +118,7 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
           <p className="text-sm text-gray-600">Esta é uma pré-visualização digital ilustrativa de como ficará o seu cartão.</p>
         </div>
         <div className="p-4 flex items-center justify-center">
-          <div className="w-full h-[450px] rounded-lg overflow-hidden bg-white select-none flex items-center justify-center p-2">
+          <div className="w-full h-[500px] rounded-lg overflow-hidden bg-white select-none flex items-center justify-center p-2">
             <img 
               src={previewUrl} 
               alt="Modelo do Cartão" 
@@ -128,15 +128,15 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
             />
           </div>
         </div>
-        <div className="px-4 pb-4 text-xs text-center text-gray-500 italic">
-          Obs: O cartão impresso poderá ter pequenas variações de cor em relação à visualização digital.
-        </div>
       </div>
 
       <div className="md:col-span-2">
         <div className="w-full space-y-4">
           <div className="space-y-2">
-            <Label className="text-gray-700 font-medium">Nome Abreviado</Label>
+            <Label className="text-gray-700 font-medium flex items-center gap-2">
+              <Type className="h-4 w-4 text-[#52aa85]" />
+              Nome Abreviado
+            </Label>
             <Input 
               placeholder="Digite seu nome abreviado" 
               value={nomeAbreviado} 
@@ -146,7 +146,10 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
           </div>
           
           <div className="space-y-2">
-            <Label className="text-gray-700 font-medium">Nome Completo</Label>
+            <Label className="text-gray-700 font-medium flex items-center gap-2">
+              <User className="h-4 w-4 text-[#52aa85]" />
+              Nome Completo
+            </Label>
             <Input 
               placeholder="Digite seu nome completo" 
               value={nomeCompleto} 
@@ -156,7 +159,10 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
           </div>
           
           <div className="space-y-2">
-            <Label className="text-gray-700 font-medium">Matrícula</Label>
+            <Label className="text-gray-700 font-medium flex items-center gap-2">
+              <BadgeCheck className="h-4 w-4 text-[#52aa85]" />
+              Matrícula
+            </Label>
             <Input 
               value={matricula} 
               readOnly 
@@ -165,7 +171,10 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
           </div>
           
           <div className="space-y-2">
-            <Label className="text-gray-700 font-medium">Foto</Label>
+            <Label className="text-gray-700 font-medium flex items-center gap-2">
+              <Camera className="h-4 w-4 text-[#52aa85]" />
+              Foto
+            </Label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center transition-colors hover:bg-gray-50">
               <Label htmlFor="foto-upload" className="cursor-pointer">
                 <div className="flex flex-col items-center">
