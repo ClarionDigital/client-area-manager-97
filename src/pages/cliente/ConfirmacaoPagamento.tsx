@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Loader2 } from "lucide-react";
 
 interface CustomerData {
   nomeCompleto: string;
@@ -14,10 +14,19 @@ interface CustomerData {
   valorUnitario: number;
 }
 
+interface PaymentDetails {
+  id: string;
+  status: string;
+  paymentDate: string;
+  value: number;
+}
+
 const ConfirmacaoPagamento = () => {
   const navigate = useNavigate();
   const [clienteData, setClienteData] = useState<CustomerData | null>(null);
   const [emailEnviado, setEmailEnviado] = useState(false);
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Recuperar dados do cliente do localStorage
@@ -30,6 +39,39 @@ const ConfirmacaoPagamento = () => {
     try {
       const parsedData = JSON.parse(storedData) as CustomerData;
       setClienteData(parsedData);
+      
+      // Recuperar ID do último pagamento
+      const lastPaymentId = localStorage.getItem("lastPaymentId");
+      
+      if (lastPaymentId) {
+        // Buscar detalhes do pagamento na API do Asaas
+        fetch(`https://sandbox.asaas.com/api/v3/payments/${lastPaymentId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "access_token": "3b4f4ccf-0a0d-424f-ab6b-ec09004b06e3"
+          }
+        })
+        .then(response => {
+          if (!response.ok) throw new Error("Falha ao obter detalhes do pagamento");
+          return response.json();
+        })
+        .then(data => {
+          setPaymentDetails({
+            id: data.id,
+            status: data.status,
+            paymentDate: data.paymentDate || new Date().toISOString(),
+            value: data.value
+          });
+          setLoading(false);
+        })
+        .catch(err => {
+          console.error("Erro ao buscar detalhes do pagamento:", err);
+          setLoading(false);
+        });
+      } else {
+        setLoading(false);
+      }
       
       // Simular o envio de email (em um ambiente real, isso seria feito pelo backend)
       setTimeout(() => {
@@ -47,8 +89,31 @@ const ConfirmacaoPagamento = () => {
     // Limpar dados do localStorage ao voltar para a página inicial
     localStorage.removeItem("clienteData");
     localStorage.removeItem("matricula");
+    localStorage.removeItem("lastPaymentId");
     navigate("/");
   };
+
+  const formatPaymentStatus = (status: string) => {
+    const statusMap: Record<string, string> = {
+      RECEIVED: "Pagamento recebido",
+      CONFIRMED: "Pagamento confirmado",
+      PENDING: "Aguardando pagamento",
+      OVERDUE: "Pagamento atrasado",
+      CANCELED: "Pagamento cancelado"
+    };
+    return statusMap[status] || "Status desconhecido";
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-amber-50 flex items-center justify-center">
+        <div className="flex flex-col items-center">
+          <Loader2 className="h-8 w-8 text-blue-500 animate-spin mb-2" />
+          <p>Carregando detalhes do pagamento...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!clienteData) {
     return <div className="min-h-screen bg-amber-50 flex items-center justify-center">Carregando...</div>;
@@ -100,6 +165,32 @@ const ConfirmacaoPagamento = () => {
                   </div>
                 </div>
               </div>
+              
+              {paymentDetails && (
+                <div className="bg-blue-50 rounded-lg p-4 mb-6 border border-blue-100">
+                  <h3 className="font-medium text-lg text-blue-800 mb-3">Detalhes do Pagamento</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="grid grid-cols-[120px_1fr] gap-2">
+                      <span className="text-blue-600">ID:</span>
+                      <span className="font-medium">{paymentDetails.id}</span>
+                    </div>
+                    <div className="grid grid-cols-[120px_1fr] gap-2">
+                      <span className="text-blue-600">Status:</span>
+                      <span className="font-medium">{formatPaymentStatus(paymentDetails.status)}</span>
+                    </div>
+                    <div className="grid grid-cols-[120px_1fr] gap-2">
+                      <span className="text-blue-600">Data:</span>
+                      <span className="font-medium">
+                        {new Date(paymentDetails.paymentDate).toLocaleDateString('pt-BR')}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-[120px_1fr] gap-2">
+                      <span className="text-blue-600">Valor:</span>
+                      <span className="font-medium">R$ {paymentDetails.value.toFixed(2)}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
               
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <h3 className="font-medium text-lg mb-3">Pedido</h3>

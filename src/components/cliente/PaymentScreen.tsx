@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ArrowLeft, ArrowRight, QrCode, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import PixPaymentModal from "./PixPaymentModal";
 
 interface CustomerData {
   nomeCompleto: string;
@@ -35,25 +36,47 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({
   const { toast } = useToast();
   const [paymentMethod, setPaymentMethod] = useState("pix");
   const [orderProcessing, setOrderProcessing] = useState(false);
+  const [pixModalOpen, setPixModalOpen] = useState(false);
   
   const valorTotal = valorUnitario * quantity;
   
   const handleProcessPayment = () => {
     setOrderProcessing(true);
     
-    // Simular processamento de pagamento
-    setTimeout(() => {
+    if (paymentMethod === "pix") {
+      // Abrir o modal de pagamento PIX
+      setPixModalOpen(true);
       setOrderProcessing(false);
-      
-      toast({
-        title: "Redirecionando para confirmação",
-        description: "Seu pagamento foi processado com sucesso!",
-        className: "bg-[#8cdcd8]/20 border-[#8cdcd8]",
-      });
-      
-      // Redirecionar para a página de confirmação
-      navigate("/cliente/confirmacao");
-    }, 2000);
+    } else {
+      // Simular processamento de pagamento para cartão
+      setTimeout(() => {
+        setOrderProcessing(false);
+        
+        toast({
+          title: "Redirecionando para confirmação",
+          description: "Seu pagamento foi processado com sucesso!",
+          className: "bg-[#8cdcd8]/20 border-[#8cdcd8]",
+        });
+        
+        // Redirecionar para a página de confirmação
+        navigate("/cliente/confirmacao");
+      }, 2000);
+    }
+  };
+  
+  const handlePaymentConfirmed = () => {
+    // Redirecionar para a página de confirmação
+    toast({
+      title: "Pagamento confirmado!",
+      description: "Seu pagamento PIX foi processado com sucesso!",
+      className: "bg-green-50 border-green-200",
+    });
+    
+    navigate("/cliente/confirmacao");
+  };
+  
+  const handleClosePixModal = () => {
+    setPixModalOpen(false);
   };
   
   return (
@@ -237,6 +260,15 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({
           </div>
         </Card>
       </div>
+      
+      <PixPaymentModal
+        open={pixModalOpen}
+        onClose={handleClosePixModal}
+        onConfirm={handlePaymentConfirmed}
+        customerData={customerData}
+        valorTotal={valorTotal}
+        quantity={quantity}
+      />
     </div>
   );
 };
