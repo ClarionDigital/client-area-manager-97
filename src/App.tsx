@@ -27,6 +27,12 @@ import PreenchidosLinks from "./pages/admin/PreenchidosLinks";
 import NovoPedido from "./pages/admin/NovoPedido";
 import GerenciarUsuarios from "./pages/admin/GerenciarUsuarios";
 
+// Admin-Alt module routes
+import AdminAltDashboard from "./pages/admin-alt/Dashboard";
+import AdminAltPedidos from "./pages/admin-alt/Pedidos";
+import AdminAltCartoes from "./pages/admin-alt/Cartoes";
+import AdminAltLayout from "./pages/admin-alt/AdminAltLayout";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -47,8 +53,15 @@ const App = () => (
             <Route path="/cliente/confirmacao" element={<ConfirmacaoPagamento />} />
             <Route path="/cartao-individual" element={<CartaoIndividual />} />
             
-            {/* Admin-alt routes */}
-            <Route path="/admin-alt" element={<AdminAltArea />} />
+            {/* Admin-alt routes with new structure */}
+            <Route path="/admin-alt" element={<AdminAltArea />}>
+              <Route element={<AdminAltLayout />}>
+                <Route index element={<Navigate to="/admin-alt/dashboard" replace />} />
+                <Route path="dashboard" element={<AdminAltDashboard />} />
+                <Route path="pedidos" element={<AdminAltPedidos />} />
+                <Route path="cartoes" element={<AdminAltCartoes />} />
+              </Route>
+            </Route>
             
             {/* Admin auth routes */}
             <Route path="/admin/login" element={<AdminLogin />} />
