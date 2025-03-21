@@ -123,6 +123,8 @@ const CardsTab: React.FC<CardsTabProps> = ({
                     className="w-full h-full"
                     title="Prévia do Cartão"
                     sandbox="allow-scripts"
+                    scrolling="no"
+                    style={{ border: 'none', overflow: 'hidden' }}
                   />
                 </div>
               </div>
