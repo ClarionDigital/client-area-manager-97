@@ -44,9 +44,19 @@ const CardForm: React.FC<CardFormProps> = ({
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   
   useEffect(() => {
+    // Initialize with initial values if provided
+    if (nomeAbreviadoInicial) setNomeAbreviado(nomeAbreviadoInicial);
+    if (nomeCompletoInicial) setNomeCompleto(nomeCompletoInicial);
+    if (fotoUrlInicial) setFotoUrl(fotoUrlInicial);
+    
     // Set initial preview with placeholder values if fields are empty
-    updatePreviewUrl("", "", matricula, null);
-  }, [matricula]);
+    updatePreviewUrl(
+      nomeAbreviadoInicial || "", 
+      nomeCompletoInicial || "", 
+      matricula, 
+      fotoUrlInicial || null
+    );
+  }, [matricula, nomeAbreviadoInicial, nomeCompletoInicial, fotoUrlInicial]);
 
   const isValidMatricula = (mat: string) => {
     // Validate that matricula starts with 3 or 7
@@ -166,9 +176,10 @@ const CardForm: React.FC<CardFormProps> = ({
           <p className="text-sm text-gray-600">Esta é uma pré-visualização digital ilustrativa de como ficará o seu cartão.</p>
         </div>
         <div className="p-4 h-full flex items-center justify-center">
-          <div className="w-full overflow-hidden rounded-xl shadow-lg relative" style={{ 
-            aspectRatio: '1 / 1.6',
-            maxWidth: isMobile ? '280px' : '320px',
+          {/* Card preview container with updated proportions for mobile */}
+          <div className="relative w-full overflow-hidden rounded-xl shadow-lg" style={{ 
+            aspectRatio: '9 / 16',
+            maxWidth: isMobile ? '220px' : '280px',
             margin: '0 auto'
           }}>
             {isPreviewLoading && (
@@ -176,13 +187,19 @@ const CardForm: React.FC<CardFormProps> = ({
                 <div className="h-8 w-8 border-4 border-[#8cdcd8] border-t-transparent rounded-full animate-spin"></div>
               </div>
             )}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <img 
+                src="/lovable-uploads/660bcf94-ee64-437d-adf6-c3f765a5016a.png"
+                alt="Card template"
+                className="absolute inset-0 w-full h-full object-cover opacity-10 pointer-events-none"
+              />
+            </div>
             <iframe 
               src={previewUrl} 
               className="absolute inset-0 w-full h-full border-0"
               style={{
                 border: 'none',
-                transform: 'scale(1)',
-                transformOrigin: 'top left'
+                overflow: 'hidden'
               }}
               onLoad={handlePreviewLoad}
               frameBorder="0"
