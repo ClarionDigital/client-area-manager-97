@@ -1,18 +1,18 @@
 
 import React, { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import CardForm from "@/components/cliente/CardForm";
-import PersonalInfoForm from "@/components/cliente/PersonalInfoForm";
-import OrderSummary from "@/components/cliente/OrderSummary";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useSecurity } from "@/hooks/use-security";
 import { getCardTypeFromEmployeeId } from "@/utils/cardHelpers";
+import CardSection from "@/components/cliente/CardSection";
+import FormSection from "@/components/cliente/FormSection";
 
 const Cadastro = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  useSecurity();
   
   const [usuarioDados, setUsuarioDados] = useState<{
     matricula: string;
@@ -73,41 +73,6 @@ const Cadastro = () => {
       });
       navigate("/cliente/login");
     }
-    
-    document.addEventListener('contextmenu', (e) => e.preventDefault());
-    document.addEventListener('keydown', (e) => {
-      if (
-        (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'u')) || 
-        e.key === 'PrintScreen' || 
-        e.key === 'F12'
-      ) {
-        e.preventDefault();
-        toast({
-          title: "Ação bloqueada",
-          description: "A impressão e captura de tela não são permitidas por motivos de segurança.",
-          variant: "destructive",
-        });
-      }
-    });
-    
-    window.addEventListener('beforeprint', (e) => {
-      e.preventDefault();
-      toast({
-        title: "Ação bloqueada",
-        description: "A impressão não é permitida por motivos de segurança.",
-        variant: "destructive",
-      });
-      return false;
-    });
-    
-    document.body.style.userSelect = 'none';
-    
-    return () => {
-      document.removeEventListener('contextmenu', (e) => e.preventDefault());
-      document.removeEventListener('keydown', (e) => e.preventDefault());
-      window.removeEventListener('beforeprint', (e) => e.preventDefault());
-      document.body.style.userSelect = '';
-    };
   }, [navigate, toast]);
   
   const handleCardSaved = (cardData: {
@@ -218,64 +183,33 @@ const Cadastro = () => {
   return (
     <div className="min-h-screen bg-amber-50 p-4 md:py-8">
       <div className="max-w-5xl mx-auto">
-        <Card className="bg-white shadow-lg rounded-xl overflow-hidden mb-6 border-0">
-          <div className="p-4 md:p-6 flex flex-col items-center">
-            <img 
-              src="https://areadocliente.alternativacard.com/up/uploads/alt-67d9cda455e18.png" 
-              alt="CrachaShop" 
-              className="h-12 md:h-16 mb-6"
-              draggable="false"
-              onContextMenu={(e) => e.preventDefault()}
-            />
-            
-            <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">Dados do Cartão</h2>
-            
-            <CardForm 
-              matricula={usuarioDados?.matricula || ""}
-              nomeAbreviadoInicial={usuarioDados?.nomeAbreviado}
-              nomeCompletoInicial={usuarioDados?.nomeCompleto}
-              fotoUrlInicial={usuarioDados?.foto || null}
-              previewUrlInicial={previewUrl}
-              onCardSaved={handleCardSaved}
-            />
-          </div>
-        </Card>
+        <CardSection 
+          matricula={usuarioDados.matricula}
+          nomeAbreviado={usuarioDados.nomeAbreviado}
+          nomeCompleto={usuarioDados.nomeCompleto}
+          fotoUrl={usuarioDados.foto || null}
+          previewUrl={previewUrl}
+          onCardSaved={handleCardSaved}
+        />
 
-        <Card className="bg-white shadow-lg rounded-xl overflow-hidden border-0" onClick={!cardSaved ? handleFormClick : undefined}>
-          <div className={`p-4 md:p-6 flex flex-col items-center ${!cardSaved ? 'opacity-70 pointer-events-none' : ''}`}>
-            <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">Dados Pessoais</h2>
-            
-            <PersonalInfoForm
-              nomeCompleto={nomeCompleto}
-              cpf={cpf}
-              email={email}
-              telefone={telefone}
-              onNomeCompletoChange={setNomeCompleto}
-              onCpfChange={setCpf}
-              onEmailChange={setEmail}
-              onTelefoneChange={setTelefone}
-            />
-            
-            <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">Finalização</h2>
-            
-            <OrderSummary
-              quantity={quantity}
-              valorUnitario={valorUnitario}
-              onIncreaseQuantity={increaseQuantity}
-              onDecreaseQuantity={decreaseQuantity}
-              onFinalizarCompra={handleFinalizarCompra}
-              isSubmitting={isSubmitting}
-            />
-            
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Light_Servi%C3%A7os_Eletricidade.svg/1200px-Light_Servi%C3%A7os_Eletricidade.svg.png" 
-              alt="Light" 
-              className="h-12 mt-4"
-              draggable="false"
-              onContextMenu={(e) => e.preventDefault()}
-            />
-          </div>
-        </Card>
+        <FormSection 
+          cardSaved={cardSaved}
+          nomeCompleto={nomeCompleto}
+          cpf={cpf}
+          email={email}
+          telefone={telefone}
+          quantity={quantity}
+          valorUnitario={valorUnitario}
+          isSubmitting={isSubmitting}
+          onFormClick={handleFormClick}
+          onNomeCompletoChange={setNomeCompleto}
+          onCpfChange={setCpf}
+          onEmailChange={setEmail}
+          onTelefoneChange={setTelefone}
+          onIncreaseQuantity={increaseQuantity}
+          onDecreaseQuantity={decreaseQuantity}
+          onFinalizarCompra={handleFinalizarCompra}
+        />
       </div>
     </div>
   );
