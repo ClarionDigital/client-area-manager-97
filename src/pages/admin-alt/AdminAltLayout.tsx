@@ -17,7 +17,7 @@ const AdminAltLayout: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
       {/* Header */}
-      <header className="bg-white shadow-sm">
+      <header className="bg-[#062b48] text-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
           <div className="flex items-center">
             <img 
@@ -25,19 +25,19 @@ const AdminAltLayout: React.FC = () => {
               alt="Alternativa Card" 
               className="h-10"
             />
-            <span className="ml-4 text-xl font-medium text-gray-900 hidden md:inline">
+            <span className="ml-4 text-xl font-medium text-white hidden md:inline">
               Painel Administrativo
             </span>
           </div>
           <div className="flex items-center">
-            <span className="mr-4 text-sm text-gray-600 hidden md:inline">
+            <span className="mr-4 text-sm text-gray-200 hidden md:inline">
               {userAlt?.name}
             </span>
             <Button 
               variant="outline" 
               size="sm" 
               onClick={handleLogout}
-              className="flex items-center"
+              className="flex items-center bg-transparent text-white border-white hover:bg-white/10"
             >
               <LogOut className="h-4 w-4 mr-2" />
               <span className="hidden md:inline">Sair</span>
@@ -49,35 +49,35 @@ const AdminAltLayout: React.FC = () => {
       {/* Main Content */}
       <div className="flex-grow flex">
         {/* Sidebar */}
-        <aside className="w-20 md:w-64 bg-white shadow-md">
+        <aside className="w-20 md:w-64 bg-[#031e33] text-white shadow-md">
           <nav className="p-4 flex flex-col h-full">
             <Link 
               to="/admin-alt/dashboard" 
-              className="flex items-center py-3 px-4 rounded-md hover:bg-gray-100 mb-2"
+              className="flex items-center py-3 px-4 rounded-md hover:bg-[#062b48]/70 mb-2"
             >
-              <Home className="h-5 w-5 text-gray-600" />
-              <span className="ml-3 text-gray-700 hidden md:inline">Dashboard</span>
+              <Home className="h-5 w-5 text-white" />
+              <span className="ml-3 text-white hidden md:inline">Dashboard</span>
             </Link>
             <Link 
               to="/admin-alt/cartoes" 
-              className="flex items-center py-3 px-4 rounded-md hover:bg-gray-100 mb-2"
+              className="flex items-center py-3 px-4 rounded-md hover:bg-[#062b48]/70 mb-2"
             >
-              <CreditCard className="h-5 w-5 text-gray-600" />
-              <span className="ml-3 text-gray-700 hidden md:inline">Cartões</span>
+              <CreditCard className="h-5 w-5 text-white" />
+              <span className="ml-3 text-white hidden md:inline">Cartões</span>
             </Link>
             <Link 
               to="/admin-alt/usuarios" 
-              className="flex items-center py-3 px-4 rounded-md hover:bg-gray-100 mb-2"
+              className="flex items-center py-3 px-4 rounded-md hover:bg-[#062b48]/70 mb-2"
             >
-              <Users className="h-5 w-5 text-gray-600" />
-              <span className="ml-3 text-gray-700 hidden md:inline">Usuários</span>
+              <Users className="h-5 w-5 text-white" />
+              <span className="ml-3 text-white hidden md:inline">Usuários</span>
             </Link>
             <Link 
               to="/admin-alt/configuracoes" 
-              className="flex items-center py-3 px-4 rounded-md hover:bg-gray-100 mb-2"
+              className="flex items-center py-3 px-4 rounded-md hover:bg-[#062b48]/70 mb-2"
             >
-              <Settings className="h-5 w-5 text-gray-600" />
-              <span className="ml-3 text-gray-700 hidden md:inline">Configurações</span>
+              <Settings className="h-5 w-5 text-white" />
+              <span className="ml-3 text-white hidden md:inline">Configurações</span>
             </Link>
           </nav>
         </aside>

@@ -60,7 +60,7 @@ const AdminAltLogin: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-amber-50 flex flex-col justify-center items-center p-4">
+    <div className="min-h-screen bg-[#031e33] flex flex-col justify-center items-center p-4">
       <Card className="w-full max-w-md bg-white shadow-lg rounded-xl overflow-hidden border-0">
         <div className="p-6 flex flex-col items-center">
           <img 
@@ -69,7 +69,7 @@ const AdminAltLogin: React.FC = () => {
             className="h-16 mb-8"
           />
           
-          <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">Acesso Administrativo</h2>
+          <h2 className="text-xl font-semibold text-[#062b48] mb-6 text-center w-full">Acesso Administrativo</h2>
           
           <form onSubmit={handleLogin} className="w-full space-y-4">
             <div className="space-y-2">
@@ -105,24 +105,12 @@ const AdminAltLogin: React.FC = () => {
             <Button 
               type="submit"
               disabled={isLoading}
-              className="w-full h-12 bg-[#52aa85] hover:bg-[#438e6d] text-white flex items-center justify-center gap-2 shadow-md"
+              className="w-full h-12 bg-[#062b48] hover:bg-[#031e33] text-white flex items-center justify-center gap-2 shadow-md"
             >
               <LogIn className="h-5 w-5" />
               {isLoading ? "Autenticando..." : "Entrar"}
             </Button>
           </form>
-          
-          <div className="bg-gray-100 p-4 rounded-lg text-gray-700 text-sm mt-8 w-full shadow-inner">
-            <p>
-              Sistema de Administração do serviço de solicitação de 2ª via do Kit de Identificação Pessoal Alternativa Card. Apenas usuários autorizados podem acessar esse sistema.
-            </p>
-          </div>
-          
-          <img 
-            src="https://areadocliente.alternativacard.com/wp-content/uploads/2022/08/logo4.png" 
-            alt="Alternativa Card" 
-            className="h-12 mt-8"
-          />
         </div>
       </Card>
     </div>
