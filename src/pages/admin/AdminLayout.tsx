@@ -47,7 +47,7 @@ const AdminLayout: React.FC = () => {
           <div className="flex items-center gap-4">
             <div className="hidden md:block text-right">
               <p className="text-sm text-gray-600">Bem-vindo,</p>
-              <p className="font-medium text-[#52aa85]">{user?.name || "Administrador"}</p>
+              <p className="font-medium text-[#52aa85]">{user?.nome || "Administrador"}</p>
             </div>
             
             <Button 
