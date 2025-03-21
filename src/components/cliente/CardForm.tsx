@@ -10,6 +10,8 @@ interface CardFormProps {
   matricula: string;
   nomeAbreviadoInicial?: string;
   nomeCompletoInicial?: string;
+  fotoUrlInicial?: string | null;
+  previewUrlInicial?: string;
   onCardSaved: (cardData: {
     nomeAbreviado: string;
     nomeCompleto: string;
@@ -22,23 +24,37 @@ interface CardFormProps {
 const CardForm: React.FC<CardFormProps> = ({ 
   matricula, 
   nomeAbreviadoInicial = "", 
-  nomeCompletoInicial = "", 
+  nomeCompletoInicial = "",
+  fotoUrlInicial = null,
+  previewUrlInicial = "",
   onCardSaved 
 }) => {
   const { toast } = useToast();
   const [nomeAbreviado, setNomeAbreviado] = useState(nomeAbreviadoInicial);
   const [nomeCompleto, setNomeCompleto] = useState(nomeCompletoInicial);
   const [foto, setFoto] = useState<File | null>(null);
-  const [fotoUrl, setFotoUrl] = useState<string | null>(null);
+  const [fotoUrl, setFotoUrl] = useState<string | null>(fotoUrlInicial);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState(previewUrlInicial);
   
-  // URL fixa para o modelo do cartão
-  const previewUrl = "https://crachasrj.com/autismo/modelo-light-verde.php?first_name=JOAO&full_name=JOAO+SILVA&registration_number=12345&photo=https://www.psicologo.com.br/wp-content/uploads/sou-uma-pessoa-boa-ou-nao.jpg&id=7";
-
   useEffect(() => {
     setNomeAbreviado(nomeAbreviadoInicial);
     setNomeCompleto(nomeCompletoInicial);
-  }, [nomeAbreviadoInicial, nomeCompletoInicial]);
+    setFotoUrl(fotoUrlInicial);
+    
+    if (previewUrlInicial) {
+      setPreviewUrl(previewUrlInicial);
+    } else {
+      // Gera URL padrão se não houver uma inicial
+      updatePreviewUrl(nomeAbreviadoInicial, nomeCompletoInicial, matricula, fotoUrlInicial);
+    }
+  }, [nomeAbreviadoInicial, nomeCompletoInicial, fotoUrlInicial, previewUrlInicial, matricula]);
+
+  const updatePreviewUrl = (nome: string, nomeCompleto: string, matricula: string, fotoUrl: string | null) => {
+    const cardId = matricula.startsWith("3") ? "3" : "7";
+    const url = `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(nome)}&nome_completo=${encodeURIComponent(nomeCompleto)}&matricula=${encodeURIComponent(matricula)}&foto=${fotoUrl ? encodeURIComponent(fotoUrl) : ""}&id=${cardId}`;
+    setPreviewUrl(url);
+  };
 
   const handleUploadFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -47,6 +63,9 @@ const CardForm: React.FC<CardFormProps> = ({
       
       const url = URL.createObjectURL(file);
       setFotoUrl(url);
+      
+      // Atualizar preview com nova foto
+      updatePreviewUrl(nomeAbreviado, nomeCompleto, matricula, url);
     }
   };
   
@@ -69,7 +88,7 @@ const CardForm: React.FC<CardFormProps> = ({
       return;
     }
 
-    if (!foto) {
+    if (!fotoUrl) {
       toast({
         title: "Erro",
         description: "Por favor adicione uma foto",
@@ -121,12 +140,12 @@ const CardForm: React.FC<CardFormProps> = ({
           <p className="text-sm text-gray-600">Esta é uma pré-visualização digital ilustrativa de como ficará o seu cartão.</p>
         </div>
         <div className="p-4 h-full flex items-center justify-center">
-          <img 
+          <iframe 
             src={previewUrl} 
-            alt="Modelo do Cartão" 
-            className="w-full h-auto object-contain shadow-lg rounded-xl"
-            draggable="false"
-            onContextMenu={(e) => e.preventDefault()}
+            className="w-full h-[450px] border-none rounded-xl shadow-lg"
+            frameBorder="0"
+            scrolling="no"
+            title="Previsualização do Cartão"
           />
         </div>
       </div>
@@ -141,7 +160,10 @@ const CardForm: React.FC<CardFormProps> = ({
             <Input 
               placeholder="Digite seu nome abreviado" 
               value={nomeAbreviado} 
-              onChange={(e) => setNomeAbreviado(e.target.value)}
+              onChange={(e) => {
+                setNomeAbreviado(e.target.value);
+                updatePreviewUrl(e.target.value, nomeCompleto, matricula, fotoUrl);
+              }}
               className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all"
               readOnly={!!nomeAbreviadoInicial}
             />
@@ -155,7 +177,10 @@ const CardForm: React.FC<CardFormProps> = ({
             <Input 
               placeholder="Digite seu nome completo" 
               value={nomeCompleto} 
-              onChange={(e) => setNomeCompleto(e.target.value)}
+              onChange={(e) => {
+                setNomeCompleto(e.target.value);
+                updatePreviewUrl(nomeAbreviado, e.target.value, matricula, fotoUrl);
+              }}
               className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all"
               readOnly={!!nomeCompletoInicial}
             />
@@ -183,6 +208,7 @@ const CardForm: React.FC<CardFormProps> = ({
                 <div className="flex flex-col items-center">
                   <Upload className="h-8 w-8 text-[#8cdcd8] mb-2" />
                   <span className="text-sm text-gray-500">Clique para selecionar</span>
+                  {fotoUrl && !foto && <span className="text-xs text-green-600 mt-2">Foto já cadastrada</span>}
                   {foto && <span className="text-xs text-green-600 mt-2">Foto selecionada: {foto.name}</span>}
                 </div>
                 <Input

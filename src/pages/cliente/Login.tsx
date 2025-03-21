@@ -1,6 +1,6 @@
 
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import LoginScreen from "@/components/cliente/LoginScreen";
 import { useToast } from "@/hooks/use-toast";
 
@@ -20,13 +20,28 @@ const usuariosDB = [
     matricula: "98765", 
     nomeAbreviado: "PEDRO GOMES", 
     nomeCompleto: "Pedro Gomes Ferreira"
+  },
+  { 
+    matricula: "3456789", 
+    nomeAbreviado: "JOSÉ", 
+    nomeCompleto: "José da Silva Santos"
   }
 ];
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+
+  // Verificar se o usuário já está logado ao carregar a página
+  useEffect(() => {
+    const dadosUsuarioJSON = localStorage.getItem("usuarioDados");
+    if (dadosUsuarioJSON) {
+      // Se já estiver logado, redireciona para a página de cadastro
+      navigate("/cliente/cadastro");
+    }
+  }, [navigate]);
 
   const handleLogin = (matricula: string) => {
     setIsLoading(true);
@@ -37,7 +52,12 @@ const Login = () => {
       
       if (usuarioEncontrado) {
         // Armazenar os dados do usuário no localStorage
-        localStorage.setItem("usuarioDados", JSON.stringify(usuarioEncontrado));
+        localStorage.setItem("usuarioDados", JSON.stringify({
+          ...usuarioEncontrado,
+          foto: usuarioEncontrado.matricula === "3456789" ? 
+            "https://www.psicologo.com.br/wp-content/uploads/sou-uma-pessoa-boa-ou-nao.jpg" : 
+            null
+        }));
         navigate("/cliente/cadastro");
       } else {
         toast({

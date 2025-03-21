@@ -17,6 +17,7 @@ const Cadastro = () => {
     matricula: string;
     nomeAbreviado: string;
     nomeCompleto: string;
+    foto?: string | null;
   } | null>(null);
   
   const [foto, setFoto] = useState<File | null>(null);
@@ -52,6 +53,16 @@ const Cadastro = () => {
       setUsuarioDados(dadosUsuario);
       setNomeAbreviado(dadosUsuario.nomeAbreviado);
       setNomeCompleto(dadosUsuario.nomeCompleto);
+      
+      // Se o usuário já tiver foto, definir a URL da foto
+      if (dadosUsuario.foto) {
+        setFotoUrl(dadosUsuario.foto);
+      }
+      
+      // Gerar URL de pré-visualização
+      const cardId = dadosUsuario.matricula.startsWith("3") ? "3" : "7";
+      const previewUrl = `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(dadosUsuario.nomeAbreviado)}&nome_completo=${encodeURIComponent(dadosUsuario.nomeCompleto)}&matricula=${encodeURIComponent(dadosUsuario.matricula)}&foto=${dadosUsuario.foto ? encodeURIComponent(dadosUsuario.foto) : ""}&id=${cardId}`;
+      setPreviewUrl(previewUrl);
     } catch (error) {
       console.error("Erro ao processar dados do usuário:", error);
       toast({
@@ -222,6 +233,8 @@ const Cadastro = () => {
               matricula={usuarioDados.matricula}
               nomeAbreviadoInicial={usuarioDados.nomeAbreviado}
               nomeCompletoInicial={usuarioDados.nomeCompleto}
+              fotoUrlInicial={usuarioDados.foto || null}
+              previewUrlInicial={previewUrl}
               onCardSaved={handleCardSaved}
             />
           </div>
