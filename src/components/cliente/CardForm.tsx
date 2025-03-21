@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -6,8 +7,6 @@ import { Upload, Save, CreditCard, User, BadgeCheck, Camera, Type, Send, AlertCi
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cardService } from "@/services/cardService";
-import { storageService } from "@/services/storageService";
 
 interface CardFormProps {
   matricula: string;
@@ -45,18 +44,22 @@ const CardForm: React.FC<CardFormProps> = ({
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   const [nomeCompletoError, setNomeCompletoError] = useState(false);
   
+  // Updated maximum character limit for nome completo from 23 to 27
   const MAX_NOME_COMPLETO_LENGTH = 27;
   
   useEffect(() => {
+    // Initialize with initial values if provided
     if (nomeAbreviadoInicial) setNomeAbreviado(nomeAbreviadoInicial);
     if (nomeCompletoInicial) {
       setNomeCompleto(nomeCompletoInicial);
+      // Check if initial value already exceeds limit
       if (nomeCompletoInicial.length > MAX_NOME_COMPLETO_LENGTH) {
         setNomeCompletoError(true);
       }
     }
     if (fotoUrlInicial) setFotoUrl(fotoUrlInicial);
     
+    // Set initial preview with placeholder values if fields are empty
     updatePreviewUrl(
       nomeAbreviadoInicial || "", 
       nomeCompletoInicial || "", 
@@ -66,6 +69,7 @@ const CardForm: React.FC<CardFormProps> = ({
   }, [matricula, nomeAbreviadoInicial, nomeCompletoInicial, fotoUrlInicial]);
 
   const isValidMatricula = (mat: string) => {
+    // Validate that matricula starts with 3 or 7
     return mat.startsWith('3') || mat.startsWith('7');
   };
 
@@ -73,15 +77,18 @@ const CardForm: React.FC<CardFormProps> = ({
     setIsPreviewLoading(true);
     const cardId = matricula.startsWith("3") ? "3" : "7";
     
+    // Use placeholder values for empty fields to avoid errors
     const displayNome = nome.trim() ? nome : "NOME";
     const displayNomeCompleto = nomeCompleto.trim() ? nomeCompleto : "NOME COMPLETO";
     const displayMatricula = matricula.trim() ? matricula : "00000000";
     
+    // Add parameters to maintain exact format and prevent resizing
     const url = `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(displayNome)}&nome_completo=${encodeURIComponent(displayNomeCompleto)}&matricula=${encodeURIComponent(displayMatricula)}&foto=${fotoUrl ? encodeURIComponent(fotoUrl) : ""}&id=${cardId}&keep_case=true&no_resize=true`;
     
     setPreviewUrl(url);
   };
 
+  // Handler for when the preview iframe finishes loading
   const handlePreviewLoad = () => {
     setIsPreviewLoading(false);
   };
@@ -94,6 +101,7 @@ const CardForm: React.FC<CardFormProps> = ({
       const url = URL.createObjectURL(file);
       setFotoUrl(url);
       
+      // Update preview with new photo
       updatePreviewUrl(nomeAbreviado, nomeCompleto, matricula, url);
     }
   };
@@ -102,12 +110,14 @@ const CardForm: React.FC<CardFormProps> = ({
     const value = e.target.value;
     setNomeCompleto(value);
     
+    // Validate name length and set error state
     if (value.length > MAX_NOME_COMPLETO_LENGTH) {
       setNomeCompletoError(true);
     } else {
       setNomeCompletoError(false);
     }
     
+    // Still update preview regardless of error
     updatePreviewUrl(nomeAbreviado, value, matricula, fotoUrl);
   };
   
@@ -160,46 +170,23 @@ const CardForm: React.FC<CardFormProps> = ({
     setIsSubmitting(true);
 
     try {
-      let uploadedPhotoUrl = fotoUrl;
-      
-      if (foto) {
-        const uploadResult = await storageService.uploadPhoto(foto, 'fotos-cartoes');
-        if (uploadResult.success) {
-          uploadedPhotoUrl = uploadResult.url;
-        } else {
-          throw new Error("Falha ao fazer upload da imagem");
-        }
-      }
-      
-      const usuarioDados = JSON.parse(localStorage.getItem("usuarioDados") || "{}");
-      const usuario_id = usuarioDados.id || "desconhecido";
-      
-      const cardResult = await cardService.saveCard({
-        usuario_id,
-        matricula,
-        nome_abreviado: nomeAbreviado,
-        nome_completo: nomeCompleto,
-        foto_url: uploadedPhotoUrl,
-        preview_url: previewUrl
+      // Aqui será implementada a lógica para enviar os dados ao banco de dados
+      // Por enquanto, apenas simularemos um atraso para mostrar o processo
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      toast({
+        title: "Sucesso",
+        description: "Dados do cartão salvos com sucesso",
+        className: "bg-[#8cdcd8]/20 border-[#8cdcd8]",
       });
       
-      if (cardResult.success) {
-        toast({
-          title: "Sucesso",
-          description: "Dados do cartão salvos com sucesso",
-          className: "bg-[#8cdcd8]/20 border-[#8cdcd8]",
-        });
-        
-        onCardSaved({
-          nomeAbreviado,
-          nomeCompleto,
-          foto,
-          fotoUrl: uploadedPhotoUrl,
-          previewUrl
-        });
-      } else {
-        throw new Error("Falha ao salvar o cartão");
-      }
+      onCardSaved({
+        nomeAbreviado,
+        nomeCompleto,
+        foto,
+        fotoUrl,
+        previewUrl
+      });
     } catch (error) {
       console.error("Erro ao salvar cartão:", error);
       toast({
@@ -223,6 +210,7 @@ const CardForm: React.FC<CardFormProps> = ({
           <p className="text-sm text-gray-600">Esta é uma pré-visualização digital ilustrativa de como ficará o seu cartão.</p>
         </div>
         <div className="p-4 h-full flex items-center justify-center">
+          {/* Card preview container with exact 292x451 dimensions */}
           <div className="relative overflow-hidden rounded-xl shadow-lg" style={{ 
             width: '292px',
             height: '451px',

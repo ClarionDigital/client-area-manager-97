@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -25,7 +26,6 @@ import TodosCartoes from "./pages/admin/TodosCartoes";
 import PreenchidosLinks from "./pages/admin/PreenchidosLinks";
 import NovoPedido from "./pages/admin/NovoPedido";
 import GerenciarUsuarios from "./pages/admin/GerenciarUsuarios";
-import Integracoes from "./pages/admin/Integracoes";
 
 const queryClient = new QueryClient();
 
@@ -64,7 +64,6 @@ const App = () => (
                   <Route path="preenchidos-links" element={<PreenchidosLinks />} />
                   <Route path="novo-pedido" element={<NovoPedido />} />
                   <Route path="gerenciar-usuarios" element={<GerenciarUsuarios />} />
-                  <Route path="integracoes" element={<Integracoes />} />
                 </Route>
               </Route>
             </Route>
