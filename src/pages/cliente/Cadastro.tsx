@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -34,7 +33,42 @@ const Cadastro = () => {
       return;
     }
     setMatricula(storedMatricula);
-  }, [navigate]);
+    
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+    document.addEventListener('keydown', (e) => {
+      if (
+        (e.ctrlKey && (e.key === 'p' || e.key === 's' || e.key === 'u')) || 
+        e.key === 'PrintScreen' || 
+        e.key === 'F12'
+      ) {
+        e.preventDefault();
+        toast({
+          title: "Ação bloqueada",
+          description: "A impressão e captura de tela não são permitidas por motivos de segurança.",
+          variant: "destructive",
+        });
+      }
+    });
+    
+    window.addEventListener('beforeprint', (e) => {
+      e.preventDefault();
+      toast({
+        title: "Ação bloqueada",
+        description: "A impressão não é permitida por motivos de segurança.",
+        variant: "destructive",
+      });
+      return false;
+    });
+    
+    document.body.style.userSelect = 'none';
+    
+    return () => {
+      document.removeEventListener('contextmenu', (e) => e.preventDefault());
+      document.removeEventListener('keydown', (e) => e.preventDefault());
+      window.removeEventListener('beforeprint', (e) => e.preventDefault());
+      document.body.style.userSelect = '';
+    };
+  }, [navigate, toast]);
   
   const handleCardSaved = (cardData: {
     nomeAbreviado: string;
@@ -139,6 +173,8 @@ const Cadastro = () => {
               src="https://areadocliente.alternativacard.com/up/uploads/alt-67d9cda455e18.png" 
               alt="CrachaShop" 
               className="h-12 md:h-16 mb-6"
+              draggable="false"
+              onContextMenu={(e) => e.preventDefault()}
             />
             
             <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">Dados do Cartão</h2>
@@ -180,6 +216,8 @@ const Cadastro = () => {
               src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Light_Servi%C3%A7os_Eletricidade.svg/1200px-Light_Servi%C3%A7os_Eletricidade.svg.png" 
               alt="Light" 
               className="h-12 mt-4"
+              draggable="false"
+              onContextMenu={(e) => e.preventDefault()}
             />
           </div>
         </Card>

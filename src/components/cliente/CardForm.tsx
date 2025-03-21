@@ -110,11 +110,17 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
       <div className="flex flex-col items-center md:col-span-1">
-        <div className="w-full h-96 rounded-lg overflow-hidden shadow-lg mb-4">
+        <div className="w-full mb-3 text-center">
+          <h3 className="text-lg font-semibold text-gray-800 mb-1">Pré-Visualização</h3>
+          <p className="text-sm text-gray-600">Esta é uma pré-visualização digital ilustrativa de como ficará o seu cartão.</p>
+        </div>
+        <div className="w-full h-[450px] rounded-lg overflow-hidden shadow-lg mb-4 select-none">
           <img 
             src={previewUrl} 
             alt="Modelo do Cartão" 
             className="w-full h-full object-contain"
+            draggable="false"
+            onContextMenu={(e) => e.preventDefault()}
           />
         </div>
       </div>
