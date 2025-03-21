@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -25,7 +24,6 @@ const Cadastro = () => {
   
   const valorUnitario = 66.40;
   
-  // Verificar se o usuário já fez login
   useEffect(() => {
     const storedMatricula = localStorage.getItem("matricula");
     if (!storedMatricula) {
@@ -102,40 +100,8 @@ const Cadastro = () => {
     setIsSubmitting(true);
     
     try {
-      // Aqui será implementada a lógica para enviar os dados ao banco de dados
-      // Por enquanto, apenas simularemos um atraso para mostrar o processo
       await new Promise(resolve => setTimeout(resolve, 800));
 
-      // Quando tivermos uma integração real com banco de dados:
-      // const pedidoData = {
-      //   matricula,
-      //   nomeAbreviado,
-      //   nomeCompleto: formNome.value,
-      //   cpf: formCpf.value,
-      //   email: formEmail.value,
-      //   telefone: formTelefone.value,
-      //   quantidade: quantity,
-      //   valorUnitario,
-      //   valorTotal: quantity * valorUnitario,
-      //   status: 'aguardando_pagamento',
-      //   dataCriacao: new Date().toISOString(),
-      //   previewUrl: previewUrl,
-      // };
-      // const fotoData = new FormData();
-      // if (foto) fotoData.append('foto', foto);
-      // const response = await fetch('/api/pedidos', { 
-      //   method: 'POST', 
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(pedidoData)
-      // });
-      // if (!response.ok) throw new Error('Falha ao criar pedido');
-      // const { id: pedidoId } = await response.json();
-      // if (foto) {
-      //   fotoData.append('pedidoId', pedidoId);
-      //   await fetch('/api/upload/foto', { method: 'POST', body: fotoData });
-      // }
-
-      // Salvando os dados no localStorage para uso na página de pagamento (temporário)
       const clienteData = {
         nomeCompleto: formNome.value,
         cpf: formCpf.value,
@@ -145,7 +111,6 @@ const Cadastro = () => {
         valorUnitario,
         nomeAbreviado,
         previewUrl,
-        // idPedido: 'temporario-' + Date.now(), // No futuro, virá do banco de dados
       };
       
       localStorage.setItem("clienteData", JSON.stringify(clienteData));
