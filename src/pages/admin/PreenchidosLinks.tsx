@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import PreenchidosLinkTab from '@/components/admin/tabs/PreenchidosLinkTab';
+import LinkGenerator from '@/components/admin/LinkGenerator';
 import { useToast } from '@/hooks/use-toast';
 
 // Mock data for demonstration purposes
@@ -92,8 +93,11 @@ const PreenchidosLinks: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="space-y-8">
       <h1 className="text-2xl font-bold mb-6">Preenchidos por Link e Portal Individual</h1>
+      
+      <LinkGenerator />
+      
       <PreenchidosLinkTab 
         preenchidosPorLink={preenchidosPorLink}
         onDownload={handleDownloadPlanilha}
