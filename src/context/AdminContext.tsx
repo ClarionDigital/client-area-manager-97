@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState } from 'react';
-import { CardData, CardDataWithPhoto, UploadedEmployee, FinancialData } from '@/types/admin';
+import { CardData, CardDataWithPhoto, UploadedEmployee } from '@/types/admin';
 
 // Sample data
 const segundasVias: CardData[] = [
