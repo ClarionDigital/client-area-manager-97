@@ -1,25 +1,22 @@
 
 import React, { useState, useMemo } from 'react';
+import { useAdmin } from '@/context/AdminContext';
+import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash, Send } from "lucide-react";
-import { UploadedEmployee } from '@/types/admin';
 import SearchFilters from "@/components/admin/SearchFilters";
 import AdminPagination from "@/components/admin/AdminPagination";
 
-interface TodosDadosTabProps {
-  uploadedEmployees: UploadedEmployee[];
-  onDownloadPlanilha: () => void;
-  onRequestSecondCopy: (id: number) => void;
-  onDeleteEmployee: (id: number) => void;
-}
-
-const TodosDadosTab: React.FC<TodosDadosTabProps> = ({
-  uploadedEmployees,
-  onDownloadPlanilha,
-  onRequestSecondCopy,
-  onDeleteEmployee
-}) => {
+const TodosCartoes: React.FC = () => {
+  const { 
+    uploadedEmployees, 
+    handleDownloadPlanilha, 
+    handleRequestSecondCopy, 
+    handleDeleteUploadedEmployee 
+  } = useAdmin();
+  const { toast } = useToast();
+  
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
   const [typeFilter, setTypeFilter] = useState("todos");
@@ -60,7 +57,7 @@ const TodosDadosTab: React.FC<TodosDadosTabProps> = ({
         </h2>
         <Button
           variant="outline"
-          onClick={onDownloadPlanilha}
+          onClick={handleDownloadPlanilha}
         >
           Exportar Lista
         </Button>
@@ -112,7 +109,7 @@ const TodosDadosTab: React.FC<TodosDadosTabProps> = ({
                         variant="orange" 
                         size="sm" 
                         className="h-8 text-xs"
-                        onClick={() => onRequestSecondCopy(employee.id)}
+                        onClick={() => handleRequestSecondCopy(employee.id)}
                       >
                         PEDIR SEGUNDA VIA
                       </Button>
@@ -120,7 +117,7 @@ const TodosDadosTab: React.FC<TodosDadosTabProps> = ({
                         variant="destructive" 
                         size="icon"
                         className="h-8 w-8"
-                        onClick={() => onDeleteEmployee(employee.id)}
+                        onClick={() => handleDeleteUploadedEmployee(employee.id)}
                       >
                         <Trash className="h-4 w-4" />
                       </Button>
@@ -150,4 +147,4 @@ const TodosDadosTab: React.FC<TodosDadosTabProps> = ({
   );
 };
 
-export default TodosDadosTab;
+export default TodosCartoes;

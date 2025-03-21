@@ -1,22 +1,8 @@
-import React, { useState } from "react";
-import { Link } from 'react-router-dom';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
-import { useIsSmallMobile, useIsMobile } from "@/hooks/use-mobile";
 
-// Importações de componentes
-import Logo from "@/components/Logo";
-import CardsTab from "@/components/admin/tabs/CardsTab";
-import NovoPedidoTab from "@/components/admin/tabs/NovoPedidoTab";
-import PreenchidosLinkTab from "@/components/admin/tabs/PreenchidosLinkTab";
-import TodosDadosTab from "@/components/admin/tabs/TodosDadosTab";
+import React, { createContext, useContext, useState } from 'react';
+import { CardData, CardDataWithPhoto, UploadedEmployee, FinancialData } from '@/types/admin';
 
-// Importações de dados de exemplo
-import { CardData, UploadedEmployee } from '@/types/admin';
-
-// Dados de exemplo (versão simplificada)
+// Sample data
 const segundasVias: CardData[] = [
   { id: 1, nome: "Carlos Silva", matricula: "3001245", data: "12/05/2023", status: "Pago", valor: "--", tipo: "Light" },
   { id: 2, nome: "Maria Santos", matricula: "3018756", data: "15/05/2023", status: "Pago", valor: "--", tipo: "Light" },
@@ -30,7 +16,16 @@ const segundasVias: CardData[] = [
   { id: 10, nome: "Patrícia Rocha", matricula: "3045678", data: "29/05/2023", status: "Pago", valor: "--", tipo: "Light" },
 ];
 
-// Dados de exemplo para funcionários carregados
+const dadosCartoes: CardDataWithPhoto[] = [
+  { id: 1, nome: "Carlos Silva", primeiroNome: "Carlos", matricula: "3001245", cargo: "Analista", setor: "TI", validade: "12/2024", foto: true, tipo: "Light", data: "12/05/2023", status: "Ativo", valor: "--" },
+  { id: 2, nome: "Maria Santos", primeiroNome: "Maria", matricula: "3018756", cargo: "Coordenadora", setor: "RH", validade: "12/2024", foto: true, tipo: "Light", data: "15/05/2023", status: "Ativo", valor: "--" },
+  { id: 3, nome: "José Oliveira", primeiroNome: "José", matricula: "7042389", cargo: "Técnico", setor: "Operações", validade: "12/2024", foto: false, tipo: "Conecta", data: "18/05/2023", status: "Pendente", valor: "--" },
+  { id: 4, nome: "Ana Rodrigues", primeiroNome: "Ana", matricula: "3021567", cargo: "Gerente", setor: "Financeiro", validade: "12/2024", foto: true, tipo: "Light", data: "20/05/2023", status: "Ativo", valor: "--" },
+  { id: 5, nome: "Paulo Costa", primeiroNome: "Paulo", matricula: "7031298", cargo: "Supervisor", setor: "Atendimento", validade: "12/2024", foto: false, tipo: "Conecta", data: "22/05/2023", status: "Inativo", valor: "--" },
+  { id: 6, nome: "Fernanda Lima", primeiroNome: "Fernanda", matricula: "3025467", cargo: "Diretora", setor: "Comercial", validade: "12/2024", foto: true, tipo: "Light", data: "25/05/2023", status: "Ativo", valor: "--" },
+];
+
+// Sample uploaded employees data
 const mockUploadedEmployees: UploadedEmployee[] = [
   { id: 1, nome: "Carlos Silva", matricula: "3001245", cargo: "Analista", setor: "TI", validade: "12/2024", tipo: "Light", foto: true },
   { id: 2, nome: "Maria Santos", matricula: "3018756", cargo: "Coordenadora", setor: "RH", validade: "12/2024", tipo: "Light", foto: true },
@@ -39,7 +34,7 @@ const mockUploadedEmployees: UploadedEmployee[] = [
   { id: 5, nome: "Paulo Costa", matricula: "7031298", cargo: "Supervisor", setor: "Atendimento", validade: "12/2024", tipo: "Conecta", foto: true },
 ];
 
-// Dados de exemplo para usuários que preencheram via link
+// Sample data for users who filled the form via link
 const initialPreenchidosPorLink = [
   { id: 1, nome: "Roberto Almeida", primeiroNome: "Roberto", email: "roberto.almeida@email.com", telefone: "(21) 99876-5432", empresa: "ABC Ltda", matricula: "3001246", tipo: "Light", foto: false, validade: "12/2024", cargo: "Desenvolvedor", dataPreenchimento: "02/06/2023", linkId: "LINK-001", setor: "TI" },
   { id: 2, nome: "Camila Ferreira", primeiroNome: "Camila", email: "camila.ferreira@email.com", telefone: "(11) 98765-4321", empresa: "XYZ S.A.", matricula: "3001247", tipo: "Light", foto: false, validade: "12/2024", cargo: "Designer", dataPreenchimento: "03/06/2023", linkId: "LINK-001", setor: "Design" },
@@ -48,31 +43,47 @@ const initialPreenchidosPorLink = [
   { id: 5, nome: "Felipe Santos", primeiroNome: "Felipe", email: "felipe.santos@email.com", telefone: "(51) 95432-1098", empresa: "Inovação Ltd", matricula: "7031300", tipo: "Conecta", foto: false, validade: "12/2024", cargo: "Diretor de Marketing", dataPreenchimento: "06/06/2023", linkId: "LINK-003", setor: "Marketing" },
 ];
 
-const AdminArea = () => {
-  const { toast } = useToast();
-  const isMobile = useIsMobile();
-  const isSmallMobile = useIsSmallMobile();
+interface AdminContextType {
+  // Estados
+  cartoesGerados: CardData[];
+  uploadedEmployees: UploadedEmployee[];
+  selectedCardType: string;
+  preenchidosPorLink: any[];
+  novoPedido: UploadedEmployee[];
   
-  const [cartoesGerados, setCartoesGerados] = useState(segundasVias);
-  const [activeTab, setActiveTab] = useState("cartoes");
+  // Setters
+  setCartoesGerados: React.Dispatch<React.SetStateAction<CardData[]>>;
+  setUploadedEmployees: React.Dispatch<React.SetStateAction<UploadedEmployee[]>>;
+  setSelectedCardType: React.Dispatch<React.SetStateAction<string>>;
+  setPreenchidosPorLink: React.Dispatch<React.SetStateAction<any[]>>;
+  setNovoPedido: React.Dispatch<React.SetStateAction<UploadedEmployee[]>>;
+  
+  // Ações
+  handleExcluirCartao: (id: number) => void;
+  handleUploadPlanilha: (cardType: string) => void;
+  handleDownloadPlanilha: () => void;
+  handleSubmitOrder: () => void;
+  handleRequestSecondCopy: (id: number) => void;
+  handleDeleteUploadedEmployee: (id: number) => void;
+}
+
+export const AdminContext = createContext<AdminContextType | null>(null);
+
+export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [cartoesGerados, setCartoesGerados] = useState<CardData[]>(segundasVias);
   const [uploadedEmployees, setUploadedEmployees] = useState<UploadedEmployee[]>(mockUploadedEmployees);
   const [selectedCardType, setSelectedCardType] = useState<string>("Todos");
   const [preenchidosPorLink, setPreenchidosPorLink] = useState(initialPreenchidosPorLink);
   const [novoPedido, setNovoPedido] = useState<UploadedEmployee[]>([]);
   
+  // Funções de ação
   const handleExcluirCartao = (id: number) => {
     setCartoesGerados(cartoesGerados.filter(cartao => cartao.id !== id));
     setUploadedEmployees(uploadedEmployees.filter(employee => employee.id !== id));
-    
-    toast({
-      title: "Cartão excluído",
-      description: "O cartão foi removido com sucesso",
-    });
   };
   
   const handleUploadPlanilha = (cardType: string) => {
     setSelectedCardType(cardType);
-    setActiveTab("novo-pedido");
     
     const newEmployees: UploadedEmployee[] = [
       { id: Date.now(), nome: "Pedro Rocha", matricula: "3005678", tipo: "Light", foto: false, cargo: "Analista", setor: "TI", validade: "12/2024" },
@@ -81,25 +92,14 @@ const AdminArea = () => {
     ];
     
     setNovoPedido(newEmployees);
-    
-    toast({
-      title: "Planilha enviada",
-      description: `Os dados da planilha para cartões ${cardType} foram carregados`,
-    });
   };
 
   const handleDownloadPlanilha = () => {
-    toast({
-      title: "Download iniciado",
-      description: "A planilha está sendo baixada",
-    });
+    // Implementação do download
   };
 
   const handleSubmitOrder = () => {
-    toast({
-      title: "Pedido enviado com sucesso",
-      description: "Os cartões serão processados em breve",
-    });
+    // Implementação do envio do pedido
   };
 
   const handleRequestSecondCopy = (id: number) => {
@@ -124,108 +124,40 @@ const AdminArea = () => {
       };
       
       setPreenchidosPorLink(prev => [...prev, newEntry]);
-      
-      setActiveTab("preenchidos-link");
-      
-      toast({
-        title: "Segunda via solicitada",
-        description: `Segunda via para ${employee.nome} foi adicionada à lista`,
-      });
     }
   };
   
   const handleDeleteUploadedEmployee = (id: number) => {
     setUploadedEmployees(prev => prev.filter(emp => emp.id !== id));
-    toast({
-      title: "Registro excluído",
-      description: "O funcionário foi removido da lista",
-    });
+  };
+  
+  const value = {
+    cartoesGerados,
+    setCartoesGerados,
+    uploadedEmployees,
+    setUploadedEmployees,
+    selectedCardType,
+    setSelectedCardType,
+    preenchidosPorLink,
+    setPreenchidosPorLink,
+    novoPedido,
+    setNovoPedido,
+    handleExcluirCartao,
+    handleUploadPlanilha,
+    handleDownloadPlanilha,
+    handleSubmitOrder,
+    handleRequestSecondCopy,
+    handleDeleteUploadedEmployee
   };
 
-  const getTabLabel = (fullLabel: string, shortLabel: string) => {
-    if (isSmallMobile) return shortLabel;
-    return fullLabel;
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-[#52aa85]/5 to-[#52aa85]/10 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <Logo size="md" />
-          
-          <Link to="/admin-modular">
-            <Button variant="outline" className="text-brand-primary border-brand-primary hover:bg-brand-primary hover:text-white">
-              Acessar Nova Versão
-            </Button>
-          </Link>
-        </div>
-        
-        <Card className="border-[#52aa85]/20 shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-[#52aa85] to-[#004c48] text-white rounded-t-lg">
-            <CardTitle className="text-2xl font-bold">Painel de Controle</CardTitle>
-            <CardDescription className="text-white/80">
-              Gerencie segundas vias e cartões
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent className="p-6">
-            <Tabs defaultValue="cartoes" value={activeTab} onValueChange={setActiveTab} className="w-full tabs-responsive">
-              <TabsList className="grid w-full grid-cols-4 mb-8">
-                <TabsTrigger value="cartoes">
-                  {getTabLabel("Cartões Gerados", "Cartões")}
-                </TabsTrigger>
-                <TabsTrigger value="todos-dados">
-                  {getTabLabel("TODOS OS DADOS", "DADOS")}
-                </TabsTrigger>
-                <TabsTrigger value="preenchidos-link">
-                  {getTabLabel("Preenchidos pelo Link", "Link")}
-                </TabsTrigger>
-                <TabsTrigger value="novo-pedido">
-                  {getTabLabel("Criar Pedido", "Pedido")}
-                </TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="cartoes" className="space-y-6">
-                <CardsTab 
-                  cards={cartoesGerados}
-                  onDownload={handleDownloadPlanilha}
-                  onUpload={handleUploadPlanilha}
-                />
-              </TabsContent>
-              
-              <TabsContent value="todos-dados" className="space-y-6">
-                <TodosDadosTab 
-                  uploadedEmployees={uploadedEmployees}
-                  onDownloadPlanilha={handleDownloadPlanilha}
-                  onRequestSecondCopy={handleRequestSecondCopy}
-                  onDeleteEmployee={handleDeleteUploadedEmployee}
-                />
-              </TabsContent>
-              
-              <TabsContent value="preenchidos-link" className="space-y-6">
-                <PreenchidosLinkTab 
-                  preenchidosPorLink={preenchidosPorLink}
-                  onDownload={handleDownloadPlanilha}
-                  onSubmitOrder={handleSubmitOrder}
-                />
-              </TabsContent>
-              
-              <TabsContent value="novo-pedido" className="space-y-6">
-                <NovoPedidoTab 
-                  novoPedido={novoPedido}
-                  selectedCardType={selectedCardType}
-                  onDownloadTemplate={handleDownloadPlanilha}
-                  onUploadPlanilha={handleUploadPlanilha}
-                  onSubmitOrder={handleSubmitOrder}
-                  setNovoPedido={setNovoPedido}
-                />
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
+  return <AdminContext.Provider value={value}>{children}</AdminContext.Provider>;
 };
 
-export default AdminArea;
+// Hook para usar o contexto
+export const useAdmin = () => {
+  const context = useContext(AdminContext);
+  if (!context) {
+    throw new Error('useAdmin deve ser usado dentro de um AdminProvider');
+  }
+  return context;
+};

@@ -14,6 +14,14 @@ import AdminArea from "./pages/AdminArea";
 import AdminAltArea from "./pages/AdminAltArea";
 import NotFound from "./pages/NotFound";
 
+// Admin module routes
+import AdminModular from "./pages/admin";
+import AdminLayout from "./pages/admin/AdminLayout";
+import CartoesGerados from "./pages/admin/CartoesGerados";
+import TodosCartoes from "./pages/admin/TodosCartoes";
+import PreenchidosLinks from "./pages/admin/PreenchidosLinks";
+import NovoPedido from "./pages/admin/NovoPedido";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -32,8 +40,21 @@ const App = () => (
           <Route path="/cliente/pagamento" element={<Pagamento />} />
           <Route path="/cliente/confirmacao" element={<ConfirmacaoPagamento />} />
           
+          {/* Admin routes */}
           <Route path="/admin" element={<AdminArea />} />
           <Route path="/admin-alt" element={<AdminAltArea />} />
+          
+          {/* New modular admin routes */}
+          <Route path="/admin-modular" element={<AdminModular />}>
+            <Route element={<AdminLayout />}>
+              <Route index element={<Navigate to="/admin-modular/cartoes-gerados" replace />} />
+              <Route path="cartoes-gerados" element={<CartoesGerados />} />
+              <Route path="todos-cartoes" element={<TodosCartoes />} />
+              <Route path="preenchidos-links" element={<PreenchidosLinks />} />
+              <Route path="novo-pedido" element={<NovoPedido />} />
+            </Route>
+          </Route>
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
