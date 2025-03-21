@@ -11,9 +11,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Clipboard, QrCode, Share2, Copy } from "lucide-react";
+import { Clipboard, QrCode, Share2, Copy, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import QRCode from "qrcode.js";
+import QRCode from "qrcode";
 
 interface ShareLinkDialogProps {
   open: boolean;
