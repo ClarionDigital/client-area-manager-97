@@ -7,6 +7,7 @@ import { Upload, Save, CreditCard, User, BadgeCheck, Camera, Type } from "lucide
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
+import { getCardTypeFromEmployeeId } from "@/utils/cardHelpers";
 
 interface CardFormProps {
   matricula: string;
@@ -74,10 +75,15 @@ const CardForm: React.FC<CardFormProps> = ({
   }, [previewLoading]);
 
   const updatePreviewUrl = (nome: string, nomeCompleto: string, matricula: string, fotoUrl: string | null) => {
+    // Usando o utilitário para determinar o tipo de cartão
+    const cardType = getCardTypeFromEmployeeId(matricula);
     const cardId = matricula.startsWith("3") ? "3" : "7";
-    const url = `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(nome)}&nome_completo=${encodeURIComponent(nomeCompleto)}&matricula=${encodeURIComponent(matricula)}&foto=${fotoUrl ? encodeURIComponent(fotoUrl) : ""}&id=${cardId}`;
+    
+    // URL atualizada para exibir corretamente o cartão de amostra
+    const url = `https://areadocliente.alternativacard.com/up/card-model.php?nome=${encodeURIComponent(nome)}&nome_completo=${encodeURIComponent(nomeCompleto)}&matricula=${encodeURIComponent(matricula)}&foto=${fotoUrl ? encodeURIComponent(fotoUrl) : ""}&id=${cardId}&amostra=true`;
+    
     setPreviewUrl(url);
-    setPreviewLoading(true); // Reinicia o carregamento quando a URL muda
+    setPreviewLoading(true);
     setLoadingProgress(0);
   };
 
@@ -178,13 +184,10 @@ const CardForm: React.FC<CardFormProps> = ({
                 <p className="text-sm text-gray-500">Carregando cartão... {loadingProgress}%</p>
               </div>
             )}
-            <iframe 
+            <img 
               src={previewUrl} 
-              className="w-full h-full border-none"
-              style={{ width: "100%", height: "100%", border: "none", overflow: "hidden", transform: "scale(0.43)", transformOrigin: "top center" }}
-              frameBorder="0"
-              scrolling="no"
-              title="Previsualização do Cartão"
+              alt="Pré-visualização do cartão"
+              className="w-full h-full object-contain"
               onLoad={handleIframeLoad}
             />
           </div>

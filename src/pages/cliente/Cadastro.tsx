@@ -7,6 +7,7 @@ import CardForm from "@/components/cliente/CardForm";
 import PersonalInfoForm from "@/components/cliente/PersonalInfoForm";
 import OrderSummary from "@/components/cliente/OrderSummary";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getCardTypeFromEmployeeId } from "@/utils/cardHelpers";
 
 const Cadastro = () => {
   const navigate = useNavigate();
@@ -59,9 +60,9 @@ const Cadastro = () => {
         setFotoUrl(dadosUsuario.foto);
       }
       
-      // Gerar URL de pré-visualização
+      // Gerar URL de pré-visualização com a flag de amostra
       const cardId = dadosUsuario.matricula.startsWith("3") ? "3" : "7";
-      const previewUrl = `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(dadosUsuario.nomeAbreviado)}&nome_completo=${encodeURIComponent(dadosUsuario.nomeCompleto)}&matricula=${encodeURIComponent(dadosUsuario.matricula)}&foto=${dadosUsuario.foto ? encodeURIComponent(dadosUsuario.foto) : ""}&id=${cardId}`;
+      const previewUrl = `https://areadocliente.alternativacard.com/up/card-model.php?nome=${encodeURIComponent(dadosUsuario.nomeAbreviado)}&nome_completo=${encodeURIComponent(dadosUsuario.nomeCompleto)}&matricula=${encodeURIComponent(dadosUsuario.matricula)}&foto=${dadosUsuario.foto ? encodeURIComponent(dadosUsuario.foto) : ""}&id=${cardId}&amostra=true`;
       setPreviewUrl(previewUrl);
     } catch (error) {
       console.error("Erro ao processar dados do usuário:", error);
@@ -230,10 +231,10 @@ const Cadastro = () => {
             <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">Dados do Cartão</h2>
             
             <CardForm 
-              matricula={usuarioDados.matricula}
-              nomeAbreviadoInicial={usuarioDados.nomeAbreviado}
-              nomeCompletoInicial={usuarioDados.nomeCompleto}
-              fotoUrlInicial={usuarioDados.foto || null}
+              matricula={usuarioDados?.matricula || ""}
+              nomeAbreviadoInicial={usuarioDados?.nomeAbreviado}
+              nomeCompletoInicial={usuarioDados?.nomeCompleto}
+              fotoUrlInicial={usuarioDados?.foto || null}
               previewUrlInicial={previewUrl}
               onCardSaved={handleCardSaved}
             />
