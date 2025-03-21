@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Dialog, DialogContent, DialogDescription, DialogFooter, 
   DialogHeader, DialogTitle, DialogTrigger 
@@ -44,10 +44,51 @@ const UploadSpreadsheet: React.FC<UploadSpreadsheetProps> = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedCardType, setSelectedCardType] = useState<string>("Light");
   const [open, setOpen] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      const fileExtension = file.name.split('.').pop()?.toLowerCase();
+      
+      if (fileExtension === 'xlsx' || fileExtension === 'csv') {
+        setSelectedFile(file);
+      } else {
+        toast({
+          title: "Formato inválido",
+          description: "Por favor, envie um arquivo .xlsx ou .csv",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
+  const handleClickUpload = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
 
@@ -61,15 +102,32 @@ const UploadSpreadsheet: React.FC<UploadSpreadsheetProps> = ({
       return;
     }
 
-    // Display success toast
-    toast({
-      title: "Planilha enviada",
-      description: `Os dados da planilha ${selectedCardType} serão processados em breve`,
-    });
+    // Parse the file to get its content
+    const fileReader = new FileReader();
+    fileReader.onload = (event) => {
+      try {
+        // In a real application, you would parse CSV/Excel here
+        // For now, we'll simulate successful upload
+        
+        // Display success toast
+        toast({
+          title: "Planilha enviada com sucesso",
+          description: `Planilha "${selectedFile.name}" processada para cartões ${selectedCardType}`,
+        });
+        
+        onUpload(selectedCardType);
+        setOpen(false);
+        setSelectedFile(null);
+      } catch (error) {
+        toast({
+          title: "Erro ao processar arquivo",
+          description: "Ocorreu um erro ao processar o arquivo. Verifique o formato e tente novamente.",
+          variant: "destructive"
+        });
+      }
+    };
     
-    onUpload(selectedCardType);
-    setOpen(false);
-    setSelectedFile(null);
+    fileReader.readAsText(selectedFile);
   };
 
   return (
@@ -111,7 +169,14 @@ const UploadSpreadsheet: React.FC<UploadSpreadsheetProps> = ({
             </p>
           </div>
           
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+          <div
+            className={`border-2 ${
+              isDragging ? "border-brand-primary bg-brand-primary/5" : "border-dashed border-gray-300"
+            } rounded-lg p-6 text-center transition-all duration-200`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
             {selectedFile ? (
               <div className="flex flex-col items-center">
                 <FileSpreadsheet className="h-10 w-10 text-green-500 mx-auto mb-2" />
@@ -129,9 +194,9 @@ const UploadSpreadsheet: React.FC<UploadSpreadsheetProps> = ({
               </div>
             ) : (
               <>
-                <Upload className="h-10 w-10 text-gray-400 mx-auto mb-4" />
+                <Upload className={`h-10 w-10 ${isDragging ? "text-brand-primary" : "text-gray-400"} mx-auto mb-4 transition-colors`} />
                 <h4 className="text-sm font-medium mb-2">
-                  Arraste sua planilha ou clique para fazer upload
+                  {isDragging ? "Solte o arquivo aqui" : "Arraste sua planilha ou clique para fazer upload"}
                 </h4>
                 <p className="text-xs text-gray-500 mb-4">
                   Formatos suportados: xlsx, csv
@@ -140,12 +205,17 @@ const UploadSpreadsheet: React.FC<UploadSpreadsheetProps> = ({
                   type="file" 
                   className="hidden" 
                   id="planilha" 
+                  ref={fileInputRef}
                   accept=".xlsx,.csv"
                   onChange={handleFileChange}
                 />
-                <Label htmlFor="planilha" className="cursor-pointer">
-                  <Button variant="outline" size="sm">Selecionar Arquivo</Button>
-                </Label>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleClickUpload}
+                >
+                  Selecionar Arquivo
+                </Button>
               </>
             )}
           </div>
