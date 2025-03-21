@@ -118,8 +118,8 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({
                     <tbody>
                       <tr className="border-b border-gray-200">
                         <td className="py-3">
-                          <div className="font-medium">Kit Completo Light</div>
-                          <div className="text-gray-500 text-xs">Crachá PVC + Cordão + Porta Crachá</div>
+                          <div className="font-medium">KIT Funcional Light</div>
+                          <div className="text-gray-500 text-xs">contendo Cartão PVC, Cordão Digital e Porta crachá</div>
                         </td>
                         <td className="text-center py-3">{quantity}</td>
                         <td className="text-right py-3">R$ {valorUnitario.toFixed(2)}</td>

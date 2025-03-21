@@ -37,7 +37,11 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         <div className="space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Produto:</span>
-            <span className="font-medium">Cartão Funcional Light</span>
+            <span className="font-medium">KIT Funcional Light</span>
+          </div>
+          
+          <div className="text-xs text-gray-500 ml-auto">
+            contendo Cartão PVC, Cordão Digital e Porta crachá
           </div>
           
           <div className="flex justify-between items-center">
