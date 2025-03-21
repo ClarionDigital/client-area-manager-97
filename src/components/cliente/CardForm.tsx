@@ -44,8 +44,7 @@ const CardForm: React.FC<CardFormProps> = ({
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
   
   useEffect(() => {
-    // We're not using initial values anymore since we want the form to be filled from scratch
-    // Just update the preview initially
+    // Set initial preview with placeholder values if fields are empty
     updatePreviewUrl("", "", matricula, null);
   }, [matricula]);
 
@@ -53,8 +52,13 @@ const CardForm: React.FC<CardFormProps> = ({
     setIsPreviewLoading(true);
     const cardId = matricula.startsWith("3") ? "3" : "7";
     
-    // Adicionar parâmetros para manter o formato exato e prevenir redimensionamento
-    const url = `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(nome)}&nome_completo=${encodeURIComponent(nomeCompleto)}&matricula=${encodeURIComponent(matricula)}&foto=${fotoUrl ? encodeURIComponent(fotoUrl) : ""}&id=${cardId}&keep_case=true&no_resize=true`;
+    // Use placeholder values for empty fields to avoid errors
+    const displayNome = nome.trim() ? nome : "NOME";
+    const displayNomeCompleto = nomeCompleto.trim() ? nomeCompleto : "NOME COMPLETO";
+    const displayMatricula = matricula.trim() ? matricula : "00000000";
+    
+    // Add parameters to maintain exact format and prevent resizing
+    const url = `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(displayNome)}&nome_completo=${encodeURIComponent(displayNomeCompleto)}&matricula=${encodeURIComponent(displayMatricula)}&foto=${fotoUrl ? encodeURIComponent(fotoUrl) : ""}&id=${cardId}&keep_case=true&no_resize=true`;
     
     setPreviewUrl(url);
   };
@@ -72,7 +76,7 @@ const CardForm: React.FC<CardFormProps> = ({
       const url = URL.createObjectURL(file);
       setFotoUrl(url);
       
-      // Atualizar preview com nova foto
+      // Update preview with new photo
       updatePreviewUrl(nomeAbreviado, nomeCompleto, matricula, url);
     }
   };
