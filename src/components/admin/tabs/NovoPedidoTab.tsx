@@ -6,6 +6,7 @@ import EmployeeTable from '../EmployeeTable';
 import ToolbarActions from '../ToolbarActions';
 import PhotoUploader from '../PhotoUploader';
 import OrderSubmitButton from '../OrderSubmitButton';
+import CardPreview from '../CardPreview';
 import { useToast } from "@/hooks/use-toast";
 
 interface NovoPedidoTabProps {
@@ -28,6 +29,7 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
   const { toast } = useToast();
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState<UploadedEmployee | null>(null);
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
 
   const handleDeleteEmployee = (id: number) => {
     setNovoPedido(prev => prev.filter(emp => emp.id !== id));
@@ -77,11 +79,31 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
     return true;
   };
 
-  const handleSubmit = () => {
+  const handleAdvance = () => {
     if (validateOrder()) {
-      onSubmitOrder();
+      setIsPreviewMode(true);
+      window.scrollTo(0, 0);
     }
   };
+
+  const handleGoBack = () => {
+    setIsPreviewMode(false);
+  };
+
+  const handleSubmit = () => {
+    onSubmitOrder();
+    setIsPreviewMode(false);
+  };
+
+  if (isPreviewMode) {
+    return (
+      <CardPreview 
+        employees={novoPedido}
+        onGoBack={handleGoBack}
+        onSubmit={handleSubmit}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -119,7 +141,14 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
       </div>
       
       {novoPedido.length > 0 && (
-        <OrderSubmitButton onClick={handleSubmit} />
+        <div className="flex justify-end">
+          <button
+            onClick={handleAdvance}
+            className="bg-[#062b48] hover:bg-[#031e33] text-white rounded-md px-4 py-2 flex items-center"
+          >
+            Avançar
+          </button>
+        </div>
       )}
 
       {selectedEmployee && (

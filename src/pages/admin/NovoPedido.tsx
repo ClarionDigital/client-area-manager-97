@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAdmin } from '@/context/AdminContext';
 import { useToast } from '@/hooks/use-toast';
 import NovoPedidoTab from '@/components/admin/tabs/NovoPedidoTab';
