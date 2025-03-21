@@ -19,6 +19,7 @@ import {
   PaginationPrevious,
   PaginationEllipsis 
 } from "@/components/ui/pagination";
+import NovoPedidoTab from "@/components/admin/tabs/NovoPedidoTab";
 
 // Import sample data
 import { CardData, CardDataWithPhoto, UploadedEmployee } from '@/types/admin';
@@ -505,114 +506,14 @@ const AdminArea = () => {
               </TabsContent>
               
               <TabsContent value="novo-pedido" className="space-y-6">
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-semibold text-gray-800">
-                      Criar Novo Pedido
-                    </h2>
-                    <div className="flex space-x-2">
-                      <Button 
-                        variant="outline"
-                        onClick={handleDownloadPlanilha}
-                        className="flex items-center gap-2"
-                      >
-                        <Download className="h-4 w-4" />
-                        Baixar Modelo
-                      </Button>
-                      <Button
-                        variant="brand"
-                        className="flex items-center gap-2"
-                        onClick={() => document.getElementById('upload-planilha')?.click()}
-                      >
-                        <Upload className="h-4 w-4" />
-                        Importar Planilha
-                      </Button>
-                      <input 
-                        type="file" 
-                        id="upload-planilha" 
-                        className="hidden" 
-                        accept=".xlsx,.csv"
-                        onChange={() => handleUploadPlanilha(selectedCardType || "Light")}
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="rounded-md border overflow-hidden">
-                    <Table>
-                      <TableHeader>
-                        <TableRow className="bg-gray-50">
-                          <TableHead>Nome</TableHead>
-                          <TableHead>Nome Completo</TableHead>
-                          <TableHead>Matrícula</TableHead>
-                          <TableHead>Foto</TableHead>
-                          <TableHead className="text-right">Ações</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {novoPedido.length > 0 ? (
-                          novoPedido.map((employee) => (
-                            <TableRow key={employee.id} className="hover:bg-brand-primary/5">
-                              <TableCell className="font-medium">{employee.nome.split(' ')[0]}</TableCell>
-                              <TableCell>{employee.nome}</TableCell>
-                              <TableCell>
-                                <span className={`${employee.matricula.startsWith('3') ? 'text-brand-primary' : 'text-blue-600'} font-medium`}>
-                                  {employee.matricula}
-                                </span>
-                              </TableCell>
-                              <TableCell>
-                                {employee.foto ? (
-                                  <span className="text-green-600 font-medium">Sim</span>
-                                ) : (
-                                  <span className="text-red-600 font-medium">Não</span>
-                                )}
-                              </TableCell>
-                              <TableCell className="text-right">
-                                <div className="flex justify-end gap-2">
-                                  <Button 
-                                    variant="outline" 
-                                    size="sm"
-                                    className="h-8 text-xs"
-                                  >
-                                    <PlusCircle className="h-3.5 w-3.5 mr-1" />
-                                    Adicionar Foto
-                                  </Button>
-                                  <Button 
-                                    variant="destructive" 
-                                    size="icon"
-                                    className="h-8 w-8"
-                                    onClick={() => setNovoPedido(prev => prev.filter(emp => emp.id !== employee.id))}
-                                  >
-                                    <Trash className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              </TableCell>
-                            </TableRow>
-                          ))
-                        ) : (
-                          <TableRow>
-                            <TableCell colSpan={5} className="text-center py-6 text-gray-500">
-                              Nenhum funcionário adicionado. Importe uma planilha para começar.
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-                  
-                  {novoPedido.length > 0 && (
-                    <div className="flex justify-center mt-8">
-                      <Button 
-                        variant="orange" 
-                        size="lg" 
-                        onClick={handleSubmitOrder}
-                        className="px-8"
-                      >
-                        <Send className="mr-2 h-5 w-5" />
-                        ENVIAR PEDIDO
-                      </Button>
-                    </div>
-                  )}
-                </div>
+                <NovoPedidoTab 
+                  novoPedido={novoPedido}
+                  selectedCardType={selectedCardType}
+                  onDownloadTemplate={handleDownloadPlanilha}
+                  onUploadPlanilha={handleUploadPlanilha}
+                  onSubmitOrder={handleSubmitOrder}
+                  setNovoPedido={setNovoPedido}
+                />
               </TabsContent>
             </Tabs>
           </CardContent>
