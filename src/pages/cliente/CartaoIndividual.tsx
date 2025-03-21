@@ -7,7 +7,7 @@ import CardForm from "@/components/cliente/CardForm";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Search, Check } from "lucide-react";
+import { Search, Check, AlertCircle } from "lucide-react";
 import { createIndividualCardEntry } from "@/utils/cardHelpers";
 
 const CartaoIndividual = () => {
@@ -32,6 +32,11 @@ const CartaoIndividual = () => {
     }
   }, [location]);
 
+  const isValidMatricula = (mat: string): boolean => {
+    // Validate that matricula starts with 3 or 7 and has a minimum length
+    return (mat.startsWith('3') || mat.startsWith('7')) && mat.length >= 5;
+  };
+
   const handleSearch = (mat?: string) => {
     setLoading(true);
     
@@ -40,7 +45,7 @@ const CartaoIndividual = () => {
     setTimeout(() => {
       const searchMatricula = mat || matricula;
       
-      if (searchMatricula.length >= 5) {
+      if (isValidMatricula(searchMatricula)) {
         // Just validate matricula format and create a basic record
         setFuncionarioDados({
           matricula: searchMatricula
@@ -50,7 +55,7 @@ const CartaoIndividual = () => {
       } else {
         toast({
           title: "Erro",
-          description: "Matrícula inválida. Por favor, tente novamente.",
+          description: "Matrícula inválida. A matrícula deve começar com 3 ou 7.",
           variant: "destructive",
         });
         setFound(false);
@@ -166,14 +171,14 @@ const CartaoIndividual = () => {
                     <div className="flex gap-2">
                       <Input
                         id="matricula"
-                        placeholder="Digite sua matrícula"
+                        placeholder="Digite sua matrícula (começa com 3 ou 7)"
                         value={matricula}
                         onChange={(e) => setMatricula(e.target.value)}
-                        className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all"
+                        className={`shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all ${matricula && !isValidMatricula(matricula) ? 'border-red-500' : ''}`}
                       />
                       <Button 
                         onClick={() => handleSearch()}
-                        disabled={loading || matricula.length < 5}
+                        disabled={loading || !isValidMatricula(matricula)}
                         className="bg-[#8cdcd8] hover:bg-[#7cc9c5] text-white"
                       >
                         {loading ? (
@@ -183,9 +188,16 @@ const CartaoIndividual = () => {
                         )}
                       </Button>
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Digite sua matrícula para preencher os dados do seu cartão
-                    </p>
+                    {matricula && !isValidMatricula(matricula) ? (
+                      <div className="flex items-center gap-1.5 text-sm text-red-500 mt-1">
+                        <AlertCircle className="h-4 w-4" />
+                        <span>A matrícula deve começar com 3 ou 7</span>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500 mt-1">
+                        Digite sua matrícula para preencher os dados do seu cartão
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

@@ -48,6 +48,11 @@ const CardForm: React.FC<CardFormProps> = ({
     updatePreviewUrl("", "", matricula, null);
   }, [matricula]);
 
+  const isValidMatricula = (mat: string) => {
+    // Validate that matricula starts with 3 or 7
+    return mat.startsWith('3') || mat.startsWith('7');
+  };
+
   const updatePreviewUrl = (nome: string, nomeCompleto: string, matricula: string, fotoUrl: string | null) => {
     setIsPreviewLoading(true);
     const cardId = matricula.startsWith("3") ? "3" : "7";
@@ -109,6 +114,15 @@ const CardForm: React.FC<CardFormProps> = ({
       return;
     }
 
+    if (!isValidMatricula(matricula)) {
+      toast({
+        title: "Erro",
+        description: "A matrícula deve começar com 3 ou 7",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -154,9 +168,8 @@ const CardForm: React.FC<CardFormProps> = ({
         <div className="p-4 h-full flex items-center justify-center">
           <div className="w-full overflow-hidden rounded-xl shadow-lg relative" style={{ 
             aspectRatio: '1 / 1.6',
-            position: 'relative',
             maxWidth: isMobile ? '280px' : '320px',
-            height: 'auto'
+            margin: '0 auto'
           }}>
             {isPreviewLoading && (
               <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
@@ -165,12 +178,8 @@ const CardForm: React.FC<CardFormProps> = ({
             )}
             <iframe 
               src={previewUrl} 
+              className="absolute inset-0 w-full h-full border-0"
               style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
                 border: 'none',
                 transform: 'scale(1)',
                 transformOrigin: 'top left'
@@ -226,8 +235,11 @@ const CardForm: React.FC<CardFormProps> = ({
             <Input 
               value={matricula} 
               readOnly 
-              className="bg-gray-50 shadow-sm"
+              className={`bg-gray-50 shadow-sm ${!isValidMatricula(matricula) ? 'border-red-500' : ''}`}
             />
+            {!isValidMatricula(matricula) && (
+              <p className="text-sm text-red-500">A matrícula deve começar com 3 ou 7</p>
+            )}
           </div>
           
           <div className="space-y-2">
@@ -256,7 +268,7 @@ const CardForm: React.FC<CardFormProps> = ({
           <Button 
             onClick={handleSaveCard} 
             className="w-full h-12 bg-[#8cdcd8] hover:bg-[#7cc9c5] text-white shadow-md transition-all duration-200"
-            disabled={isSubmitting}
+            disabled={isSubmitting || !isValidMatricula(matricula)}
           >
             {isSubmitting ? (
               <div className="flex items-center">
