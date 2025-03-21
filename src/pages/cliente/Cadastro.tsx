@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -11,7 +12,13 @@ const Cadastro = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const isMobile = useIsMobile();
-  const [matricula, setMatricula] = useState("");
+  
+  const [usuarioDados, setUsuarioDados] = useState<{
+    matricula: string;
+    nomeAbreviado: string;
+    nomeCompleto: string;
+  } | null>(null);
+  
   const [foto, setFoto] = useState<File | null>(null);
   const [fotoUrl, setFotoUrl] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -27,12 +34,33 @@ const Cadastro = () => {
   const valorUnitario = 66.40;
   
   useEffect(() => {
-    const storedMatricula = localStorage.getItem("matricula");
-    if (!storedMatricula) {
+    // Recuperar dados do usuário do localStorage
+    const dadosUsuarioJSON = localStorage.getItem("usuarioDados");
+    
+    if (!dadosUsuarioJSON) {
+      toast({
+        title: "Sessão expirada",
+        description: "Por favor, faça login novamente",
+        variant: "destructive",
+      });
       navigate("/cliente/login");
       return;
     }
-    setMatricula(storedMatricula);
+    
+    try {
+      const dadosUsuario = JSON.parse(dadosUsuarioJSON);
+      setUsuarioDados(dadosUsuario);
+      setNomeAbreviado(dadosUsuario.nomeAbreviado);
+      setNomeCompleto(dadosUsuario.nomeCompleto);
+    } catch (error) {
+      console.error("Erro ao processar dados do usuário:", error);
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao carregar seus dados",
+        variant: "destructive",
+      });
+      navigate("/cliente/login");
+    }
     
     document.addEventListener('contextmenu', (e) => e.preventDefault());
     document.addEventListener('keydown', (e) => {
@@ -164,6 +192,17 @@ const Cadastro = () => {
     }
   };
   
+  if (!usuarioDados) {
+    return (
+      <div className="min-h-screen bg-amber-50 flex justify-center items-center">
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-4 border-[#8cdcd8] border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p>Carregando dados...</p>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="min-h-screen bg-amber-50 p-4 md:py-8">
       <div className="max-w-5xl mx-auto">
@@ -180,7 +219,9 @@ const Cadastro = () => {
             <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">Dados do Cartão</h2>
             
             <CardForm 
-              matricula={matricula}
+              matricula={usuarioDados.matricula}
+              nomeAbreviadoInicial={usuarioDados.nomeAbreviado}
+              nomeCompletoInicial={usuarioDados.nomeCompleto}
               onCardSaved={handleCardSaved}
             />
           </div>

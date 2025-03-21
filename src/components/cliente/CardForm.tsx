@@ -8,6 +8,8 @@ import { useToast } from "@/hooks/use-toast";
 
 interface CardFormProps {
   matricula: string;
+  nomeAbreviadoInicial?: string;
+  nomeCompletoInicial?: string;
   onCardSaved: (cardData: {
     nomeAbreviado: string;
     nomeCompleto: string;
@@ -17,16 +19,26 @@ interface CardFormProps {
   }) => void;
 }
 
-const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
+const CardForm: React.FC<CardFormProps> = ({ 
+  matricula, 
+  nomeAbreviadoInicial = "", 
+  nomeCompletoInicial = "", 
+  onCardSaved 
+}) => {
   const { toast } = useToast();
-  const [nomeAbreviado, setNomeAbreviado] = useState("");
-  const [nomeCompleto, setNomeCompleto] = useState("");
+  const [nomeAbreviado, setNomeAbreviado] = useState(nomeAbreviadoInicial);
+  const [nomeCompleto, setNomeCompleto] = useState(nomeCompletoInicial);
   const [foto, setFoto] = useState<File | null>(null);
   const [fotoUrl, setFotoUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // URL fixa para o modelo do cartão
   const previewUrl = "https://crachasrj.com/autismo/modelo-light-verde.php?first_name=JOAO&full_name=JOAO+SILVA&registration_number=12345&photo=https://www.psicologo.com.br/wp-content/uploads/sou-uma-pessoa-boa-ou-nao.jpg&id=7";
+
+  useEffect(() => {
+    setNomeAbreviado(nomeAbreviadoInicial);
+    setNomeCompleto(nomeCompletoInicial);
+  }, [nomeAbreviadoInicial, nomeCompletoInicial]);
 
   const handleUploadFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -73,15 +85,6 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
       // Por enquanto, apenas simularemos um atraso para mostrar o processo
       await new Promise(resolve => setTimeout(resolve, 500));
 
-      // Quando tivermos uma integração real com banco de dados:
-      // const formData = new FormData();
-      // formData.append('nomeAbreviado', nomeAbreviado);
-      // formData.append('nomeCompleto', nomeCompleto);
-      // formData.append('matricula', matricula);
-      // formData.append('foto', foto);
-      // const response = await fetch('/api/cartoes', { method: 'POST', body: formData });
-      // if (!response.ok) throw new Error('Falha ao salvar cartão');
-
       toast({
         title: "Sucesso",
         description: "Dados do cartão salvos com sucesso",
@@ -109,7 +112,7 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-      <div className="flex flex-col md:col-span-1 bg-gradient-to-b from-gray-50 to-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+      <div className="flex flex-col md:col-span-1 overflow-hidden">
         <div className="w-full p-4 bg-[#8cdcd8]/20 border-b border-[#8cdcd8]/30">
           <div className="flex items-center gap-2 mb-1">
             <CreditCard className="h-5 w-5 text-[#52aa85]" />
@@ -140,6 +143,7 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
               value={nomeAbreviado} 
               onChange={(e) => setNomeAbreviado(e.target.value)}
               className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all"
+              readOnly={!!nomeAbreviadoInicial}
             />
           </div>
           
@@ -153,6 +157,7 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
               value={nomeCompleto} 
               onChange={(e) => setNomeCompleto(e.target.value)}
               className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all"
+              readOnly={!!nomeCompletoInicial}
             />
           </div>
           

@@ -8,9 +8,10 @@ import { useToast } from "@/hooks/use-toast";
 
 interface LoginScreenProps {
   onLogin: (matricula: string) => void;
+  isLoading?: boolean;
 }
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
+const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, isLoading = false }) => {
   const [matricula, setMatricula] = useState("");
   const { toast } = useToast();
 
@@ -23,12 +24,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
       });
       return;
     }
-    
-    toast({
-      title: "Matrícula válida",
-      description: "Sua matrícula foi validada com sucesso",
-      className: "bg-[#8cdcd8]/20 border-[#8cdcd8]",
-    });
     
     onLogin(matricula);
   };
@@ -57,9 +52,22 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin }) => {
           <Button 
             onClick={handleConsultar} 
             className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white flex items-center justify-center gap-2 mb-6 shadow-md"
+            disabled={isLoading}
           >
-            <Search className="h-5 w-5" />
-            Consultar Matrícula
+            {isLoading ? (
+              <div className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Consultando...
+              </div>
+            ) : (
+              <>
+                <Search className="h-5 w-5" />
+                Consultar Matrícula
+              </>
+            )}
           </Button>
           
           <div className="bg-gray-100 p-4 rounded-lg text-gray-700 text-sm mb-8 w-full shadow-inner">
