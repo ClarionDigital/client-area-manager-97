@@ -49,6 +49,10 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({
         className: "bg-[#8cdcd8]/20 border-[#8cdcd8]",
       });
       
+      // Limpar os dados do localStorage após o pagamento
+      localStorage.removeItem("matricula");
+      localStorage.removeItem("clienteData");
+      
       setTimeout(() => {
         navigate("/");
       }, 3000);
