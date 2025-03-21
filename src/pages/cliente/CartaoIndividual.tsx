@@ -84,7 +84,7 @@ const CartaoIndividual = () => {
       
       toast({
         title: "Sucesso",
-        description: "Cartão enviado com sucesso!",
+        description: "Pedido enviado com sucesso!",
         className: "bg-[#8cdcd8]/20 border-[#8cdcd8]",
       });
     }, 1000);
@@ -108,9 +108,9 @@ const CartaoIndividual = () => {
                 <div className="w-16 h-16 bg-[#8cdcd8] rounded-full flex items-center justify-center mx-auto mb-6">
                   <Check className="h-8 w-8 text-white" />
                 </div>
-                <h2 className="text-2xl font-semibold text-gray-800 mb-3">Cartão Enviado com Sucesso!</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-3">Pedido Enviado com Sucesso!</h2>
                 <p className="text-gray-600 mb-6">
-                  Seu cartão foi enviado para validação e produção. Em breve você receberá mais informações.
+                  Seu pedido de cartão foi enviado para validação e produção. Em breve você receberá mais informações.
                 </p>
                 <Button 
                   className="bg-[#8cdcd8] hover:bg-[#7cc9c5] text-white"
@@ -127,7 +127,7 @@ const CartaoIndividual = () => {
             ) : found && funcionarioDados ? (
               <>
                 <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center w-full">
-                  Preencha os dados do seu Cartão
+                  Preenchimento Individual de Cartão
                 </h2>
                 
                 <CardForm 
@@ -137,6 +137,7 @@ const CartaoIndividual = () => {
                   fotoUrlInicial={funcionarioDados.foto || null}
                   previewUrlInicial=""
                   onCardSaved={handleCardSaved}
+                  saveButtonText="Enviar Pedido"
                 />
                 
                 <img 
@@ -150,7 +151,7 @@ const CartaoIndividual = () => {
             ) : (
               <div className="w-full max-w-md p-6 my-8">
                 <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center">
-                  Consulte sua Matrícula
+                  Preenchimento Individual de Cartão
                 </h2>
                 
                 <div className="space-y-4">
