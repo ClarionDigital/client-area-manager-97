@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ interface CardFormProps {
     nomeCompleto: string;
     foto: File | null;
     fotoUrl: string | null;
+    previewUrl: string;
   }) => void;
 }
 
@@ -23,6 +24,21 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
   const [foto, setFoto] = useState<File | null>(null);
   const [fotoUrl, setFotoUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+
+  // Atualiza a URL de visualização do cartão sempre que os dados mudarem
+  useEffect(() => {
+    if (nomeAbreviado && matricula) {
+      const firstName = nomeAbreviado.split(' ')[0] || nomeAbreviado;
+      const fullName = nomeCompleto || nomeAbreviado;
+      const photoParam = fotoUrl ? `&photo=${encodeURIComponent(fotoUrl)}` : '';
+      
+      // Substitua esta URL pela URL do seu serviço de geração de cartões
+      const url = `https://crachasrj.com/autismo/modelo-light-verde.php?first_name=${encodeURIComponent(firstName)}&full_name=${encodeURIComponent(fullName)}&registration_number=${encodeURIComponent(matricula)}${photoParam}&id=7`;
+      
+      setPreviewUrl(url);
+    }
+  }, [nomeAbreviado, nomeCompleto, matricula, fotoUrl]);
 
   const handleUploadFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -88,7 +104,8 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
         nomeAbreviado,
         nomeCompleto,
         foto,
-        fotoUrl
+        fotoUrl,
+        previewUrl
       });
     } catch (error) {
       console.error("Erro ao salvar cartão:", error);
@@ -105,33 +122,43 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
       <div className="flex flex-col items-center">
-        <div className="bg-blue-800 rounded-lg p-6 w-full h-72 relative flex flex-col justify-between shadow-lg">
-          <div className="absolute right-2 top-2">
+        {previewUrl ? (
+          <div className="w-full h-72 rounded-lg overflow-hidden shadow-lg">
             <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Light_Servi%C3%A7os_Eletricidade.svg/1200px-Light_Servi%C3%A7os_Eletricidade.svg.png" 
-              alt="Light Logo" 
-              className="w-20 h-auto bg-white p-1 rounded"
+              src={previewUrl} 
+              alt="Prévia do Cartão" 
+              className="w-full h-full object-contain"
             />
           </div>
+        ) : (
+          <div className="bg-blue-800 rounded-lg p-6 w-full h-72 relative flex flex-col justify-between shadow-lg">
+            <div className="absolute right-2 top-2">
+              <img 
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Light_Servi%C3%A7os_Eletricidade.svg/1200px-Light_Servi%C3%A7os_Eletricidade.svg.png" 
+                alt="Light Logo" 
+                className="w-20 h-auto bg-white p-1 rounded"
+              />
+            </div>
 
-          <div className="mt-16 flex items-center justify-center">
-            {fotoUrl ? (
-              <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md">
-                <img src={fotoUrl} alt="Foto do funcionário" className="w-full h-full object-cover" />
-              </div>
-            ) : (
-              <div className="w-24 h-24 rounded-full bg-gray-300 border-4 border-white flex items-center justify-center shadow-md">
-                <CreditCard className="w-12 h-12 text-gray-500" />
-              </div>
-            )}
-          </div>
+            <div className="mt-16 flex items-center justify-center">
+              {fotoUrl ? (
+                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md">
+                  <img src={fotoUrl} alt="Foto do funcionário" className="w-full h-full object-cover" />
+                </div>
+              ) : (
+                <div className="w-24 h-24 rounded-full bg-gray-300 border-4 border-white flex items-center justify-center shadow-md">
+                  <CreditCard className="w-12 h-12 text-gray-500" />
+                </div>
+              )}
+            </div>
 
-          <div className="text-white text-center mt-2">
-            <div className="text-lg font-bold">{nomeAbreviado || "NOME ABREVIADO"}</div>
-            <div className="text-sm mt-1">{matricula || "MATRÍCULA"}</div>
-            <div className="text-xs mt-1">LIGHT</div>
+            <div className="text-white text-center mt-2">
+              <div className="text-lg font-bold">{nomeAbreviado || "NOME ABREVIADO"}</div>
+              <div className="text-sm mt-1">{matricula || "MATRÍCULA"}</div>
+              <div className="text-xs mt-1">LIGHT</div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div className="md:col-span-2">

@@ -21,6 +21,7 @@ export interface Cartao {
   dataValidade?: string;
   status?: 'pendente' | 'aprovado' | 'rejeitado' | 'impresso';
   clienteId?: string;
+  previewUrl?: string; // URL para visualização do cartão
 }
 
 export interface Pedido {

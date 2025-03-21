@@ -21,6 +21,7 @@ const Cadastro = () => {
   const [email, setEmail] = useState("");
   const [telefone, setTelefone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState("");
   
   const valorUnitario = 66.40;
   
@@ -39,11 +40,13 @@ const Cadastro = () => {
     nomeCompleto: string;
     foto: File | null;
     fotoUrl: string | null;
+    previewUrl: string;
   }) => {
     setNomeAbreviado(cardData.nomeAbreviado);
     setNomeCompleto(cardData.nomeCompleto);
     setFoto(cardData.foto);
     setFotoUrl(cardData.fotoUrl);
+    setPreviewUrl(cardData.previewUrl);
     setCardSaved(true);
   };
   
@@ -116,6 +119,7 @@ const Cadastro = () => {
       //   valorTotal: quantity * valorUnitario,
       //   status: 'aguardando_pagamento',
       //   dataCriacao: new Date().toISOString(),
+      //   previewUrl: previewUrl,
       // };
       // const fotoData = new FormData();
       // if (foto) fotoData.append('foto', foto);
@@ -140,6 +144,7 @@ const Cadastro = () => {
         quantity,
         valorUnitario,
         nomeAbreviado,
+        previewUrl,
         // idPedido: 'temporario-' + Date.now(), // No futuro, virá do banco de dados
       };
       
