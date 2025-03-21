@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -210,7 +209,7 @@ const CardForm: React.FC<CardFormProps> = ({
           <p className="text-sm text-gray-600">Esta é uma pré-visualização digital ilustrativa de como ficará o seu cartão.</p>
         </div>
         <div className="p-4 h-full flex items-center justify-center">
-          {/* Card preview container with exact 292x451 dimensions */}
+          {/* Card preview container with fixed dimensions */}
           <div className="relative overflow-hidden rounded-xl shadow-lg" style={{ 
             width: '292px',
             height: '451px',
