@@ -176,10 +176,10 @@ const CardForm: React.FC<CardFormProps> = ({
           <p className="text-sm text-gray-600">Esta é uma pré-visualização digital ilustrativa de como ficará o seu cartão.</p>
         </div>
         <div className="p-4 h-full flex items-center justify-center">
-          {/* Card preview container with updated proportions for mobile */}
-          <div className="relative w-full overflow-hidden rounded-xl shadow-lg" style={{ 
-            aspectRatio: '9 / 16',
-            maxWidth: isMobile ? '220px' : '280px',
+          {/* Card preview container with fixed dimensions */}
+          <div className="relative overflow-hidden rounded-xl shadow-lg" style={{ 
+            width: '292px',
+            height: '451px',
             margin: '0 auto'
           }}>
             {isPreviewLoading && (
@@ -199,7 +199,9 @@ const CardForm: React.FC<CardFormProps> = ({
               className="absolute inset-0 w-full h-full border-0"
               style={{
                 border: 'none',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                width: '100%',
+                height: '100%'
               }}
               onLoad={handlePreviewLoad}
               frameBorder="0"
