@@ -1,4 +1,3 @@
-
 export interface CardData {
   id: number;
   nome: string;
@@ -7,6 +6,7 @@ export interface CardData {
   status: string;
   valor: string;
   tipo: string;
+  fotoUrl?: string;
 }
 
 export interface TransactionData {
