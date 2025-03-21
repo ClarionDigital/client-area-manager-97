@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Upload, Save, CreditCard, User, BadgeCheck, Camera, Type } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Progress } from "@/components/ui/progress";
 
 interface CardFormProps {
   matricula: string;
@@ -36,6 +38,8 @@ const CardForm: React.FC<CardFormProps> = ({
   const [fotoUrl, setFotoUrl] = useState<string | null>(fotoUrlInicial);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(previewUrlInicial);
+  const [previewLoading, setPreviewLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   
   useEffect(() => {
     setNomeAbreviado(nomeAbreviadoInicial);
@@ -50,10 +54,31 @@ const CardForm: React.FC<CardFormProps> = ({
     }
   }, [nomeAbreviadoInicial, nomeCompletoInicial, fotoUrlInicial, previewUrlInicial, matricula]);
 
+  useEffect(() => {
+    // Simulação de progresso de carregamento
+    if (previewLoading) {
+      const timer = setInterval(() => {
+        setLoadingProgress((oldProgress) => {
+          const newProgress = Math.min(oldProgress + 10, 100);
+          if (newProgress === 100) {
+            clearInterval(timer);
+          }
+          return newProgress;
+        });
+      }, 200);
+      
+      return () => {
+        clearInterval(timer);
+      };
+    }
+  }, [previewLoading]);
+
   const updatePreviewUrl = (nome: string, nomeCompleto: string, matricula: string, fotoUrl: string | null) => {
     const cardId = matricula.startsWith("3") ? "3" : "7";
     const url = `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(nome)}&nome_completo=${encodeURIComponent(nomeCompleto)}&matricula=${encodeURIComponent(matricula)}&foto=${fotoUrl ? encodeURIComponent(fotoUrl) : ""}&id=${cardId}`;
     setPreviewUrl(url);
+    setPreviewLoading(true); // Reinicia o carregamento quando a URL muda
+    setLoadingProgress(0);
   };
 
   const handleUploadFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,6 +154,11 @@ const CardForm: React.FC<CardFormProps> = ({
     }
   };
 
+  const handleIframeLoad = () => {
+    setPreviewLoading(false);
+    setLoadingProgress(100);
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
       <div className="flex flex-col md:col-span-1 overflow-hidden">
@@ -140,13 +170,24 @@ const CardForm: React.FC<CardFormProps> = ({
           <p className="text-sm text-gray-600">Esta é uma pré-visualização digital ilustrativa de como ficará o seu cartão.</p>
         </div>
         <div className="p-4 h-full flex items-center justify-center">
-          <iframe 
-            src={previewUrl} 
-            className="w-full h-[450px] border-none rounded-xl shadow-lg"
-            frameBorder="0"
-            scrolling="no"
-            title="Previsualização do Cartão"
-          />
+          <div className="w-full max-w-[280px] mx-auto relative rounded-xl shadow-lg overflow-hidden" style={{ height: "350px" }}>
+            {previewLoading && (
+              <div className="absolute inset-0 z-10 bg-white/90 flex flex-col items-center justify-center p-4">
+                <Skeleton className="w-full h-40 mb-4" />
+                <Progress value={loadingProgress} className="w-full mb-2" />
+                <p className="text-sm text-gray-500">Carregando cartão... {loadingProgress}%</p>
+              </div>
+            )}
+            <iframe 
+              src={previewUrl} 
+              className="w-full h-full border-none"
+              style={{ transform: "scale(0.9)", transformOrigin: "top center" }}
+              frameBorder="0"
+              scrolling="no"
+              title="Previsualização do Cartão"
+              onLoad={handleIframeLoad}
+            />
+          </div>
         </div>
       </div>
 
