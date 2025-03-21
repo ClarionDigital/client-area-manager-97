@@ -9,6 +9,7 @@ import CardList from "@/components/admin/CardList";
 import CardGrid from "@/components/admin/CardGrid";
 import CardDetail from "@/components/admin/CardDetail";
 import ExportButton from "@/components/admin/dashboard/ExportButton";
+import { generateCardPreviewUrl } from '@/utils/formatters';
 
 interface CardsTabProps {
   cards: CardData[];
@@ -44,9 +45,13 @@ const CardsTab: React.FC<CardsTabProps> = ({
   const cartoesFiltrados = filtrarCartoes();
   const cartaoSelecionado = visualizarId ? cards.find(cartao => cartao.id === visualizarId) : null;
 
+  // Generate the preview URL for the card
   const getCardPreviewUrl = (card: CardData) => {
+    // Extract first name from full name
+    const firstName = card.nome.split(' ')[0];
     const cardId = card.matricula.startsWith("3") ? "3" : "7";
-    return `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(card.nome.split(' ')[0])}&nome_completo=${encodeURIComponent(card.nome)}&matricula=${encodeURIComponent(card.matricula)}&foto=${card.fotoUrl ? encodeURIComponent(card.fotoUrl) : ""}&id=${cardId}`;
+    
+    return `https://areadocliente.alternativacard.com/up/card-light.php?nome=${encodeURIComponent(firstName)}&nome_completo=${encodeURIComponent(card.nome)}&matricula=${encodeURIComponent(card.matricula)}&foto=${card.fotoUrl ? encodeURIComponent(card.fotoUrl) : ""}&id=${cardId}`;
   };
 
   return (
@@ -86,19 +91,35 @@ const CardsTab: React.FC<CardsTabProps> = ({
       </div>
 
       <Dialog open={visualizarId !== null} onOpenChange={(open) => !open && setVisualizarId(null)}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle>Visualizar Cartão</DialogTitle>
           </DialogHeader>
           {cartaoSelecionado && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <CardDetail card={cartaoSelecionado} />
-              <div className="flex flex-col items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col space-y-4">
+                <div className={`${cartaoSelecionado.tipo === 'Light' ? 'bg-brand-primary' : 'bg-blue-600'} text-white text-center py-2 rounded-md font-bold`}>
+                  {cartaoSelecionado.tipo}
+                </div>
+                <div className="flex flex-col items-center border p-6 rounded-md shadow-sm">
+                  <div className="bg-gray-100 w-32 h-32 rounded-md flex items-center justify-center mb-4 overflow-hidden">
+                    {cartaoSelecionado.fotoUrl ? (
+                      <img src={cartaoSelecionado.fotoUrl} alt={cartaoSelecionado.nome} className="w-full h-full object-cover" />
+                    ) : (
+                      <ImagePlus className="h-12 w-12 text-gray-400" />
+                    )}
+                  </div>
+                  <h3 className="text-xl font-bold">{cartaoSelecionado.nome}</h3>
+                  <p className="text-gray-600">Matrícula: {cartaoSelecionado.matricula}</p>
+                </div>
+              </div>
+              
+              <div className="flex flex-col">
                 <h3 className="text-lg font-semibold mb-2">Prévia do Cartão</h3>
-                <div className="border rounded-md overflow-hidden w-full shadow-md">
+                <div className="border rounded-md overflow-hidden shadow-md mx-auto" style={{ width: '292px', height: '451px' }}>
                   <iframe 
                     src={getCardPreviewUrl(cartaoSelecionado)}
-                    className="w-full h-56 md:h-64"
+                    className="w-full h-full"
                     title="Prévia do Cartão"
                     sandbox="allow-scripts"
                   />
