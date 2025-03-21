@@ -109,19 +109,27 @@ const CardForm: React.FC<CardFormProps> = ({ matricula, onCardSaved }) => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
-      <div className="flex flex-col items-center md:col-span-1">
-        <div className="w-full mb-3 text-center">
-          <h3 className="text-lg font-semibold text-gray-800 mb-1">Pré-Visualização</h3>
+      <div className="flex flex-col md:col-span-1 bg-gradient-to-b from-gray-50 to-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+        <div className="w-full p-4 bg-[#8cdcd8]/20 border-b border-[#8cdcd8]/30">
+          <div className="flex items-center gap-2 mb-1">
+            <CreditCard className="h-5 w-5 text-[#52aa85]" />
+            <h3 className="text-lg font-semibold text-gray-800">Pré-Visualização</h3>
+          </div>
           <p className="text-sm text-gray-600">Esta é uma pré-visualização digital ilustrativa de como ficará o seu cartão.</p>
         </div>
-        <div className="w-full h-[450px] rounded-lg overflow-hidden shadow-lg mb-4 select-none">
-          <img 
-            src={previewUrl} 
-            alt="Modelo do Cartão" 
-            className="w-full h-full object-contain"
-            draggable="false"
-            onContextMenu={(e) => e.preventDefault()}
-          />
+        <div className="p-4 flex items-center justify-center">
+          <div className="w-full h-[450px] rounded-lg overflow-hidden bg-white select-none flex items-center justify-center p-2">
+            <img 
+              src={previewUrl} 
+              alt="Modelo do Cartão" 
+              className="w-full h-full object-contain shadow-lg"
+              draggable="false"
+              onContextMenu={(e) => e.preventDefault()}
+            />
+          </div>
+        </div>
+        <div className="px-4 pb-4 text-xs text-center text-gray-500 italic">
+          Obs: O cartão impresso poderá ter pequenas variações de cor em relação à visualização digital.
         </div>
       </div>
 
