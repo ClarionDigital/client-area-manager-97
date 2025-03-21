@@ -36,6 +36,38 @@ const mockPreenchidosPorLink = [
     empresa: "Conecta",
     dataPreenchimento: "05/05/2023",
     linkId: "CARTAO-INDIVIDUAL"
+  },
+  {
+    id: 3,
+    nome: "Pedro Santos",
+    primeiroNome: "Pedro",
+    matricula: "3789012",
+    tipo: "Light",
+    foto: false,
+    validade: "12/2024",
+    cargo: "Técnico",
+    setor: "Operações",
+    email: "pedro@example.com",
+    telefone: "(21) 95678-1234",
+    empresa: "Light",
+    dataPreenchimento: "10/05/2023",
+    linkId: "LINK-456"
+  },
+  {
+    id: 4,
+    nome: "Ana Souza",
+    primeiroNome: "Ana",
+    matricula: "7345678",
+    tipo: "Conecta",
+    foto: true,
+    validade: "12/2024",
+    cargo: "Coordenadora",
+    setor: "RH",
+    email: "ana@example.com",
+    telefone: "(21) 99876-5432",
+    empresa: "Conecta",
+    dataPreenchimento: "15/05/2023",
+    linkId: "CARTAO-INDIVIDUAL"
   }
 ];
 
@@ -46,8 +78,8 @@ const PreenchidosLinks: React.FC = () => {
   const handleDownloadPlanilha = () => {
     // Mock function to simulate downloading a spreadsheet
     toast({
-      title: "Spreadsheet Downloaded",
-      description: "The spreadsheet has been downloaded successfully.",
+      title: "Planilha Baixada",
+      description: "A planilha foi baixada com sucesso.",
     });
   };
 

@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Download, Search, Eye } from "lucide-react";
+import { Download, Search, Clipboard, Share2, QrCode } from "lucide-react";
 import AdminPagination from "@/components/admin/AdminPagination";
 import OrderSubmitButton from "@/components/admin/OrderSubmitButton";
 import { useToast } from "@/hooks/use-toast";
+import ShareLinkDialog from "@/components/admin/ShareLinkDialog";
 
 interface PreenchidosLinkUser {
   id: number;
@@ -40,6 +41,8 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
   const { toast } = useToast();
   const [linkSearch, setLinkSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<PreenchidosLinkUser | null>(null);
   
   const filteredLinkUsers = initialUsers.filter(user => 
     (linkSearch === "" || 
@@ -82,6 +85,11 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
     
     onDownload();
   };
+  
+  const handleShareLink = (user: PreenchidosLinkUser) => {
+    setSelectedUser(user);
+    setShareDialogOpen(true);
+  };
 
   return (
     <div className="space-y-6">
@@ -121,6 +129,7 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
               <TableHead>Foto</TableHead>
               <TableHead>Origem</TableHead>
               <TableHead>Data</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -156,11 +165,22 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
                     </span>
                   </TableCell>
                   <TableCell>{user.dataPreenchimento}</TableCell>
+                  <TableCell className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleShareLink(user)}
+                      className="h-8 px-2 text-gray-600 hover:text-gray-900"
+                    >
+                      <Share2 className="h-4 w-4" />
+                      <span className="sr-only">Compartilhar Link</span>
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-6 text-gray-500">
+                <TableCell colSpan={8} className="text-center py-6 text-gray-500">
                   Nenhum registro encontrado
                 </TableCell>
               </TableRow>
@@ -178,6 +198,15 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
       )}
       
       <OrderSubmitButton onClick={onSubmitOrder} />
+      
+      {selectedUser && (
+        <ShareLinkDialog
+          open={shareDialogOpen}
+          onOpenChange={setShareDialogOpen}
+          matricula={selectedUser.matricula}
+          nome={selectedUser.nome}
+        />
+      )}
     </div>
   );
 };
