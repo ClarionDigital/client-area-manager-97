@@ -2,7 +2,9 @@
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Send } from "lucide-react";
+import { Download, Search } from "lucide-react";
+import AdminPagination from "@/components/admin/AdminPagination";
+import OrderSubmitButton from "@/components/admin/OrderSubmitButton";
 
 interface PreenchidosLinkUser {
   id: number;
@@ -27,18 +29,51 @@ interface PreenchidosLinkTabProps {
   onSubmitOrder: () => void;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
   preenchidosPorLink: initialUsers,
   onDownload,
   onSubmitOrder
 }) => {
   const [linkSearch, setLinkSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   
   const filteredLinkUsers = initialUsers.filter(user => 
     (linkSearch === "" || 
       user.nome.toLowerCase().includes(linkSearch.toLowerCase()) || 
       (user.matricula && user.matricula.toLowerCase().includes(linkSearch.toLowerCase())))
   );
+
+  const totalPages = Math.ceil(filteredLinkUsers.length / ITEMS_PER_PAGE);
+  const indexOfLastItem = currentPage * ITEMS_PER_PAGE;
+  const indexOfFirstItem = indexOfLastItem - ITEMS_PER_PAGE;
+  const currentUsers = filteredLinkUsers.slice(indexOfFirstItem, indexOfLastItem);
+
+  const handleExportCSV = () => {
+    const header = "Nome,Nome Completo,Matrícula,Tipo,Email,Telefone,Empresa,Data Preenchimento,Validade";
+    
+    const csvData = filteredLinkUsers.map(user => {
+      return `${user.primeiroNome},${user.nome},${user.matricula},${user.tipo},${user.email},${user.telefone},${user.empresa},${user.dataPreenchimento},${user.validade}`;
+    }).join("\n");
+    
+    const csvContent = `${header}\n${csvData}`;
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `preenchidos-pelo-link-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    onDownload();
+  };
 
   return (
     <div className="space-y-6">
@@ -48,9 +83,11 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
         </h2>
         <Button
           variant="outline"
-          onClick={onDownload}
+          onClick={handleExportCSV}
+          className="flex items-center gap-2"
         >
-          Exportar Lista
+          <Download className="h-4 w-4" />
+          Exportar Lista Completa
         </Button>
       </div>
       
@@ -76,37 +113,43 @@ const PreenchidosLinkTab: React.FC<PreenchidosLinkTabProps> = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredLinkUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.primeiroNome}</TableCell>
-                <TableCell>{user.nome}</TableCell>
-                <TableCell>{user.matricula}</TableCell>
-                <TableCell>
-                  <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                    user.tipo === "Light" 
-                      ? "bg-green-50 text-green-700" 
-                      : "bg-blue-50 text-blue-700"
-                  }`}>
-                    {user.tipo}
-                  </span>
+            {currentUsers.length > 0 ? (
+              currentUsers.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.primeiroNome}</TableCell>
+                  <TableCell>{user.nome}</TableCell>
+                  <TableCell>{user.matricula}</TableCell>
+                  <TableCell>
+                    <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                      user.tipo === "Light" 
+                        ? "bg-green-50 text-green-700" 
+                        : "bg-blue-50 text-blue-700"
+                    }`}>
+                      {user.tipo}
+                    </span>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center py-6 text-gray-500">
+                  Nenhum registro encontrado
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </div>
       
-      <div className="flex justify-center mt-8">
-        <Button 
-          variant="orange" 
-          size="lg" 
-          onClick={onSubmitOrder}
-          className="px-8"
-        >
-          <Send className="mr-2 h-5 w-5" />
-          ENVIAR PEDIDO
-        </Button>
-      </div>
+      {totalPages > 1 && (
+        <AdminPagination 
+          currentPage={currentPage} 
+          totalPages={totalPages} 
+          onPageChange={setCurrentPage} 
+        />
+      )}
+      
+      <OrderSubmitButton onClick={onSubmitOrder} />
     </div>
   );
 };
