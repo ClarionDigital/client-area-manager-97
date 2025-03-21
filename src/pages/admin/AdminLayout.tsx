@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useIsSmallMobile, useIsMobile } from "@/hooks/use-mobile";
 import Logo from "@/components/Logo";
 import { useAuth } from "@/context/AuthContext";
-import { LogOut, Users } from "lucide-react";
+import { LogOut, Users, Database } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const AdminLayout: React.FC = () => {
@@ -70,7 +70,7 @@ const AdminLayout: React.FC = () => {
           </CardHeader>
           
           <CardContent className="p-6">
-            <div className="grid grid-cols-5 gap-2 mb-8 tabs-responsive w-full">
+            <div className="grid grid-cols-6 gap-2 mb-8 tabs-responsive w-full">
               <NavLink 
                 to="/admin/cartoes-gerados" 
                 className={`flex justify-center items-center px-3 py-2 rounded-md transition-colors ${
@@ -121,6 +121,17 @@ const AdminLayout: React.FC = () => {
               >
                 <Users className="h-4 w-4 mr-1" />
                 {getTabLabel("Usuários", "Users")}
+              </NavLink>
+              <NavLink 
+                to="/admin/integracoes" 
+                className={`flex justify-center items-center px-3 py-2 rounded-md transition-colors ${
+                  isActive('/integracoes') ? 
+                  'bg-background text-foreground shadow-sm' : 
+                  'bg-muted text-muted-foreground hover:bg-muted/80'
+                }`}
+              >
+                <Database className="h-4 w-4 mr-1" />
+                {getTabLabel("Integrações", "API")}
               </NavLink>
             </div>
             
