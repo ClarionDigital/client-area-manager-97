@@ -10,6 +10,7 @@ import Login from "./pages/cliente/Login";
 import Cadastro from "./pages/cliente/Cadastro";
 import Pagamento from "./pages/cliente/Pagamento";
 import ConfirmacaoPagamento from "./pages/cliente/ConfirmacaoPagamento";
+import CartaoIndividual from "./pages/cliente/CartaoIndividual";
 import AdminAltArea from "./pages/AdminAltArea";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "@/context/AuthContext";
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/cliente/cadastro" element={<Cadastro />} />
             <Route path="/cliente/pagamento" element={<Pagamento />} />
             <Route path="/cliente/confirmacao" element={<ConfirmacaoPagamento />} />
+            <Route path="/cartao-individual" element={<CartaoIndividual />} />
             
             {/* Admin-alt routes */}
             <Route path="/admin-alt" element={<AdminAltArea />} />
