@@ -79,7 +79,7 @@ const AdminAltLogin: React.FC = () => {
                 <Input 
                   id="email"
                   type="email" 
-                  placeholder="seu@email.com" 
+                  placeholder="contato@alternativacard.com" 
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 w-full h-12 text-base shadow-sm"

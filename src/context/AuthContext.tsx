@@ -33,7 +33,7 @@ const defaultUsers = [
 const defaultAltUsers = [
   {
     id: 1,
-    email: 'contato@alternativacad.com',
+    email: 'contato@alternativacard.com',
     password: 'admin',
     name: 'Administrador Alternativa',
     role: 'admin-alt',
