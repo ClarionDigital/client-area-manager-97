@@ -41,21 +41,18 @@ const PaymentScreen: React.FC<PaymentScreenProps> = ({
   const handleProcessPayment = () => {
     setOrderProcessing(true);
     
+    // Simular processamento de pagamento
     setTimeout(() => {
       setOrderProcessing(false);
+      
       toast({
-        title: "Pagamento realizado com sucesso!",
-        description: "Você receberá um e-mail e WhatsApp com a confirmação",
+        title: "Redirecionando para confirmação",
+        description: "Seu pagamento foi processado com sucesso!",
         className: "bg-[#8cdcd8]/20 border-[#8cdcd8]",
       });
       
-      // Limpar os dados do localStorage após o pagamento
-      localStorage.removeItem("matricula");
-      localStorage.removeItem("clienteData");
-      
-      setTimeout(() => {
-        navigate("/");
-      }, 3000);
+      // Redirecionar para a página de confirmação
+      navigate("/cliente/confirmacao");
     }, 2000);
   };
   

@@ -9,6 +9,7 @@ import ClienteArea from "./pages/ClienteArea";
 import Login from "./pages/cliente/Login";
 import Cadastro from "./pages/cliente/Cadastro";
 import Pagamento from "./pages/cliente/Pagamento";
+import ConfirmacaoPagamento from "./pages/cliente/ConfirmacaoPagamento";
 import AdminArea from "./pages/AdminArea";
 import AdminAltArea from "./pages/AdminAltArea";
 import NotFound from "./pages/NotFound";
@@ -29,6 +30,7 @@ const App = () => (
           <Route path="/cliente/login" element={<Login />} />
           <Route path="/cliente/cadastro" element={<Cadastro />} />
           <Route path="/cliente/pagamento" element={<Pagamento />} />
+          <Route path="/cliente/confirmacao" element={<ConfirmacaoPagamento />} />
           
           <Route path="/admin" element={<AdminArea />} />
           <Route path="/admin-alt" element={<AdminAltArea />} />
