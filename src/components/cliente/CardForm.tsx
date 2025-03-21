@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Upload, Save, CreditCard, User, BadgeCheck, Camera, Type, Send } from "lucide-react";
+import { Upload, Save, CreditCard, User, BadgeCheck, Camera, Type, Send, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -42,11 +42,21 @@ const CardForm: React.FC<CardFormProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState("");
   const [isPreviewLoading, setIsPreviewLoading] = useState(false);
+  const [nomeCompletoError, setNomeCompletoError] = useState(false);
+  
+  // Maximum character limit for nome completo
+  const MAX_NOME_COMPLETO_LENGTH = 23;
   
   useEffect(() => {
     // Initialize with initial values if provided
     if (nomeAbreviadoInicial) setNomeAbreviado(nomeAbreviadoInicial);
-    if (nomeCompletoInicial) setNomeCompleto(nomeCompletoInicial);
+    if (nomeCompletoInicial) {
+      setNomeCompleto(nomeCompletoInicial);
+      // Check if initial value already exceeds limit
+      if (nomeCompletoInicial.length > MAX_NOME_COMPLETO_LENGTH) {
+        setNomeCompletoError(true);
+      }
+    }
     if (fotoUrlInicial) setFotoUrl(fotoUrlInicial);
     
     // Set initial preview with placeholder values if fields are empty
@@ -96,6 +106,21 @@ const CardForm: React.FC<CardFormProps> = ({
     }
   };
   
+  const handleNomeCompletoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setNomeCompleto(value);
+    
+    // Validate name length and set error state
+    if (value.length > MAX_NOME_COMPLETO_LENGTH) {
+      setNomeCompletoError(true);
+    } else {
+      setNomeCompletoError(false);
+    }
+    
+    // Still update preview regardless of error
+    updatePreviewUrl(nomeAbreviado, value, matricula, fotoUrl);
+  };
+  
   const handleSaveCard = async () => {
     if (!nomeAbreviado.trim()) {
       toast({
@@ -110,6 +135,15 @@ const CardForm: React.FC<CardFormProps> = ({
       toast({
         title: "Erro",
         description: "Por favor preencha o Nome Completo",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (nomeCompletoError) {
+      toast({
+        title: "Erro",
+        description: "O nome completo deve ter no máximo 23 caracteres. Por favor, abrevie o nome.",
         variant: "destructive",
       });
       return;
@@ -238,12 +272,20 @@ const CardForm: React.FC<CardFormProps> = ({
             <Input 
               placeholder="Digite seu nome completo" 
               value={nomeCompleto} 
-              onChange={(e) => {
-                setNomeCompleto(e.target.value);
-                updatePreviewUrl(nomeAbreviado, e.target.value, matricula, fotoUrl);
-              }}
-              className="shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all"
+              onChange={handleNomeCompletoChange}
+              className={`shadow-sm focus:ring-2 focus:ring-[#8cdcd8]/50 transition-all ${nomeCompletoError ? 'border-red-500 focus:ring-red-200' : ''}`}
             />
+            {nomeCompletoError && (
+              <div className="flex items-center gap-1.5 text-sm text-red-500 mt-1">
+                <AlertCircle className="h-4 w-4" />
+                <span>O nome completo deve ter no máximo 23 caracteres. Por favor, abrevie o nome.</span>
+              </div>
+            )}
+            <div className="flex justify-end">
+              <span className={`text-xs ${nomeCompletoError ? 'text-red-500' : 'text-gray-500'}`}>
+                {nomeCompleto.length}/{MAX_NOME_COMPLETO_LENGTH} caracteres
+              </span>
+            </div>
           </div>
           
           <div className="space-y-2">
@@ -287,7 +329,7 @@ const CardForm: React.FC<CardFormProps> = ({
           <Button 
             onClick={handleSaveCard} 
             className="w-full h-12 bg-[#8cdcd8] hover:bg-[#7cc9c5] text-white shadow-md transition-all duration-200"
-            disabled={isSubmitting || !isValidMatricula(matricula)}
+            disabled={isSubmitting || !isValidMatricula(matricula) || nomeCompletoError}
           >
             {isSubmitting ? (
               <div className="flex items-center">
