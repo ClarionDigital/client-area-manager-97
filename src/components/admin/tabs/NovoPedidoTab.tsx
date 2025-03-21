@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -62,7 +61,6 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
     ));
   };
 
-  // Validation before submitting order
   const validateOrder = () => {
     const missingPhotos = novoPedido.filter(emp => !emp.foto);
     
@@ -85,9 +83,7 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
     }
   };
 
-  // Function to download the template file
   const handleDownloadTemplate = () => {
-    // Define the CSV content for the template - updated with only the required fields
     const header = "Nome,Nome Completo,Matrícula,Foto";
     const sampleData = [
       "João,João da Silva,3001234,",
@@ -97,10 +93,8 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
     
     const csvContent = `${header}\n${sampleData}`;
     
-    // Create a Blob with the CSV content
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     
-    // Create a download link and trigger the download
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     
@@ -112,7 +106,6 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
     link.click();
     document.body.removeChild(link);
     
-    // Call the original onDownloadTemplate for any additional logic
     onDownloadTemplate();
   };
 
@@ -145,8 +138,6 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
               <TableHead>Nome</TableHead>
               <TableHead>Nome Completo</TableHead>
               <TableHead>Matrícula</TableHead>
-              <TableHead>Cargo</TableHead>
-              <TableHead>Setor</TableHead>
               <TableHead>Foto</TableHead>
               <TableHead className="text-right">Ações</TableHead>
             </TableRow>
@@ -162,8 +153,6 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
                       {employee.matricula}
                     </span>
                   </TableCell>
-                  <TableCell>{employee.cargo}</TableCell>
-                  <TableCell>{employee.setor}</TableCell>
                   <TableCell>
                     {employee.foto ? (
                       <div className="flex items-center">
@@ -212,7 +201,7 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-6 text-gray-500">
+                <TableCell colSpan={5} className="text-center py-6 text-gray-500">
                   Nenhum funcionário adicionado. Importe uma planilha para começar.
                 </TableCell>
               </TableRow>
@@ -235,7 +224,6 @@ const NovoPedidoTab: React.FC<NovoPedidoTabProps> = ({
         </div>
       )}
 
-      {/* Photo Uploader Dialog */}
       {selectedEmployee && (
         <PhotoUploader
           open={photoDialogOpen}

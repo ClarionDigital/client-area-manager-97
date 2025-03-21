@@ -15,8 +15,6 @@ const NewEmployeeDialog: React.FC<NewEmployeeDialogProps> = ({
   const [newEmployee, setNewEmployee] = useState({
     nome: '',
     matricula: '',
-    cargo: '',
-    setor: '',
     validade: '12/2024',
   });
 
@@ -32,15 +30,15 @@ const NewEmployeeDialog: React.FC<NewEmployeeDialogProps> = ({
     onSave({
       ...newEmployee,
       tipo,
-      foto: false
+      foto: false,
+      cargo: '', // Keep empty string for backward compatibility
+      setor: '',  // Keep empty string for backward compatibility
     });
     
     // Reset form
     setNewEmployee({
       nome: '',
       matricula: '',
-      cargo: '',
-      setor: '',
       validade: '12/2024',
     });
     
@@ -83,30 +81,6 @@ const NewEmployeeDialog: React.FC<NewEmployeeDialogProps> = ({
             </p>
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="cargo">Cargo</Label>
-              <Input
-                id="cargo"
-                name="cargo"
-                value={newEmployee.cargo}
-                onChange={handleChange}
-                placeholder="Analista"
-              />
-            </div>
-            
-            <div className="grid gap-2">
-              <Label htmlFor="setor">Setor</Label>
-              <Input
-                id="setor"
-                name="setor"
-                value={newEmployee.setor}
-                onChange={handleChange}
-                placeholder="TI"
-              />
-            </div>
-          </div>
-          
           <div className="grid gap-2">
             <Label htmlFor="validade">Validade</Label>
             <Input
@@ -126,7 +100,7 @@ const NewEmployeeDialog: React.FC<NewEmployeeDialogProps> = ({
           <Button 
             onClick={handleSubmit} 
             className="bg-brand-primary hover:bg-brand-primaryDark"
-            disabled={!newEmployee.nome || !newEmployee.matricula || !newEmployee.cargo || !newEmployee.setor}
+            disabled={!newEmployee.nome || !newEmployee.matricula}
           >
             Adicionar
           </Button>
